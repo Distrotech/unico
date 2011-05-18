@@ -113,6 +113,7 @@ Makefile
 build/Makefile
 po/Makefile
 unico/Makefile
+tests/Makefile
 ])
 AC_OUTPUT
 
