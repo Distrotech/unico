@@ -26,6 +26,7 @@
 
 #include "unico.h"
 #include "unico-css-support.h"
+#include "unico-cairo-support.h"
 #include "unico-engine.h"
 #include "unico-types.h"
 
@@ -223,7 +224,7 @@ unico_engine_render_expander (GtkThemingEngine *engine,
 
   cairo_set_line_width (cr, 1);
 
-  unico_cairo_round_rect (cr, x + 0.5, y + 0.5, side, side, 2, 0, 0);
+  unico_cairo_round_rect (cr, x + 0.5, y + 0.5, side, side, 2, SIDE_ALL, 0);
   gdk_cairo_set_source_rgba (cr, &bg);
   cairo_fill_preserve (cr);
 
