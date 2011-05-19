@@ -1,0 +1,5 @@
+gtk3-engines-unico (0.1.0+r64-0ubuntu1) oneiric; urgency=low
+
+  * Initial packaging
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 19 May 2011 09:46:01 -0400
