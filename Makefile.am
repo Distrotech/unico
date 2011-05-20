@@ -5,7 +5,7 @@ SUBDIRS = \
 
 ACLOCAL_AMFLAGS = -I build
 
-EXTRA_DIST = autogen.sh COPYING RELEASE
+EXTRA_DIST = autogen.sh COPYING
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-scrollkeeper
 

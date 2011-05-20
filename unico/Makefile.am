@@ -2,6 +2,7 @@ source_h = \
 	$(srcdir)/unico.h \
 	$(srcdir)/unico-cairo-support.h \
 	$(srcdir)/unico-css-support.h \
+	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-draw.h \
 	$(srcdir)/unico-engine.h \
 	$(srcdir)/unico-types.h
