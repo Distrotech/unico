@@ -1,3 +1,10 @@
+gtk3-engines-unico (0.1.0+r66-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/control
+    - Updated Vcs-Bzr to point to the proper project
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 01 Jun 2011 13:28:13 -0400
+
 gtk3-engines-unico (0.1.0+r66-0ubuntu1) oneiric; urgency=low
 
   * New upstream snapshot.

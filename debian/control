@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 7.0.50~),
 Standards-Version: 3.9.1
 Section: x11
 Homepage: https://launchpad.net/unico
-Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gtk3-engines-unico/ubuntu
+Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/unico/ubuntu
 
 Package: gtk3-engines-unico
 Architecture: any
