@@ -1,3 +1,11 @@
+gtk3-engines-unico (0.1.0+r66-0ubuntu1) oneiric; urgency=low
+
+  * New upstream snapshot.
+    - Fix for a gnome-control-center crasher (LP: #789010)
+
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 01 Jun 2011 13:21:40 -0400
+
 gtk3-engines-unico (0.1.0+r64-0ubuntu1) oneiric; urgency=low
 
   * Initial packaging

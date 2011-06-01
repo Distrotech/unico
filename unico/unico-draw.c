@@ -327,9 +327,9 @@ unico_draw_icon_view (DRAW_ARGS)
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
-  unico_cairo_draw_frame_gap (engine, cr,
-                              x, y, width, height,
-                              0, gtk_theming_engine_get_junction_sides (engine));
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
 }
 
 static void
