@@ -551,8 +551,7 @@ unico_engine_render_slider (GtkThemingEngine *engine,
     }
   else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
     {
-      style_functions->draw_common_background (engine, cr, x, y, width, height);
-      style_functions->draw_common_frame (engine, cr, x, y, width, height);
+      style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
     }
   else
     {
