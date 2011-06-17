@@ -37,21 +37,27 @@ unico_draw_cell (DRAW_ARGS,
                  GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
+
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
+
+  hidden_side = SIDE_RIGHT;
 
   if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+    junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
+  if ((flags & GTK_REGION_LAST) != 0)
+    {
+      junction &= ~(GTK_JUNCTION_CORNER_TOPRIGHT | GTK_JUNCTION_CORNER_BOTTOMRIGHT);
+      hidden_side = 0;
+    }
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
-                               0, junction);
+                               hidden_side, junction);
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
-                          0, junction);
+                          hidden_side, junction);
 }
 
 static void
@@ -64,7 +70,7 @@ unico_draw_check (DRAW_ARGS)
   flags = gtk_theming_engine_get_state (engine);
 
   in_cell = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_CELL);
-  in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENU);
+  in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
   inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
   draw_bullet = (flags & GTK_STATE_FLAG_ACTIVE) != 0;
@@ -159,13 +165,9 @@ unico_draw_column_header_background (DRAW_ARGS,
                                      GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
 
-  if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_CORNER_BOTTOMLEFT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT | GTK_JUNCTION_CORNER_BOTTOMRIGHT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
@@ -177,17 +179,24 @@ unico_draw_column_header_frame (DRAW_ARGS,
                                 GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
+
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
+
+  hidden_side = SIDE_RIGHT | SIDE_TOP;
 
   if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_CORNER_BOTTOMLEFT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT | GTK_JUNCTION_CORNER_BOTTOMRIGHT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+    {
+      hidden_side |= SIDE_LEFT;
+    }
+  if ((flags & GTK_REGION_LAST) != 0)
+    {
+      hidden_side = SIDE_RIGHT | SIDE_TOP;
+    }
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
-                          0, junction);
+                          hidden_side, junction);
 }
 
 static void
@@ -239,7 +248,11 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   unico_get_line_width (engine, &line_width);
   unico_get_border_radius (engine, &radius);
-  border_width = 3 * cairo_get_line_width (cr);
+
+  border_width = cairo_get_line_width (cr);
+
+  if (unico_has_outer_stroke (engine))
+    border_width = 2 * cairo_get_line_width (cr);
 
   cairo_save (cr);
 
@@ -388,7 +401,7 @@ unico_draw_radio (DRAW_ARGS)
   flags = gtk_theming_engine_get_state (engine);
 
   in_cell = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_CELL);
-  in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENU);
+  in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
   inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
   draw_bullet = (flags & GTK_STATE_FLAG_ACTIVE) != 0;
@@ -487,6 +500,18 @@ unico_draw_scrollbar_slider (DRAW_ARGS)
 }
 
 static void
+unico_draw_scrolled_window_frame (DRAW_ARGS)
+{
+  gint radius;
+
+  unico_get_border_radius (engine, &radius);
+
+  unico_cairo_draw_border_rect (engine, cr,
+                                x, y, width, height,
+                                0, 0, gtk_theming_engine_get_junction_sides (engine));
+}
+
+static void
 unico_draw_separator (DRAW_ARGS)
 {
   GtkStateFlags flags;
@@ -500,9 +525,12 @@ unico_draw_separator (DRAW_ARGS)
    * but doesn't work for separator tool item. */
   if (width > height)
     {
-      cairo_move_to (cr, x, y + height / 2 + line_width / 2);
-      cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
-      unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
+      if (unico_has_inner_stroke (engine))
+        {
+          cairo_move_to (cr, x, y + height / 2 + line_width / 2);
+          cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
+          unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
+        }
 
       cairo_move_to (cr, x, y + height / 2 - line_width / 2);
       cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
@@ -510,9 +538,12 @@ unico_draw_separator (DRAW_ARGS)
     }
   else
     {  
-      cairo_move_to (cr, x + width / 2 + line_width / 2, y);
-      cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
-      unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
+      if (unico_has_inner_stroke (engine))
+        {
+          cairo_move_to (cr, x + width / 2 + line_width / 2, y);
+          cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
+          unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
+        }
 
       cairo_move_to (cr, x + width / 2 - line_width / 2, y);
       cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
@@ -584,17 +615,19 @@ unico_draw_slider_button (DRAW_ARGS,
                                            line_width / 2.0,
                                            width - line_width,
                                            height - line_width);
-
-  draw_slider_button_path (cr, line_width / 2.0 + offset + line_width,
-                               line_width / 2.0 + offset + line_width,
-                               width - line_width - offset * 2 - line_width * 2,
-                               height - line_width - offset * 2 - line_width * 2,
-                               radius - 1);
-  unico_cairo_draw_inner_stroke_from_path (engine, cr,
-                                           line_width / 2.0 + offset + line_width,
-                                           line_width / 2.0 + offset + line_width,
-                                           width - line_width - offset * 2 - line_width * 2,
-                                           height - line_width - offset * 2 - line_width * 2);
+  if (unico_has_inner_stroke (engine))
+    {
+      draw_slider_button_path (cr, line_width / 2.0 + offset + line_width,
+                                   line_width / 2.0 + offset + line_width,
+                                   width - line_width - offset * 2 - line_width * 2,
+                                   height - line_width - offset * 2 - line_width * 2,
+                                   radius - 1);
+      unico_cairo_draw_inner_stroke_from_path (engine, cr,
+                                               line_width / 2.0 + offset + line_width,
+                                               line_width / 2.0 + offset + line_width,
+                                               width - line_width - offset * 2 - line_width * 2,
+                                               height - line_width - offset * 2 - line_width * 2);
+    }
 
   draw_slider_button_path (cr, line_width / 2.0 + offset,
                                line_width / 2.0 + offset,
@@ -611,21 +644,33 @@ unico_draw_slider_button (DRAW_ARGS,
 }
 
 static void
+unico_draw_switch (DRAW_ARGS,
+                   GtkOrientation orientation)
+{
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
+}
+
+static void
 unico_draw_tab (DRAW_ARGS,
                 GtkPositionType gap_side)
 {
   GtkStateFlags flags;
   GtkJunctionSides junction = 0;
   gdouble line_width;
-  gdouble offset;
   guint hidden_side = 0;
+  gdouble offset = 0;
 
   flags = gtk_theming_engine_get_state (engine);
   unico_get_line_width (engine, &line_width);
 
   offset = 0;
-  if (unico_has_outer_stroke (engine) && (flags & GTK_STATE_FLAG_ACTIVE))
-    offset = line_width;
+  if (unico_has_outer_stroke (engine))
+    offset = line_width * 2;
 
   cairo_save (cr);
 
@@ -635,7 +680,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_LEFT;
       hidden_side = SIDE_LEFT;
 
-      x -= line_width * 2 + offset;
+      x -= offset;
 
       cairo_translate (cr, x + width, y);
       cairo_rotate (cr, G_PI / 2);
@@ -644,7 +689,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_RIGHT;
       hidden_side = SIDE_RIGHT;
 
-      width += line_width * 2 + offset;
+      width += offset;
 
       cairo_translate (cr, x, y + height);
       cairo_rotate (cr, - G_PI / 2);
@@ -653,7 +698,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_TOP;
       hidden_side = SIDE_TOP;
 
-      y -= line_width * 2 + offset;
+      y -= offset;
 
       cairo_translate (cr, x + width, y + height);
       cairo_rotate (cr, G_PI);
@@ -662,7 +707,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_BOTTOM;
       hidden_side = SIDE_BOTTOM;
 
-      height += line_width * 2 + offset;
+      height += offset;
 
       cairo_translate (cr, x, y);
       break;
@@ -706,7 +751,9 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_scrollbar_slider              = unico_draw_scrollbar_slider;
   functions->draw_scrollbar_stepper_background  = unico_draw_scrollbar_stepper_background;
   functions->draw_scrollbar_stepper_frame       = unico_draw_scrollbar_stepper_frame;
+  functions->draw_scrolled_window_frame         = unico_draw_scrolled_window_frame;
   functions->draw_separator                     = unico_draw_separator;
   functions->draw_slider_button                 = unico_draw_slider_button;
+  functions->draw_switch                        = unico_draw_switch;
   functions->draw_tab                           = unico_draw_tab;
 }
