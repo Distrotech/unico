@@ -49,10 +49,10 @@ typedef struct
 
 typedef enum
 {
-  UNICO_OUTER_STROKE_STYLE_CUSTOM = 0,
-  UNICO_OUTER_STROKE_STYLE_INSET = 1,
-  UNICO_OUTER_STROKE_STYLE_NONE = 2
-} UnicoOuterStrokeStyle;
+  UNICO_STROKE_STYLE_CUSTOM = 0,
+  UNICO_STROKE_STYLE_INSET = 1,
+  UNICO_STROKE_STYLE_NONE = 2
+} UnicoStrokeStyle;
 
 typedef enum
 {
@@ -111,7 +111,12 @@ struct _UnicoStyleFunctions
 
   void (*draw_scrollbar_stepper_frame) (DRAW_ARGS);
 
+  void (*draw_scrolled_window_frame) (DRAW_ARGS);
+
   void (*draw_separator) (DRAW_ARGS);
+
+  void (*draw_switch) (DRAW_ARGS,
+                       GtkOrientation orientation);
 
   void (*draw_slider_button) (DRAW_ARGS,
                               UnicoSliderParameters *slider);

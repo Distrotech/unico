@@ -324,6 +324,9 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
     style_functions->draw_menubaritem_frame (engine, cr, x, y, width, height);
+  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_FRAME) &&
+           gtk_widget_path_is_type (path, GTK_TYPE_SCROLLED_WINDOW))
+    style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_frame (engine, cr, x, y, width, height);
   else
@@ -488,52 +491,7 @@ unico_engine_render_layout (GtkThemingEngine *engine,
                             gdouble           y,
                             PangoLayout      *layout)
 {
-  GdkRGBA *color;
-  GtkStateFlags flags;
-
-  UNICO_CAIRO_INIT
-
-  cairo_translate (cr, x, y);
-
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "color", &color,
-                          NULL);
-
-  gdk_cairo_set_source_rgba (cr, color);
-
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_ACCELERATOR))
-    {
-      unico_cairo_set_source_color_with_alpha (cr, color, 0.6);
-    }
-
-  if (flags & GTK_STATE_FLAG_INSENSITIVE)
-    {
-      GdkRGBA *text_shadow_color;
-
-      gtk_theming_engine_get (engine, flags,
-                              "-unico-text-shadow-color", &text_shadow_color,
-                              NULL);
-
-      cairo_save (cr);
-
-      cairo_translate (cr, 1, 1);
-
-      if (text_shadow_color)
-        gdk_cairo_set_source_rgba (cr, text_shadow_color);
-      else
-        cairo_set_source_rgba (cr, 1, 1, 1, 0.6);
-
-      pango_cairo_show_layout (cr, layout);
-
-      cairo_restore (cr);
-
-      gdk_rgba_free (text_shadow_color);
-    }
-
-  pango_cairo_show_layout (cr, layout);
-
-  gdk_rgba_free (color);
+  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_layout (engine, cr, x, y, layout);
 }
 
 static void
@@ -580,15 +538,21 @@ unico_engine_render_slider (GtkThemingEngine *engine,
                             GtkOrientation    orientation)
 {
   UnicoStyleFunctions *style_functions;
+  const GtkWidgetPath *path;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+  path = gtk_theming_engine_get_path (engine);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SLIDER) &&
-      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
     {
       style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
+    }
+  else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
+    {
+      style_functions->draw_common_background (engine, cr, x, y, width, height);
+      style_functions->draw_common_frame (engine, cr, x, y, width, height);
     }
   else
     {
@@ -623,14 +587,14 @@ unico_engine_class_init (UnicoEngineClass *klass)
   engine_class->render_arrow       = unico_engine_render_arrow;
   engine_class->render_background  = unico_engine_render_background;
   engine_class->render_check       = unico_engine_render_check;
-  engine_class->render_expander    = unico_engine_render_expander;
+  //engine_class->render_expander    = unico_engine_render_expander;
   engine_class->render_extension   = unico_engine_render_extension;
   engine_class->render_focus       = unico_engine_render_focus;
   engine_class->render_frame       = unico_engine_render_frame;
   engine_class->render_frame_gap   = unico_engine_render_frame_gap;
   engine_class->render_handle      = unico_engine_render_handle;
   engine_class->render_icon_pixbuf = unico_engine_render_icon_pixbuf;
-  engine_class->render_layout      = unico_engine_render_layout;
+  //engine_class->render_layout      = unico_engine_render_layout;
   engine_class->render_line        = unico_engine_render_line;
   engine_class->render_option      = unico_engine_render_option;
   engine_class->render_slider      = unico_engine_render_slider;
@@ -672,6 +636,14 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_enum ("inner-stroke-style",
+                                                           "Inner stroke style",
+                                                           "Inner stroke style",
+                                                           UNICO_TYPE_STROKE_STYLE,
+                                                           UNICO_STROKE_STYLE_NONE,
+                                                           0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("outer-stroke-color",
                                                             "Outer stroke color",
                                                             "Outer stroke color",
@@ -687,8 +659,8 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                         g_param_spec_enum ("outer-stroke-style",
                                                            "Outer stroke style",
                                                            "Outer stroke style",
-                                                           UNICO_TYPE_OUTER_STROKE_STYLE,
-                                                           UNICO_OUTER_STROKE_STYLE_NONE,
+                                                           UNICO_TYPE_STROKE_STYLE,
+                                                           UNICO_STROKE_STYLE_NONE,
                                                            0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,

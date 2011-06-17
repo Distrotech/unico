@@ -64,15 +64,29 @@ unico_get_border_radius (GtkThemingEngine *engine,
 }
 
 gboolean
+unico_has_inner_stroke (GtkThemingEngine *engine)
+{
+  GtkStateFlags flags;
+  UnicoStrokeStyle inner_stroke_style;
+
+  flags = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get (engine, flags,
+                          "-unico-inner-stroke-style", &inner_stroke_style,
+                          NULL);
+
+  return inner_stroke_style != UNICO_STROKE_STYLE_NONE;
+}
+
+gboolean
 unico_has_outer_stroke (GtkThemingEngine *engine)
 {
   GtkStateFlags flags;
-  UnicoOuterStrokeStyle outer_stroke_style;
+  UnicoStrokeStyle outer_stroke_style;
 
   flags = gtk_theming_engine_get_state (engine);
   gtk_theming_engine_get (engine, flags,
                           "-unico-outer-stroke-style", &outer_stroke_style,
                           NULL);
 
-  return outer_stroke_style != UNICO_OUTER_STROKE_STYLE_NONE;
+  return outer_stroke_style != UNICO_STROKE_STYLE_NONE;
 }
