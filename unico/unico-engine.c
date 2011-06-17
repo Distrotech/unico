@@ -86,6 +86,34 @@ render_from_assets_common (GtkThemingEngine *engine,
   return retval;
 }
 
+static void
+trim_allocation_for_scale (GtkThemingEngine *engine,
+                           gdouble          *x,
+                           gdouble          *y,
+                           gdouble          *width,
+                           gdouble          *height)
+{
+  const GtkWidgetPath *path;
+
+  path = gtk_theming_engine_get_path (engine);
+
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
+      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH) ||
+       gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR)))
+    {
+      if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
+        {
+          *y += *height / 2.0 - 2.0;
+          *height = 4;
+        }
+      else
+        {
+          *x += *width / 2.0 - 2.0;
+          *width = 4;
+        }
+    }
+}
+
 
 static void
 unico_engine_render_activity (GtkThemingEngine *engine,
@@ -139,6 +167,8 @@ unico_engine_render_background (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
   len = gtk_widget_path_length (path);
+
+  trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
 /*  if ((gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR)) ||*/
 /*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TOOLBAR)) ||*/
@@ -299,6 +329,8 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
   len = gtk_widget_path_length (path);
+
+  trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
 /*  if ((gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR)) ||*/
 /*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TOOLBAR)) ||*/

@@ -37,21 +37,27 @@ unico_draw_cell (DRAW_ARGS,
                  GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
+
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
+
+  hidden_side = SIDE_RIGHT;
 
   if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+    junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
+  if ((flags & GTK_REGION_LAST) != 0)
+    {
+      junction &= ~(GTK_JUNCTION_CORNER_TOPRIGHT | GTK_JUNCTION_CORNER_BOTTOMRIGHT);
+      hidden_side = 0;
+    }
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
-                               0, junction);
+                               hidden_side, junction);
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
-                          0, junction);
+                          hidden_side, junction);
 }
 
 static void
@@ -159,13 +165,9 @@ unico_draw_column_header_background (DRAW_ARGS,
                                      GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
 
-  if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_CORNER_BOTTOMLEFT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT | GTK_JUNCTION_CORNER_BOTTOMRIGHT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
@@ -177,17 +179,24 @@ unico_draw_column_header_frame (DRAW_ARGS,
                                 GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
+  guint hidden_side;
+
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
+
+  hidden_side = SIDE_RIGHT | SIDE_TOP;
 
   if ((flags & GTK_REGION_FIRST) != 0)
-    junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_CORNER_BOTTOMLEFT;
-  else if ((flags & GTK_REGION_LAST) != 0)
-    junction = GTK_JUNCTION_LEFT | GTK_JUNCTION_CORNER_BOTTOMRIGHT;
-  else
-    junction = GTK_JUNCTION_TOP | GTK_JUNCTION_BOTTOM;
+    {
+      hidden_side |= SIDE_LEFT;
+    }
+  if ((flags & GTK_REGION_LAST) != 0)
+    {
+      hidden_side = SIDE_RIGHT | SIDE_TOP;
+    }
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
-                          0, junction);
+                          hidden_side, junction);
 }
 
 static void
@@ -239,7 +248,11 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   unico_get_line_width (engine, &line_width);
   unico_get_border_radius (engine, &radius);
-  border_width = 3 * cairo_get_line_width (cr);
+
+  border_width = cairo_get_line_width (cr);
+
+  if (unico_has_outer_stroke (engine))
+    border_width = 2 * cairo_get_line_width (cr);
 
   cairo_save (cr);
 
@@ -649,15 +662,15 @@ unico_draw_tab (DRAW_ARGS,
   GtkStateFlags flags;
   GtkJunctionSides junction = 0;
   gdouble line_width;
-  gdouble offset;
   guint hidden_side = 0;
+  gdouble offset = 0;
 
   flags = gtk_theming_engine_get_state (engine);
   unico_get_line_width (engine, &line_width);
 
   offset = 0;
-  if (unico_has_outer_stroke (engine) && (flags & GTK_STATE_FLAG_ACTIVE))
-    offset = line_width;
+  if (unico_has_outer_stroke (engine))
+    offset = line_width * 2;
 
   cairo_save (cr);
 
@@ -667,7 +680,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_LEFT;
       hidden_side = SIDE_LEFT;
 
-      x -= line_width * 2 + offset;
+      x -= offset;
 
       cairo_translate (cr, x + width, y);
       cairo_rotate (cr, G_PI / 2);
@@ -676,7 +689,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_RIGHT;
       hidden_side = SIDE_RIGHT;
 
-      width += line_width * 2 + offset;
+      width += offset;
 
       cairo_translate (cr, x, y + height);
       cairo_rotate (cr, - G_PI / 2);
@@ -685,7 +698,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_TOP;
       hidden_side = SIDE_TOP;
 
-      y -= line_width * 2 + offset;
+      y -= offset;
 
       cairo_translate (cr, x + width, y + height);
       cairo_rotate (cr, G_PI);
@@ -694,7 +707,7 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_BOTTOM;
       hidden_side = SIDE_BOTTOM;
 
-      height += line_width * 2 + offset;
+      height += offset;
 
       cairo_translate (cr, x, y);
       break;
