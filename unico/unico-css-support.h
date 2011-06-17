@@ -29,8 +29,8 @@
 
 G_BEGIN_DECLS
 
-GType unico_outer_stroke_style_get_type (void) G_GNUC_CONST;
-#define UNICO_TYPE_OUTER_STROKE_STYLE (unico_outer_stroke_style_get_type ())
+GType unico_stroke_style_get_type (void) G_GNUC_CONST;
+#define UNICO_TYPE_STROKE_STYLE (unico_stroke_style_get_type ())
 
 G_END_DECLS
 

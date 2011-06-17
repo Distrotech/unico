@@ -616,6 +616,7 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
 {
   GtkStateFlags flags;
   GdkRGBA *inner_stroke_color;
+  UnicoStrokeStyle inner_stroke_style;
   cairo_pattern_t *inner_stroke_pat;
   gdouble line_width;
 
@@ -623,6 +624,7 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
   gtk_theming_engine_get (engine, flags,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           "-unico-inner-stroke-gradient", &inner_stroke_pat,
+                          "-unico-inner-stroke-style", &inner_stroke_style,
                           NULL);
 
   cairo_save (cr);
@@ -631,7 +633,8 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
 
   line_width = cairo_get_line_width (cr);
 
-  if (inner_stroke_pat || inner_stroke_color)
+  if (inner_stroke_style != UNICO_STROKE_STYLE_NONE &&
+      (inner_stroke_pat || inner_stroke_color))
     {
       if (inner_stroke_pat)
         {
@@ -688,7 +691,7 @@ unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
 {
   GtkStateFlags flags;
   GdkRGBA *outer_stroke_color;
-  UnicoOuterStrokeStyle outer_stroke_style;
+  UnicoStrokeStyle outer_stroke_style;
   cairo_pattern_t *outer_stroke_pat;
   gdouble line_width;
 
@@ -705,7 +708,7 @@ unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
 
   line_width = cairo_get_line_width (cr);
 
-  if (outer_stroke_style != UNICO_OUTER_STROKE_STYLE_NONE &&
+  if (outer_stroke_style != UNICO_STROKE_STYLE_NONE &&
       (outer_stroke_pat || outer_stroke_color))
     {
       if (outer_stroke_pat)
@@ -756,10 +759,13 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
                                           radius + line_width, hidden_side, junction);
     }
 
-  unico_cairo_draw_inner_stroke_rect (engine, cr,
-                                      x + offset + line_width, y + offset + line_width,
-                                      width - offset * 2 - line_width * 2, height - offset * 2 - line_width * 2,
-                                      radius - line_width, hidden_side, junction);
+  if (unico_has_inner_stroke (engine))
+    {
+      unico_cairo_draw_inner_stroke_rect (engine, cr,
+                                          x + offset + line_width, y + offset + line_width,
+                                          width - offset * 2 - line_width * 2, height - offset * 2 - line_width * 2,
+                                          radius - line_width, hidden_side, junction);
+    }
 
   unico_cairo_draw_border_rect (engine, cr,
                                 x + offset, y + offset,
