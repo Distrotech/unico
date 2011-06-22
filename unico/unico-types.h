@@ -83,6 +83,8 @@ struct _UnicoStyleFunctions
 
   void (*draw_common_frame) (DRAW_ARGS);
 
+  void (*draw_focus) (DRAW_ARGS);
+
   void (*draw_frame_gap) (DRAW_ARGS,
                           GtkPositionType gap_side,
                           gdouble         xy0_gap,

@@ -25,6 +25,12 @@
 
 #include "unico-engine.h"
 
+G_MODULE_EXPORT void theme_init (GTypeModule *module);
+
+G_MODULE_EXPORT void theme_exit (void);
+
+G_MODULE_EXPORT GtkThemingEngine* create_engine (void);
+
 G_MODULE_EXPORT void 
 theme_init (GTypeModule *module)
 {

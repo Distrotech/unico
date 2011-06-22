@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 
 #include "unico-engine.h"
+#include "unico-support.h"
 #include "unico-types.h"
 
 void
@@ -61,20 +62,6 @@ unico_get_border_radius (GtkThemingEngine *engine,
   gtk_theming_engine_get (engine, flags,
                           "border-radius", radius,
                           NULL);
-}
-
-gboolean
-unico_has_inner_stroke (GtkThemingEngine *engine)
-{
-  GtkStateFlags flags;
-  UnicoStrokeStyle inner_stroke_style;
-
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "-unico-inner-stroke-style", &inner_stroke_style,
-                          NULL);
-
-  return inner_stroke_style != UNICO_STROKE_STYLE_NONE;
 }
 
 gboolean
