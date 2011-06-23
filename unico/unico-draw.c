@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include <cairo.h>
 
+#include "math.h"
 #include "unico-cairo-support.h"
 #include "unico-draw.h"
 #include "unico-support.h"
@@ -46,6 +47,11 @@ unico_draw_arrow (GtkThemingEngine *engine,
   gdouble size_reduction = 2;
 
   cairo_save (cr);
+
+  /* use floor function to adjust those doubles. */
+  y = floor (y) + 0.5;
+  x = floor (x) + 0.5;
+  size = floor (size);
 
   size -= size_reduction;
 
