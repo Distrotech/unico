@@ -231,7 +231,13 @@ unico_engine_render_expander (GtkThemingEngine *engine,
                               gdouble           width,
                               gdouble           height)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_expander (engine, cr, x, y, width, height);
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  style_functions->draw_expander (engine, cr, x, y, width, height);
 }
 
 static void

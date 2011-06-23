@@ -46,19 +46,22 @@ unico_draw_arrow (GtkThemingEngine *engine,
   GdkRGBA color;
   gdouble size_reduction = 2;
 
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_color (engine, state, &color);
+
   cairo_save (cr);
 
   /* use floor function to adjust those doubles. */
-  y = floor (y) + 0.5;
-  x = floor (x) + 0.5;
+  y = floor (y);
+  x = floor (x);
   size = floor (size);
 
   size -= size_reduction;
 
   cairo_translate (cr, size_reduction / 2, size_reduction / 2);
-  cairo_translate (cr, x + size / 2.0, y + size / 2.0);
+  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
   cairo_rotate (cr, angle - G_PI_2);
-  cairo_translate (cr, size / 4.0, 0);
+  cairo_translate (cr, (gint) (size / 4.0), 0);
 
   /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
    * I know it's not nice at all, but it fix a visual bug. */
@@ -66,9 +69,6 @@ unico_draw_arrow (GtkThemingEngine *engine,
   cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
   cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
   cairo_close_path (cr);
-
-  state = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get_color (engine, state, &color);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
   cairo_fill_preserve (cr);
@@ -272,6 +272,44 @@ unico_draw_common_frame (DRAW_ARGS)
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, gtk_theming_engine_get_junction_sides (engine));
+}
+
+static void
+unico_draw_expander (DRAW_ARGS)
+{
+  GtkStateFlags state;
+  GdkRGBA color;
+  gdouble size;
+  gdouble angle = G_PI_2;
+
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_color (engine, state, &color);
+
+  cairo_save (cr);
+
+  size = floor (MIN (width, height));
+
+  if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
+    angle = 0;
+
+  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_rotate (cr, angle);
+  cairo_translate (cr, (gint) (size / 4.0), 0);
+
+  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug. */
+  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
+  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
+  cairo_fill_preserve (cr);
+
+  gdk_cairo_set_source_rgba (cr, &color);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
 }
 
 static void
@@ -821,6 +859,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_combo_button_frame            = unico_draw_combo_button_frame;
   functions->draw_common_background             = unico_draw_common_background;
   functions->draw_common_frame                  = unico_draw_common_frame;
+  functions->draw_expander                      = unico_draw_expander;
   functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
   functions->draw_icon_view                     = unico_draw_icon_view;
