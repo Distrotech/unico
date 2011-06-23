@@ -147,7 +147,13 @@ unico_engine_render_arrow (GtkThemingEngine *engine,
                            gdouble           y,
                            gdouble           size)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_arrow (engine, cr, angle, x, y, size);
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  style_functions->draw_arrow (engine, cr, angle, x, y, size);
 }
 
 static void
@@ -171,16 +177,6 @@ unico_engine_render_background (GtkThemingEngine *engine,
 
   trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
-/*  if ((gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TOOLBAR)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_ENTRY) &&*/
-/*       !gtk_widget_path_has_parent (path, GTK_TYPE_TREE_VIEW)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENU)))*/
-/*    style_functions->draw_common_background (engine, cr, x, y, width, height);*/
-/*  else */
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
       gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
     style_functions->draw_column_header_background (engine, cr, x, y, width, height, flags);    
@@ -297,16 +293,6 @@ unico_engine_render_frame (GtkThemingEngine *engine,
 
   trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
-/*  if ((gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TOOLBAR)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_ENTRY) &&*/
-/*       !gtk_widget_path_has_parent (path, GTK_TYPE_TREE_VIEW)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM)) ||*/
-/*      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENU)))*/
-/*    style_functions->draw_common_frame (engine, cr, x, y, width, height);*/
-/*  else*/
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
       gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
     style_functions->draw_column_header_frame (engine, cr, x, y, width, height, flags);    

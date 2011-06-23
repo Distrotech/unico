@@ -64,6 +64,13 @@ typedef struct _UnicoStyleFunctions UnicoStyleFunctions;
 
 struct _UnicoStyleFunctions
 {
+  void (*draw_arrow) (GtkThemingEngine *engine,
+                      cairo_t          *cr,
+                      gdouble           angle,
+                      gdouble           x,
+                      gdouble           y,
+                      gdouble           size);
+
   void (*draw_cell) (DRAW_ARGS,
                      GtkRegionFlags flags);
 

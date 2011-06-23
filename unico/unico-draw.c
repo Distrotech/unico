@@ -34,6 +34,46 @@
                                              (rect).height = (_h);
 
 static void
+unico_draw_arrow (GtkThemingEngine *engine,
+                  cairo_t          *cr,
+                  gdouble           angle,
+                  gdouble           x,
+                  gdouble           y,
+                  gdouble           size)
+{
+  GtkStateFlags state;
+  GdkRGBA color;
+  gdouble size_reduction = 2;
+
+  cairo_save (cr);
+
+  size -= size_reduction;
+
+  cairo_translate (cr, size_reduction / 2, size_reduction / 2);
+  cairo_translate (cr, x + size / 2.0, y + size / 2.0);
+  cairo_rotate (cr, angle - G_PI_2);
+  cairo_translate (cr, size / 4.0, 0);
+
+  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug. */
+  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
+  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_close_path (cr);
+
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_color (engine, state, &color);
+
+  cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
+  cairo_fill_preserve (cr);
+
+  gdk_cairo_set_source_rgba (cr, &color);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
+}
+
+static void
 unico_draw_cell (DRAW_ARGS,
                  GtkRegionFlags flags)
 {
@@ -766,6 +806,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
 {
   g_assert (functions);
 
+  functions->draw_arrow                         = unico_draw_arrow;
   functions->draw_cell                          = unico_draw_cell;
   functions->draw_check                         = unico_draw_check;
   functions->draw_column_header_background      = unico_draw_column_header_background;
