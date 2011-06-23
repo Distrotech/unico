@@ -289,6 +289,9 @@ unico_draw_expander (DRAW_ARGS)
 
   size = floor (MIN (width, height));
 
+  x += width / 2 - size / 2;
+  y += height / 2 - size / 2;
+
   if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
     angle = 0;
 
