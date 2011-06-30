@@ -1,3 +1,11 @@
+gtk3-engines-unico (0.1.0+r74-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+  * debian/control
+    - bump build depends for libgtk-3-dev >= 3.1.6
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 30 Jun 2011 10:51:38 +0100
+
 gtk3-engines-unico (0.1.0+r69-0ubuntu1) oneiric; urgency=low
 
   * New upstream snapshot.

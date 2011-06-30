@@ -23,14 +23,61 @@
 #include <gtk/gtk.h>
 #include <cairo.h>
 
+#include "math.h"
 #include "unico-cairo-support.h"
 #include "unico-draw.h"
+#include "unico-support.h"
 #include "unico-types.h"
 
 #define UNICO_RECT_SET(rect, _x, _y, _w, _h) (rect).x      = (_x); \
                                              (rect).y      = (_y); \
                                              (rect).width  = (_w); \
                                              (rect).height = (_h);
+
+static void
+unico_draw_arrow (GtkThemingEngine *engine,
+                  cairo_t          *cr,
+                  gdouble           angle,
+                  gdouble           x,
+                  gdouble           y,
+                  gdouble           size)
+{
+  GtkStateFlags state;
+  GdkRGBA color;
+  gdouble size_reduction = 2;
+
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_color (engine, state, &color);
+
+  cairo_save (cr);
+
+  /* use floor function to adjust those doubles. */
+  y = floor (y);
+  x = floor (x);
+  size = floor (size);
+
+  size -= size_reduction;
+
+  cairo_translate (cr, size_reduction / 2, size_reduction / 2);
+  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_rotate (cr, angle - G_PI_2);
+  cairo_translate (cr, (gint) (size / 4.0), 0);
+
+  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug. */
+  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
+  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
+  cairo_fill_preserve (cr);
+
+  gdk_cairo_set_source_rgba (cr, &color);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
+}
 
 static void
 unico_draw_cell (DRAW_ARGS,
@@ -64,12 +111,11 @@ static void
 unico_draw_check (DRAW_ARGS)
 {
   GtkStateFlags flags;
-  gboolean in_cell, in_menu;
+  gboolean in_menu;
   gboolean draw_bullet, inconsistent;
 
   flags = gtk_theming_engine_get_state (engine);
 
-  in_cell = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_CELL);
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
   inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
@@ -165,7 +211,6 @@ unico_draw_column_header_background (DRAW_ARGS,
                                      GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
-  guint hidden_side;
 
   junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
 
@@ -230,19 +275,106 @@ unico_draw_common_frame (DRAW_ARGS)
 }
 
 static void
+unico_draw_expander (DRAW_ARGS)
+{
+  GtkStateFlags state;
+  GdkRGBA color;
+  gdouble size;
+  gdouble angle = G_PI_2;
+
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_color (engine, state, &color);
+
+  cairo_save (cr);
+
+  size = floor (MIN (width, height));
+
+  x += width / 2 - size / 2;
+  y += height / 2 - size / 2;
+
+  if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
+    angle = 0;
+
+  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_rotate (cr, angle);
+  cairo_translate (cr, (gint) (size / 4.0), 0);
+
+  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug. */
+  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
+  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
+  cairo_fill_preserve (cr);
+
+  gdk_cairo_set_source_rgba (cr, &color);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
+}
+
+static void
+unico_draw_focus (DRAW_ARGS)
+{
+  GdkRGBA *fill_color, *border_color, *outer_stroke_color;
+  GtkStateFlags state;
+  gint line_width;
+  gint radius;
+
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get (engine, state,
+                          "-unico-focus-border-color", &border_color,
+                          "-unico-focus-border-radius", &radius,
+                          "-unico-focus-fill-color", &fill_color,
+                          "-unico-focus-outer-stroke-color", &outer_stroke_color,
+                          NULL);
+
+  gtk_theming_engine_get_style (engine,
+                                "focus-line-width", &line_width,
+                                NULL);  
+
+  cairo_save (cr);
+  cairo_set_line_width (cr, line_width);
+
+  unico_cairo_round_rect (cr, x, y,
+                              width, height,
+                              radius, SIDE_ALL, GTK_JUNCTION_NONE);
+  gdk_cairo_set_source_rgba (cr, fill_color);
+  cairo_fill (cr);
+
+  unico_cairo_round_rect_inner (cr, x - line_width, y - line_width,
+                                    width + line_width * 2, height + line_width * 2,
+                                    radius + 1, SIDE_ALL, GTK_JUNCTION_NONE);
+  gdk_cairo_set_source_rgba (cr, outer_stroke_color);
+  cairo_stroke (cr);
+
+  unico_cairo_round_rect_inner (cr, x, y,
+                                    width, height,
+                                    radius, SIDE_ALL, GTK_JUNCTION_NONE);
+  gdk_cairo_set_source_rgba (cr, border_color);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
+
+  gdk_rgba_free (border_color);
+  gdk_rgba_free (fill_color);
+  gdk_rgba_free (outer_stroke_color);
+}
+
+static void
 unico_draw_frame_gap (DRAW_ARGS,
                       GtkPositionType gap_side,
                       gdouble         xy0_gap,
                       gdouble         xy1_gap)
 {
   GtkJunctionSides junction;
-  GtkStateFlags flags;
   gint border_width, radius;
   gdouble x0, y0, x1, y1, xc, yc, wc, hc;
   gdouble line_width;
 
   xc = yc = wc = hc = 0;
-  flags = gtk_theming_engine_get_state (engine);
 
   junction = gtk_theming_engine_get_junction_sides (engine);
 
@@ -271,6 +403,7 @@ unico_draw_frame_gap (DRAW_ARGS,
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
 
       break;
+    default:
     case GTK_POS_BOTTOM:
       xc = x + xy0_gap + border_width;
       yc = y + height - border_width;
@@ -395,12 +528,11 @@ static void
 unico_draw_radio (DRAW_ARGS)
 {
   GtkStateFlags flags;
-  gboolean in_cell, in_menu;
+  gboolean in_menu;
   gboolean draw_bullet, inconsistent;
 
   flags = gtk_theming_engine_get_state (engine);
 
-  in_cell = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_CELL);
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
   inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
@@ -514,10 +646,8 @@ unico_draw_scrolled_window_frame (DRAW_ARGS)
 static void
 unico_draw_separator (DRAW_ARGS)
 {
-  GtkStateFlags flags;
   gdouble line_width;
 
-  flags = gtk_theming_engine_get_state (engine);
   unico_get_line_width (engine, &line_width);
 
   /* FIXME right code should be
@@ -525,25 +655,19 @@ unico_draw_separator (DRAW_ARGS)
    * but doesn't work for separator tool item. */
   if (width > height)
     {
-      if (unico_has_inner_stroke (engine))
-        {
-          cairo_move_to (cr, x, y + height / 2 + line_width / 2);
-          cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
-          unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
-        }
+      cairo_move_to (cr, x, y + height / 2 + line_width / 2);
+      cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
+      unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
 
       cairo_move_to (cr, x, y + height / 2 - line_width / 2);
       cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
       unico_cairo_draw_border_from_path (engine, cr, x, y + height / 2 - line_width / 2, width, line_width);
     }
   else
-    {  
-      if (unico_has_inner_stroke (engine))
-        {
-          cairo_move_to (cr, x + width / 2 + line_width / 2, y);
-          cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
-          unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
-        }
+    {
+      cairo_move_to (cr, x + width / 2 + line_width / 2, y);
+      cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
+      unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
 
       cairo_move_to (cr, x + width / 2 - line_width / 2, y);
       cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
@@ -615,19 +739,17 @@ unico_draw_slider_button (DRAW_ARGS,
                                            line_width / 2.0,
                                            width - line_width,
                                            height - line_width);
-  if (unico_has_inner_stroke (engine))
-    {
-      draw_slider_button_path (cr, line_width / 2.0 + offset + line_width,
-                                   line_width / 2.0 + offset + line_width,
-                                   width - line_width - offset * 2 - line_width * 2,
-                                   height - line_width - offset * 2 - line_width * 2,
-                                   radius - 1);
-      unico_cairo_draw_inner_stroke_from_path (engine, cr,
-                                               line_width / 2.0 + offset + line_width,
-                                               line_width / 2.0 + offset + line_width,
-                                               width - line_width - offset * 2 - line_width * 2,
-                                               height - line_width - offset * 2 - line_width * 2);
-    }
+
+  draw_slider_button_path (cr, line_width / 2.0 + offset + line_width,
+                               line_width / 2.0 + offset + line_width,
+                               width - line_width - offset * 2 - line_width * 2,
+                               height - line_width - offset * 2 - line_width * 2,
+                               radius - 1);
+  unico_cairo_draw_inner_stroke_from_path (engine, cr,
+                                           line_width / 2.0 + offset + line_width,
+                                           line_width / 2.0 + offset + line_width,
+                                           width - line_width - offset * 2 - line_width * 2,
+                                           height - line_width - offset * 2 - line_width * 2);
 
   draw_slider_button_path (cr, line_width / 2.0 + offset,
                                line_width / 2.0 + offset,
@@ -659,13 +781,11 @@ static void
 unico_draw_tab (DRAW_ARGS,
                 GtkPositionType gap_side)
 {
-  GtkStateFlags flags;
   GtkJunctionSides junction = 0;
   gdouble line_width;
   guint hidden_side = 0;
   gdouble offset = 0;
 
-  flags = gtk_theming_engine_get_state (engine);
   unico_get_line_width (engine, &line_width);
 
   offset = 0;
@@ -676,6 +796,24 @@ unico_draw_tab (DRAW_ARGS,
 
   switch (gap_side)
   {
+    case GTK_POS_TOP:
+      junction = GTK_JUNCTION_TOP;
+      hidden_side = SIDE_TOP;
+
+      y -= offset;
+
+      cairo_translate (cr, x + width, y + height);
+      cairo_rotate (cr, G_PI);
+      break;
+    default:
+    case GTK_POS_BOTTOM:
+      junction = GTK_JUNCTION_BOTTOM;
+      hidden_side = SIDE_BOTTOM;
+
+      height += offset;
+
+      cairo_translate (cr, x, y);
+      break;
     case GTK_POS_LEFT:
       junction = GTK_JUNCTION_LEFT;
       hidden_side = SIDE_LEFT;
@@ -693,23 +831,6 @@ unico_draw_tab (DRAW_ARGS,
 
       cairo_translate (cr, x, y + height);
       cairo_rotate (cr, - G_PI / 2);
-      break;
-    case GTK_POS_TOP:
-      junction = GTK_JUNCTION_TOP;
-      hidden_side = SIDE_TOP;
-
-      y -= offset;
-
-      cairo_translate (cr, x + width, y + height);
-      cairo_rotate (cr, G_PI);
-      break;
-    case GTK_POS_BOTTOM:
-      junction = GTK_JUNCTION_BOTTOM;
-      hidden_side = SIDE_BOTTOM;
-
-      height += offset;
-
-      cairo_translate (cr, x, y);
       break;
   }
 
@@ -732,6 +853,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
 {
   g_assert (functions);
 
+  functions->draw_arrow                         = unico_draw_arrow;
   functions->draw_cell                          = unico_draw_cell;
   functions->draw_check                         = unico_draw_check;
   functions->draw_column_header_background      = unico_draw_column_header_background;
@@ -740,6 +862,8 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_combo_button_frame            = unico_draw_combo_button_frame;
   functions->draw_common_background             = unico_draw_common_background;
   functions->draw_common_frame                  = unico_draw_common_frame;
+  functions->draw_expander                      = unico_draw_expander;
+  functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
   functions->draw_icon_view                     = unico_draw_icon_view;
   functions->draw_menubaritem_background        = unico_draw_menubaritem_background;

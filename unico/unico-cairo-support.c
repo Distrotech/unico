@@ -167,7 +167,7 @@ unico_cairo_draw_background_from_path (GtkThemingEngine *engine,
               gdouble offset1, red1, green1, blue1, alpha1;
               gdouble x00, x01, y00, y01, x10, x11, y10, y11;
               gdouble r00, r01, r10, r11;
-              guint i;
+              gint i;
 
               if (type == CAIRO_PATTERN_TYPE_LINEAR)
                 {
@@ -435,7 +435,7 @@ unico_cairo_draw_border_from_path (GtkThemingEngine *engine,
               gdouble offset1, red1, green1, blue1, alpha1;
               gdouble x00, x01, y00, y01, x10, x11, y10, y11;
               gdouble r00, r01, r10, r11;
-              guint i;
+              gint i;
 
               if (type == CAIRO_PATTERN_TYPE_LINEAR)
                 {
@@ -562,6 +562,7 @@ unico_cairo_draw_border_from_path (GtkThemingEngine *engine,
 
   switch (border_style)
   {
+    default:
     case GTK_BORDER_STYLE_NONE:
       break;
     /* FIXME Need to implement those two styles. */
@@ -616,7 +617,6 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
 {
   GtkStateFlags flags;
   GdkRGBA *inner_stroke_color;
-  UnicoStrokeStyle inner_stroke_style;
   cairo_pattern_t *inner_stroke_pat;
   gdouble line_width;
 
@@ -624,7 +624,6 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
   gtk_theming_engine_get (engine, flags,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           "-unico-inner-stroke-gradient", &inner_stroke_pat,
-                          "-unico-inner-stroke-style", &inner_stroke_style,
                           NULL);
 
   cairo_save (cr);
@@ -633,27 +632,22 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
 
   line_width = cairo_get_line_width (cr);
 
-  if (inner_stroke_style != UNICO_STROKE_STYLE_NONE &&
-      (inner_stroke_pat || inner_stroke_color))
+  if (inner_stroke_pat)
     {
-      if (inner_stroke_pat)
-        {
-          unico_cairo_style_pattern_set_matrix (inner_stroke_pat, width - line_width, height - line_width);
-          cairo_set_source (cr, inner_stroke_pat);
-        }
-      else
-        gdk_cairo_set_source_rgba (cr, inner_stroke_color);
-
-      cairo_stroke (cr);
+      unico_cairo_style_pattern_set_matrix (inner_stroke_pat, width - line_width, height - line_width);
+      cairo_set_source (cr, inner_stroke_pat);
     }
+  else
+    gdk_cairo_set_source_rgba (cr, inner_stroke_color);
+
+  cairo_stroke (cr);
 
   cairo_restore (cr);
 
   if (inner_stroke_pat != NULL)
     cairo_pattern_destroy (inner_stroke_pat);
 
-  if (inner_stroke_color != NULL)
-    gdk_rgba_free (inner_stroke_color);
+  gdk_rgba_free (inner_stroke_color);
 }
 
 void
@@ -708,8 +702,7 @@ unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
 
   line_width = cairo_get_line_width (cr);
 
-  if (outer_stroke_style != UNICO_STROKE_STYLE_NONE &&
-      (outer_stroke_pat || outer_stroke_color))
+  if (outer_stroke_style != UNICO_STROKE_STYLE_NONE)
     {
       if (outer_stroke_pat)
         {
@@ -727,8 +720,7 @@ unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
   if (outer_stroke_pat != NULL)
     cairo_pattern_destroy (outer_stroke_pat);
 
-  if (outer_stroke_color != NULL)
-    gdk_rgba_free (outer_stroke_color);
+  gdk_rgba_free (outer_stroke_color);
 }
 
 void
@@ -759,13 +751,10 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
                                           radius + line_width, hidden_side, junction);
     }
 
-  if (unico_has_inner_stroke (engine))
-    {
-      unico_cairo_draw_inner_stroke_rect (engine, cr,
-                                          x + offset + line_width, y + offset + line_width,
-                                          width - offset * 2 - line_width * 2, height - offset * 2 - line_width * 2,
-                                          radius - line_width, hidden_side, junction);
-    }
+  unico_cairo_draw_inner_stroke_rect (engine, cr,
+                                      x + offset + line_width, y + offset + line_width,
+                                      width - offset * 2 - line_width * 2, height - offset * 2 - line_width * 2,
+                                      radius - line_width, hidden_side, junction);
 
   unico_cairo_draw_border_rect (engine, cr,
                                 x + offset, y + offset,
