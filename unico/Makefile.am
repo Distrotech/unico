@@ -1,5 +1,7 @@
 source_h = \
 	$(srcdir)/unico.h \
+	$(srcdir)/exponential-blur.h \
+	$(srcdir)/raico-blur.h \
 	$(srcdir)/unico-cairo-support.h \
 	$(srcdir)/unico-css-support.h \
 	$(srcdir)/unico-support.h \
@@ -8,6 +10,8 @@ source_h = \
 	$(srcdir)/unico-types.h
 
 source_c = \
+	$(srcdir)/exponential-blur.c \
+	$(srcdir)/raico-blur.c \
 	$(srcdir)/unico-cairo-support.c \
 	$(srcdir)/unico-css-support.c \
 	$(srcdir)/unico-draw.c \

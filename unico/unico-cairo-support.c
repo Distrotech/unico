@@ -25,6 +25,77 @@
 #include "unico-cairo-support.h"
 #include "unico-support.h"
 #include "unico-types.h"
+#include "raico-blur.h"
+
+static void
+apply_glow (GtkThemingEngine *engine,
+            cairo_t          *cr,
+            gint              x,
+            gint              y,
+            gint              width,
+            gint              height,
+            gint              radius,
+            guint             hidden_side,
+            GtkJunctionSides  junction)
+{
+  GdkRGBA *glow_color;
+  GtkStateFlags flags;
+  cairo_t *cr_surface; 
+  cairo_surface_t *surface;
+  raico_blur_t* blur = NULL;
+  gint bradius = 0;
+  gdouble line_width;
+
+  unico_get_line_width (engine, &line_width);
+
+  flags = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get (engine, flags,
+                          "-unico-glow-radius", &bradius,
+                          "-unico-glow-color", &glow_color,
+                          NULL);
+
+  if (bradius <= 0)
+    {
+      gdk_rgba_free (glow_color);
+      return;
+    }
+
+  /* clip the area */
+  cairo_save (cr);
+  unico_cairo_round_rect (cr, x, y,
+                              width, height,
+                              radius, SIDE_ALL & ~(hidden_side), junction);
+  cairo_clip (cr);
+
+  /* create the surface to blur */
+  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                        width + bradius * 2,
+                                        height + bradius * 2);
+  cr_surface = cairo_create (surface); 
+
+  cairo_set_line_width (cr_surface, line_width * 4.0);
+
+  /* draw a rounded rectangle on the surface to blur */
+  unico_cairo_round_rect (cr_surface, bradius, bradius, width, height, radius, SIDE_ALL & ~(hidden_side), junction);
+  gdk_cairo_set_source_rgba (cr_surface, glow_color);
+  cairo_stroke (cr_surface);
+
+  /* create and apply raico blur */
+  blur = raico_blur_create ();
+  raico_blur_set_radius (blur, bradius);
+  raico_blur_apply (blur, surface);
+
+  /* paint the blurred surface to cr */
+  cairo_set_source_surface (cr, surface, x - bradius, y - bradius); 
+  cairo_paint (cr);
+
+  cairo_surface_destroy (surface); 
+  cairo_destroy (cr_surface);
+
+  gdk_rgba_free (glow_color);
+
+  cairo_restore (cr);
+}
 
 void
 unico_cairo_draw_background (GtkThemingEngine *engine,
@@ -51,6 +122,11 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
                                     x + offset, y + offset,
                                     width - offset * 2, height - offset * 2,
                                     radius, hidden_side, junction);
+
+  apply_glow (engine, cr,
+              x + offset, y + offset,
+              width - offset * 2, height - offset * 2,
+              radius, hidden_side, junction);
 }
 
 void

@@ -57,7 +57,7 @@ render_from_assets_common (GtkThemingEngine *engine,
 
   flags = gtk_theming_engine_get_state (engine);
 
-	gtk_theming_engine_get_property (engine, "background-image", flags, &value);
+  gtk_theming_engine_get_property (engine, "background-image", flags, &value);
 
   if (!G_VALUE_HOLDS_BOXED (&value))
     return FALSE;
@@ -214,11 +214,11 @@ unico_engine_render_check (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-	if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
-	  {
-	    if (render_from_assets_common (engine, cr, x, y, width, height))
-		    return;
-	  }
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
+    {
+      if (render_from_assets_common (engine, cr, x, y, width, height))
+        return;
+    }
 
   style_functions->draw_check (engine, cr, x, y, width, height);
 }
@@ -508,11 +508,11 @@ unico_engine_render_option (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-	if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
-	  {
-	    if (render_from_assets_common (engine, cr, x, y, width, height))
-		    return;
-	  }
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
+    {
+      if (render_from_assets_common (engine, cr, x, y, width, height))
+        return;
+    }
 
   style_functions->draw_radio (engine, cr, x, y, width, height);
 }
@@ -627,6 +627,18 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                         g_param_spec_boxed ("focus-outer-stroke-color",
                                                             "Focus outer stroke color",
                                                             "Focus outer stroke color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_int ("glow-radius",
+                                                          "Glow radius",
+                                                          "Glow radius",
+                                                          0, G_MAXINT, 0, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("glow-color",
+                                                            "Glow color",
+                                                            "Glow color",
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
