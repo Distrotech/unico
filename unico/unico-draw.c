@@ -766,6 +766,58 @@ unico_draw_slider_button (DRAW_ARGS,
 }
 
 static void
+unico_draw_spinbutton_background (DRAW_ARGS)
+{
+  GtkJunctionSides junction;
+  gdouble line_width;
+  gint radius;
+
+  unico_get_line_width (engine, &line_width);
+  unico_get_border_radius (engine, &radius);
+
+  junction = gtk_theming_engine_get_junction_sides (engine);
+
+  if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
+    y += line_width;
+
+  unico_cairo_draw_background_rect (engine, cr,
+                                    x, y,
+                                    width, height,
+                                    radius, 0, junction);
+
+  unico_cairo_draw_glow (engine, cr,
+                         x, y,
+                         width, height,
+                         radius, 0, junction);
+}
+
+static void
+unico_draw_spinbutton_frame (DRAW_ARGS)
+{
+  GtkJunctionSides junction;
+  gdouble line_width;
+  gint radius;
+
+  unico_get_line_width (engine, &line_width);
+  unico_get_border_radius (engine, &radius);
+
+  junction = gtk_theming_engine_get_junction_sides (engine);
+
+  if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
+    y += line_width;
+
+  unico_cairo_draw_inner_stroke_rect (engine, cr,
+                                      x + line_width, y + line_width,
+                                      width - line_width * 2, height - line_width * 2,
+                                      radius - line_width, 0, junction);
+
+  unico_cairo_draw_border_rect (engine, cr,
+                                x, y,
+                                width, height,
+                                radius, 0, junction);
+}
+
+static void
 unico_draw_switch (DRAW_ARGS,
                    GtkOrientation orientation)
 {
@@ -878,6 +930,8 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_scrolled_window_frame         = unico_draw_scrolled_window_frame;
   functions->draw_separator                     = unico_draw_separator;
   functions->draw_slider_button                 = unico_draw_slider_button;
+  functions->draw_spinbutton_background         = unico_draw_spinbutton_background;
+  functions->draw_spinbutton_frame              = unico_draw_spinbutton_frame;
   functions->draw_switch                        = unico_draw_switch;
   functions->draw_tab                           = unico_draw_tab;
 }

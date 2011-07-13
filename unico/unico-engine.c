@@ -186,6 +186,9 @@ unico_engine_render_background (GtkThemingEngine *engine,
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
     style_functions->draw_scrollbar_stepper_background (engine, cr, x, y, width, height);
+  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
+    style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
     style_functions->draw_menubaritem_background (engine, cr, x, y, width, height);
@@ -310,6 +313,9 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
     style_functions->draw_scrollbar_stepper_frame (engine, cr, x, y, width, height);
+  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
+    style_functions->draw_spinbutton_frame (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
     style_functions->draw_menubaritem_frame (engine, cr, x, y, width, height);

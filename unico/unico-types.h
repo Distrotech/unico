@@ -126,6 +126,10 @@ struct _UnicoStyleFunctions
 
   void (*draw_separator) (DRAW_ARGS);
 
+  void (*draw_spinbutton_background) (DRAW_ARGS);
+
+  void (*draw_spinbutton_frame) (DRAW_ARGS);
+
   void (*draw_switch) (DRAW_ARGS,
                        GtkOrientation orientation);
 

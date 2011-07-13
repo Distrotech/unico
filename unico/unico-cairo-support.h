@@ -81,6 +81,16 @@ G_GNUC_INTERNAL void unico_cairo_draw_frame (GtkThemingEngine *engine,
                                              guint             hidden_side,
                                              GtkJunctionSides  junction);
 
+G_GNUC_INTERNAL void unico_cairo_draw_glow (GtkThemingEngine *engine,
+                                            cairo_t          *cr,
+                                            gint              x,
+                                            gint              y,
+                                            gint              width,
+                                            gint              height,
+                                            gint              radius,
+                                            guint             hidden_side,
+                                            GtkJunctionSides  junction);
+
 G_GNUC_INTERNAL void unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
                                                               cairo_t          *cr,
                                                               gdouble           x,
