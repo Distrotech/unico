@@ -394,7 +394,7 @@ unico_draw_frame_gap (DRAW_ARGS,
       xc = x + xy0_gap + border_width;
       yc = y;
       wc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
-      hc = border_width;
+      hc = border_width + cairo_get_line_width (cr);
 
       if (xy0_gap < radius)
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
@@ -408,7 +408,7 @@ unico_draw_frame_gap (DRAW_ARGS,
       xc = x + xy0_gap + border_width;
       yc = y + height - border_width;
       wc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
-      hc = border_width;
+      hc = border_width + cairo_get_line_width (cr);
 
       if (xy0_gap < radius)
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
@@ -420,7 +420,7 @@ unico_draw_frame_gap (DRAW_ARGS,
     case GTK_POS_LEFT:
       xc = x;
       yc = y + xy0_gap + border_width;
-      wc = border_width;
+      wc = border_width + cairo_get_line_width (cr);
       hc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
 
       if (xy0_gap < radius)
@@ -433,7 +433,7 @@ unico_draw_frame_gap (DRAW_ARGS,
     case GTK_POS_RIGHT:
       xc = x + width - border_width;
       yc = y + xy0_gap + border_width;
-      wc = border_width;
+      wc = border_width + cairo_get_line_width (cr);
       hc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
 
       if (xy0_gap < radius)
