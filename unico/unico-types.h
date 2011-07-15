@@ -99,6 +99,8 @@ struct _UnicoStyleFunctions
                           gdouble         xy0_gap,
                           gdouble         xy1_gap);
 
+  void (*draw_grip) (DRAW_ARGS);
+
   void (*draw_icon_view) (DRAW_ARGS);
 
   void (*draw_menubaritem_background) (DRAW_ARGS);
@@ -109,6 +111,8 @@ struct _UnicoStyleFunctions
                          GtkPositionType gap_side,
                          gdouble         xy0_gap,
                          gdouble         xy1_gap);
+
+  void (*draw_pane_separator) (DRAW_ARGS);
 
   void (*draw_progressbar_fill_background) (DRAW_ARGS);
 

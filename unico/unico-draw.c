@@ -468,6 +468,40 @@ unico_draw_frame_gap (DRAW_ARGS,
 }
 
 static void
+unico_draw_grip (DRAW_ARGS)
+{
+  GdkRGBA border_color;
+  GdkRGBA *inner_stroke_color;
+  GtkStateFlags flags;
+  gint lx, ly;
+
+  flags = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border_color (engine, flags, &border_color);
+  gtk_theming_engine_get (engine, flags,
+                          "-unico-inner-stroke-color", &inner_stroke_color,
+                          NULL);
+
+  for (ly = 0; ly < 4; ly++) /* vertically, four rows of dots */
+    {
+      for (lx = 0; lx <= ly; lx++) /* horizontally */
+        {
+          int ny = (3.5 - ly) * 3;
+          int nx = lx * 3;
+
+          gdk_cairo_set_source_rgba (cr, inner_stroke_color);
+          cairo_rectangle (cr, x + width - nx - 1, y + height - ny - 1, 2, 2);
+          cairo_fill (cr);
+
+          gdk_cairo_set_source_rgba (cr, &border_color);
+          cairo_rectangle (cr, x + width - nx - 1, y + height - ny - 1, 1, 1);
+          cairo_fill (cr);
+        }
+    }
+
+  gdk_rgba_free (inner_stroke_color);
+}
+
+static void
 unico_draw_icon_view (DRAW_ARGS)
 {
   unico_cairo_draw_background (engine, cr,
@@ -504,6 +538,50 @@ unico_draw_notebook (DRAW_ARGS,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
   unico_draw_frame_gap (engine, cr, x, y, width, height, gap_side, xy0_gap, xy1_gap);
+}
+
+static void
+unico_draw_pane_separator (DRAW_ARGS)
+{
+  GdkRGBA border_color;
+  GdkRGBA *inner_stroke_color;
+  GtkStateFlags flags;
+  gdouble line_width;
+  gint bar_height;
+  gint bar_width = 3;
+  gint i, bar_y = 1;
+  gint num_bars = 3, bar_spacing = 3;
+
+  unico_get_line_width (engine, &line_width);
+
+  bar_height = num_bars * bar_spacing * line_width;
+
+  flags = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border_color (engine, flags, &border_color);
+  gtk_theming_engine_get (engine, flags,
+                          "-unico-inner-stroke-color", &inner_stroke_color,
+                          NULL);
+
+  /* FIXME(Cimi) add HORIZONTAL case with GTK_STYLE_CLASS_HORIZONTAL */
+  cairo_translate (cr, x + width / 2 - bar_width / 2, y + height / 2 - bar_height / 2 + 0.5);
+
+  /* FIXME(Cimi) translations could be done better */
+  for (i = 0; i < num_bars; i++)
+    {
+      cairo_move_to (cr, -0.5, bar_y);
+      cairo_line_to (cr, bar_width - 0.5, bar_y);
+      gdk_cairo_set_source_rgba (cr, &border_color);
+      cairo_stroke (cr);
+
+      cairo_move_to (cr, -0.5, bar_y + line_width);
+      cairo_line_to (cr, bar_width - 0.5, bar_y + line_width);
+      gdk_cairo_set_source_rgba (cr, inner_stroke_color);
+      cairo_stroke (cr);
+
+      bar_y += bar_spacing;
+    }
+
+  gdk_rgba_free (inner_stroke_color);
 }
 
 static void
@@ -917,10 +995,12 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_expander                      = unico_draw_expander;
   functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
+  functions->draw_grip                          = unico_draw_grip;
   functions->draw_icon_view                     = unico_draw_icon_view;
   functions->draw_menubaritem_background        = unico_draw_menubaritem_background;
   functions->draw_menubaritem_frame             = unico_draw_menubaritem_frame;
   functions->draw_notebook                      = unico_draw_notebook;
+  functions->draw_pane_separator                = unico_draw_pane_separator;
   functions->draw_progressbar_fill_background   = unico_draw_progressbar_fill_background;
   functions->draw_progressbar_fill_frame        = unico_draw_progressbar_fill_frame;
   functions->draw_radio                         = unico_draw_radio;

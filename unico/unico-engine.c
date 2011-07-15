@@ -363,7 +363,18 @@ unico_engine_render_handle (GtkThemingEngine *engine,
                             gdouble           width,
                             gdouble           height)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_handle (engine, cr, x, y, width, height);
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_GRIP))
+    style_functions->draw_grip (engine, cr, x, y, width, height);
+  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PANE_SEPARATOR))
+    style_functions->draw_pane_separator (engine, cr, x, y, width, height);
+  else
+    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_handle (engine, cr, x, y, width, height);
 }
 
 static GdkPixbuf*

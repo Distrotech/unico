@@ -621,8 +621,8 @@ unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
                                          gdouble           width,
                                          gdouble           height)
 {
-  GtkStateFlags flags;
   GdkRGBA *inner_stroke_color;
+  GtkStateFlags flags;
   cairo_pattern_t *inner_stroke_pat;
   gdouble line_width;
 
@@ -689,8 +689,8 @@ unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
                                          gdouble           width,
                                          gdouble           height)
 {
-  GtkStateFlags flags;
   GdkRGBA *outer_stroke_color;
+  GtkStateFlags flags;
   UnicoStrokeStyle outer_stroke_style;
   cairo_pattern_t *outer_stroke_pat;
   gdouble line_width;
