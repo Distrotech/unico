@@ -80,8 +80,10 @@ unico_cairo_draw_background_from_path (GtkThemingEngine *engine,
 
   cairo_matrix_init_identity (&identity);
 
-  /* FIXME really? */
-  /* Use unmodified size for pattern scaling */
+  /* FIXME really?
+   * Original gtk theming engine code uses unmodified width and height
+   * for pattern scaling, but here it is already modified
+   * by unico_draw_background_rect. */
   mat_w = width;
   mat_h = height;
 
@@ -96,26 +98,6 @@ unico_cairo_draw_background_from_path (GtkThemingEngine *engine,
 
   border_width = MIN (MIN (border.top, border.bottom),
                       MIN (border.left, border.right));
-
-  /* FIXME needed? */
-  if (border_width > 1 &&
-      border_style == GTK_BORDER_STYLE_NONE)
-    {
-      x += (gdouble) border_width / 2;
-      y += (gdouble) border_width / 2;
-      width -= border_width;
-      height -= border_width;
-    }
-  else
-    {
-      x += border.left;
-      y += border.top;
-      width -= border.left + border.right;
-      height -= border.top + border.bottom;
-    }
-
-  if (width <= 0 || height <= 0)
-    return;
 
   cairo_save (cr);
 
@@ -366,6 +348,40 @@ unico_cairo_draw_background_rect (GtkThemingEngine *engine,
                                   guint             hidden_side,
                                   GtkJunctionSides  junction)
 {
+  GtkBorder border;
+  GtkBorderStyle border_style;
+  GtkStateFlags flags;
+  gint border_width;
+
+  flags = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border (engine, flags, &border);
+  gtk_theming_engine_get (engine, flags,
+                          "border-style", &border_style,
+                          NULL);
+
+  border_width = MIN (MIN (border.top, border.bottom),
+                      MIN (border.left, border.right));
+
+  /* FIXME I don't like this */
+  if (border_width > 1 &&
+      border_style == GTK_BORDER_STYLE_NONE)
+    {
+      x += (gdouble) border_width / 2;
+      y += (gdouble) border_width / 2;
+      width -= border_width;
+      height -= border_width;
+    }
+  else
+    {
+      x += border.left;
+      y += border.top;
+      width -= border.left + border.right;
+      height -= border.top + border.bottom;
+    }
+
+  if (width <= 0 || height <= 0)
+    return;
+
   unico_cairo_round_rect (cr, x, y, width, height, radius, SIDE_ALL & ~(hidden_side), junction);
   unico_cairo_draw_background_from_path (engine, cr, x, y, width, height);
 }

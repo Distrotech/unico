@@ -796,6 +796,8 @@ unico_draw_slider_button (DRAW_ARGS,
   /* Is there a way to avoid this translation? */
   cairo_translate (cr, 0.5, 0.5);
 
+  /* FIXME I should shrink x, y, width, height following border.
+   * See unico_cairo_draw_background_rect */
   draw_slider_button_path (cr, offset,
                                offset,
                                width - offset * 2,
