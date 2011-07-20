@@ -452,6 +452,10 @@ draw_border (GtkThemingEngine *engine,
 
   running = gtk_theming_engine_state_is_running (engine, GTK_STATE_PRELIGHT, &progress);
 
+  cairo_save (cr);
+
+  cairo_translate (cr, x, y);
+
   if (running)
     {
       cairo_pattern_t *other_pat;
@@ -661,10 +665,6 @@ draw_border (GtkThemingEngine *engine,
       //color_shade (colors[3], 1.8, colors[3]);
       break;
   }
-
-  cairo_save (cr);
-
-  cairo_translate (cr, x, y);
 
   cairo_set_fill_rule (cr, CAIRO_FILL_RULE_EVEN_ODD);
 

@@ -107,9 +107,7 @@ struct _UnicoStyleFunctions
 
   void (*draw_pane_separator) (DRAW_ARGS);
 
-  void (*draw_progressbar_fill_background) (DRAW_ARGS);
-
-  void (*draw_progressbar_fill_frame) (DRAW_ARGS);
+  void (*draw_progressbar_fill) (DRAW_ARGS);
 
   void (*draw_radio) (DRAW_ARGS);
 

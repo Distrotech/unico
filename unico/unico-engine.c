@@ -75,6 +75,7 @@ render_from_assets_common (GtkThemingEngine *engine,
       cairo_scale (cr, width / cairo_image_surface_get_width (surface),
                        height / cairo_image_surface_get_height (surface));
       cairo_set_source_surface (cr, surface, x, y);
+
       cairo_paint (cr);
 
       cairo_restore (cr);
@@ -131,10 +132,7 @@ unico_engine_render_activity (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR))
-    {
-      style_functions->draw_progressbar_fill_background (engine, cr, x, y, width, height);
-      style_functions->draw_progressbar_fill_frame (engine, cr, x, y, width, height);
-    }
+    style_functions->draw_progressbar_fill (engine, cr, x, y, width, height);
   else
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_activity (engine, cr, x, y, width, height);
 }
@@ -555,7 +553,7 @@ unico_engine_render_slider (GtkThemingEngine *engine,
     style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
   else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
     style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
-  else
+  else if (!render_from_assets_common (engine, cr, x, y, width, height))
     style_functions->draw_slider_button (engine, cr, x, y, width, height);
 }
 

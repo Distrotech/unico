@@ -580,18 +580,12 @@ unico_draw_pane_separator (DRAW_ARGS)
 }
 
 static void
-unico_draw_progressbar_fill_background (DRAW_ARGS)
+unico_draw_progressbar_fill (DRAW_ARGS)
 {
   /* Playground for effects. */
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
-unico_draw_progressbar_fill_frame (DRAW_ARGS)
-{
-  /* Playground for effects. */
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, gtk_theming_engine_get_junction_sides (engine));
@@ -759,15 +753,20 @@ unico_draw_slider_button (DRAW_ARGS)
 static void
 unico_draw_spinbutton_background (DRAW_ARGS)
 {
+  GtkBorder border;
   GtkJunctionSides junction;
-  gdouble line_width;
+  GtkStateFlags state;
 
-  unico_get_line_width (engine, &line_width);
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_border (engine, state, &border);
 
   junction = gtk_theming_engine_get_junction_sides (engine);
 
+  /* FIXME this code always adds padding,
+   * even when outer stroke for the spinbutton frame is none */
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
-    y += line_width;
+    y += border.top;
 
   unico_cairo_draw_background (engine, cr,
                                x, y,
@@ -778,15 +777,20 @@ unico_draw_spinbutton_background (DRAW_ARGS)
 static void
 unico_draw_spinbutton_frame (DRAW_ARGS)
 {
+  GtkBorder border;
   GtkJunctionSides junction;
-  gdouble line_width;
+  GtkStateFlags state;
 
-  unico_get_line_width (engine, &line_width);
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_border (engine, state, &border);
 
   junction = gtk_theming_engine_get_junction_sides (engine);
 
+  /* FIXME this code always adds padding,
+   * even when outer stroke for the spinbutton frame is none */
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
-    y += line_width;
+    y += border.top;
 
   unico_cairo_draw_frame (engine, cr,
                           x, y,
@@ -900,8 +904,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_menubaritem_frame             = unico_draw_menubaritem_frame;
   functions->draw_notebook                      = unico_draw_notebook;
   functions->draw_pane_separator                = unico_draw_pane_separator;
-  functions->draw_progressbar_fill_background   = unico_draw_progressbar_fill_background;
-  functions->draw_progressbar_fill_frame        = unico_draw_progressbar_fill_frame;
+  functions->draw_progressbar_fill              = unico_draw_progressbar_fill;
   functions->draw_radio                         = unico_draw_radio;
   functions->draw_scrollbar_slider              = unico_draw_scrollbar_slider;
   functions->draw_scrollbar_stepper_background  = unico_draw_scrollbar_stepper_background;
