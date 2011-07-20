@@ -69,15 +69,11 @@ struct _UnicoStyleFunctions
 
   void (*draw_check) (DRAW_ARGS);
 
-  void (*draw_column_header_background) (DRAW_ARGS,
-                                         GtkRegionFlags flags);
-
-  void (*draw_column_header_frame) (DRAW_ARGS,
-                                    GtkRegionFlags flags);
-
   void (*draw_combo_button_background) (DRAW_ARGS);
 
   void (*draw_combo_button_frame) (DRAW_ARGS);
+
+  void (*draw_common) (DRAW_ARGS);
 
   void (*draw_common_background) (DRAW_ARGS);
 
@@ -94,12 +90,6 @@ struct _UnicoStyleFunctions
 
   void (*draw_grip) (DRAW_ARGS);
 
-  void (*draw_icon_view) (DRAW_ARGS);
-
-  void (*draw_menubaritem_background) (DRAW_ARGS);
-
-  void (*draw_menubaritem_frame) (DRAW_ARGS);
-
   void (*draw_notebook) (DRAW_ARGS,
                          GtkPositionType gap_side,
                          gdouble         xy0_gap,
@@ -107,28 +97,20 @@ struct _UnicoStyleFunctions
 
   void (*draw_pane_separator) (DRAW_ARGS);
 
-  void (*draw_progressbar_fill) (DRAW_ARGS);
+  void (*draw_progressbar_activity) (DRAW_ARGS);
 
   void (*draw_radio) (DRAW_ARGS);
-
-  void (*draw_scrollbar_slider) (DRAW_ARGS);
-
-  void (*draw_scrollbar_stepper_background) (DRAW_ARGS);
-
-  void (*draw_scrollbar_stepper_frame) (DRAW_ARGS);
 
   void (*draw_scrolled_window_frame) (DRAW_ARGS);
 
   void (*draw_separator) (DRAW_ARGS);
 
+  void (*draw_slider) (DRAW_ARGS,
+                       GtkOrientation orientation);
+
   void (*draw_spinbutton_background) (DRAW_ARGS);
 
   void (*draw_spinbutton_frame) (DRAW_ARGS);
-
-  void (*draw_switch) (DRAW_ARGS,
-                       GtkOrientation orientation);
-
-  void (*draw_slider_button) (DRAW_ARGS);
 
   void (*draw_tab) (DRAW_ARGS,
                     GtkPositionType gap_side);

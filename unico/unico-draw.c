@@ -47,6 +47,7 @@ unico_draw_arrow (GtkThemingEngine *engine,
   gdouble size_reduction = 2;
 
   state = gtk_theming_engine_get_state (engine);
+
   gtk_theming_engine_get_color (engine, state, &color);
 
   cairo_save (cr);
@@ -90,6 +91,7 @@ unico_draw_cell (DRAW_ARGS,
 
   hidden_side = SIDE_RIGHT;
 
+  /* FIXME really needed? or doable through css? */
   if ((flags & GTK_REGION_FIRST) != 0)
     junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
   if ((flags & GTK_REGION_LAST) != 0)
@@ -207,55 +209,32 @@ unico_draw_check (DRAW_ARGS)
 }
 
 static void
-unico_draw_column_header_background (DRAW_ARGS,
-                                     GtkRegionFlags flags)
-{
-  GtkJunctionSides junction;
-
-  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
-
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, junction);
-}
-
-static void
-unico_draw_column_header_frame (DRAW_ARGS, 
-                                GtkRegionFlags flags)
-{
-  GtkJunctionSides junction;
-  guint hidden_side;
-
-  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
-
-  hidden_side = SIDE_RIGHT | SIDE_TOP;
-
-  if ((flags & GTK_REGION_FIRST) != 0)
-    {
-      hidden_side |= SIDE_LEFT;
-    }
-  if ((flags & GTK_REGION_LAST) != 0)
-    {
-      hidden_side = SIDE_RIGHT | SIDE_TOP;
-    }
-
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          hidden_side, junction);
-}
-
-static void
 unico_draw_combo_button_background (DRAW_ARGS)
 {
-  /* Playground for junctions. */
-  unico_cairo_draw_background (engine, cr, x, y, width, height, 0, gtk_theming_engine_get_junction_sides (engine));
+  /* playground for junctions */
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
 }
 
 static void
 unico_draw_combo_button_frame (DRAW_ARGS)
 {
-  /* Playground for junctions. */
-  unico_cairo_draw_frame (engine, cr, x, y, width, height, 0, gtk_theming_engine_get_junction_sides (engine));
+  /* playground for junctions */
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
+}
+
+static void
+unico_draw_common (DRAW_ARGS)
+{
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
 }
 
 static void
@@ -283,6 +262,7 @@ unico_draw_expander (DRAW_ARGS)
   gdouble angle = G_PI_2;
 
   state = gtk_theming_engine_get_state (engine);
+
   gtk_theming_engine_get_color (engine, state, &color);
 
   cairo_save (cr);
@@ -324,6 +304,7 @@ unico_draw_focus (DRAW_ARGS)
   gint radius;
 
   state = gtk_theming_engine_get_state (engine);
+
   gtk_theming_engine_get (engine, state,
                           "-unico-focus-border-color", &border_color,
                           "-unico-focus-border-radius", &radius,
@@ -336,6 +317,7 @@ unico_draw_focus (DRAW_ARGS)
                                 NULL);  
 
   cairo_save (cr);
+
   cairo_set_line_width (cr, line_width);
 
   unico_cairo_round_rect (cr, x, y,
@@ -471,6 +453,7 @@ unico_draw_grip (DRAW_ARGS)
   gint lx, ly;
 
   flags = gtk_theming_engine_get_state (engine);
+
   gtk_theming_engine_get_border_color (engine, flags, &border_color);
   gtk_theming_engine_get (engine, flags,
                           "-unico-inner-stroke-color", &inner_stroke_color,
@@ -497,33 +480,6 @@ unico_draw_grip (DRAW_ARGS)
 }
 
 static void
-unico_draw_icon_view (DRAW_ARGS)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
-unico_draw_menubaritem_background (DRAW_ARGS)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, GTK_JUNCTION_BOTTOM);
-}
-
-static void
-unico_draw_menubaritem_frame (DRAW_ARGS)
-{
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, GTK_JUNCTION_BOTTOM);
-}
-
-static void
 unico_draw_notebook (DRAW_ARGS,
                      GtkPositionType gap_side,
                      gdouble         xy0_gap,
@@ -532,7 +488,9 @@ unico_draw_notebook (DRAW_ARGS,
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
-  unico_draw_frame_gap (engine, cr, x, y, width, height, gap_side, xy0_gap, xy1_gap);
+  unico_draw_frame_gap (engine, cr,
+                        x, y, width, height,
+                        gap_side, xy0_gap, xy1_gap);
 }
 
 static void
@@ -580,9 +538,9 @@ unico_draw_pane_separator (DRAW_ARGS)
 }
 
 static void
-unico_draw_progressbar_fill (DRAW_ARGS)
+unico_draw_progressbar_activity (DRAW_ARGS)
 {
-  /* Playground for effects. */
+  /* playground for effects */
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
@@ -672,33 +630,6 @@ unico_draw_radio (DRAW_ARGS)
 }
 
 static void
-unico_draw_scrollbar_stepper_background (DRAW_ARGS)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
-unico_draw_scrollbar_stepper_frame (DRAW_ARGS)
-{
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
-unico_draw_scrollbar_slider (DRAW_ARGS)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
 unico_draw_scrolled_window_frame (DRAW_ARGS)
 {
   unico_cairo_draw_frame (engine, cr,
@@ -739,12 +670,13 @@ unico_draw_separator (DRAW_ARGS)
 }
 
 static void
-unico_draw_slider_button (DRAW_ARGS)
+unico_draw_slider (DRAW_ARGS,
+                   GtkOrientation orientation)
 {
+  /* use orientation, if needed */
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
-
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, gtk_theming_engine_get_junction_sides (engine));
@@ -769,8 +701,7 @@ unico_draw_spinbutton_background (DRAW_ARGS)
     y += border.top;
 
   unico_cairo_draw_background (engine, cr,
-                               x, y,
-                               width, height,
+                               x, y, width, height,
                                0, junction);
 }
 
@@ -793,21 +724,8 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
     y += border.top;
 
   unico_cairo_draw_frame (engine, cr,
-                          x, y,
-                          width, height,
-                          0, junction);
-}
-
-static void
-unico_draw_switch (DRAW_ARGS,
-                   GtkOrientation orientation)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-  unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
+                          0, junction);
 }
 
 static void
@@ -889,31 +807,23 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_arrow                         = unico_draw_arrow;
   functions->draw_cell                          = unico_draw_cell;
   functions->draw_check                         = unico_draw_check;
-  functions->draw_column_header_background      = unico_draw_column_header_background;
-  functions->draw_column_header_frame           = unico_draw_column_header_frame;
   functions->draw_combo_button_background       = unico_draw_combo_button_background;
   functions->draw_combo_button_frame            = unico_draw_combo_button_frame;
+  functions->draw_common                        = unico_draw_common;
   functions->draw_common_background             = unico_draw_common_background;
   functions->draw_common_frame                  = unico_draw_common_frame;
   functions->draw_expander                      = unico_draw_expander;
   functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
   functions->draw_grip                          = unico_draw_grip;
-  functions->draw_icon_view                     = unico_draw_icon_view;
-  functions->draw_menubaritem_background        = unico_draw_menubaritem_background;
-  functions->draw_menubaritem_frame             = unico_draw_menubaritem_frame;
   functions->draw_notebook                      = unico_draw_notebook;
   functions->draw_pane_separator                = unico_draw_pane_separator;
-  functions->draw_progressbar_fill              = unico_draw_progressbar_fill;
+  functions->draw_progressbar_activity          = unico_draw_progressbar_activity;
   functions->draw_radio                         = unico_draw_radio;
-  functions->draw_scrollbar_slider              = unico_draw_scrollbar_slider;
-  functions->draw_scrollbar_stepper_background  = unico_draw_scrollbar_stepper_background;
-  functions->draw_scrollbar_stepper_frame       = unico_draw_scrollbar_stepper_frame;
   functions->draw_scrolled_window_frame         = unico_draw_scrolled_window_frame;
   functions->draw_separator                     = unico_draw_separator;
-  functions->draw_slider_button                 = unico_draw_slider_button;
+  functions->draw_slider                        = unico_draw_slider;
   functions->draw_spinbutton_background         = unico_draw_spinbutton_background;
   functions->draw_spinbutton_frame              = unico_draw_spinbutton_frame;
-  functions->draw_switch                        = unico_draw_switch;
   functions->draw_tab                           = unico_draw_tab;
 }

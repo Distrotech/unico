@@ -107,12 +107,12 @@ trim_allocation_for_scale (GtkThemingEngine *engine,
       if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
         {
           *y += *height / 2.0 - 2.0;
-          *height = 4;
+          *height = 5;
         }
       else
         {
           *x += *width / 2.0 - 2.0;
-          *width = 4;
+          *width = 5;
         }
     }
 }
@@ -132,7 +132,7 @@ unico_engine_render_activity (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR))
-    style_functions->draw_progressbar_fill (engine, cr, x, y, width, height);
+    style_functions->draw_progressbar_activity (engine, cr, x, y, width, height);
   else
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_activity (engine, cr, x, y, width, height);
 }
@@ -165,33 +165,22 @@ unico_engine_render_background (GtkThemingEngine *engine,
   UnicoStyleFunctions *style_functions;
   const GtkWidgetPath *path;
   GtkRegionFlags flags;
-  gint len;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
-  len = gtk_widget_path_length (path);
 
   trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-      gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
-    style_functions->draw_column_header_background (engine, cr, x, y, width, height, flags);    
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
+      gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
     style_functions->draw_combo_button_background (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    style_functions->draw_scrollbar_stepper_background (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
-    style_functions->draw_menubaritem_background (engine, cr, x, y, width, height);
   else if (gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW))
-      style_functions->draw_icon_view (engine, cr, x, y, width, height);
+      style_functions->draw_common (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
       style_functions->draw_cell (engine, cr, x, y, width, height, flags);
@@ -289,34 +278,22 @@ unico_engine_render_frame (GtkThemingEngine *engine,
 {
   UnicoStyleFunctions *style_functions;
   const GtkWidgetPath *path;
-  GtkRegionFlags flags;
-  gint len;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
-  len = gtk_widget_path_length (path);
 
   trim_allocation_for_scale (engine, &x, &y, &width, &height);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-      gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
-    style_functions->draw_column_header_frame (engine, cr, x, y, width, height, flags);    
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
     style_functions->draw_separator (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
     style_functions->draw_combo_button_frame (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    style_functions->draw_scrollbar_stepper_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
-    style_functions->draw_menubaritem_frame (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_FRAME) &&
            gtk_widget_path_is_type (path, GTK_TYPE_SCROLLED_WINDOW))
     style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
@@ -542,19 +519,18 @@ unico_engine_render_slider (GtkThemingEngine *engine,
                             GtkOrientation    orientation)
 {
   UnicoStyleFunctions *style_functions;
-  const GtkWidgetPath *path;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
-  path = gtk_theming_engine_get_path (engine);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
-  else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
-    style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
-  else if (!render_from_assets_common (engine, cr, x, y, width, height))
-    style_functions->draw_slider_button (engine, cr, x, y, width, height);
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCALE))
+    {
+      if (render_from_assets_common (engine, cr, x, y, width, height))
+        return;
+    }
+
+  style_functions->draw_slider (engine, cr, x, y, width, height, orientation);
 }
 
 void
