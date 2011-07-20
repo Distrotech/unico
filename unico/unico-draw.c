@@ -63,7 +63,7 @@ unico_draw_arrow (GtkThemingEngine *engine,
   cairo_rotate (cr, angle - G_PI_2);
   cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+  /* FIXME This +1 / -1 is done to fix blurred diagonal lines.
    * I know it's not nice at all, but it fix a visual bug. */
   cairo_move_to (cr, -size / 2.0, -size / 2.0);
   cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
@@ -110,16 +110,16 @@ unico_draw_cell (DRAW_ARGS,
 static void
 unico_draw_check (DRAW_ARGS)
 {
-  GtkStateFlags flags;
+  GtkStateFlags state;
   gboolean in_menu;
   gboolean draw_bullet, inconsistent;
 
-  flags = gtk_theming_engine_get_state (engine);
+  state = gtk_theming_engine_get_state (engine);
 
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
-  inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
-  draw_bullet = (flags & GTK_STATE_FLAG_ACTIVE) != 0;
+  inconsistent = (state & GTK_STATE_FLAG_INCONSISTENT) != 0;
+  draw_bullet = (state & GTK_STATE_FLAG_ACTIVE) != 0;
   draw_bullet |= inconsistent;
 
   if (!in_menu)
@@ -136,7 +136,7 @@ unico_draw_check (DRAW_ARGS)
     {
       GdkRGBA *bullet_color;
 
-      gtk_theming_engine_get (engine, flags,
+      gtk_theming_engine_get (engine, state,
                               "-unico-bullet-color", &bullet_color,
                               NULL);
 
@@ -163,7 +163,7 @@ unico_draw_check (DRAW_ARGS)
             {
               GdkRGBA *bullet_outline_color;
 
-              gtk_theming_engine_get (engine, flags,
+              gtk_theming_engine_get (engine, state,
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
 
@@ -299,7 +299,7 @@ unico_draw_expander (DRAW_ARGS)
   cairo_rotate (cr, angle);
   cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME(Cimi) This +1 / -1 is done to fix blurred diagonal lines.
+  /* FIXME This +1 / -1 is done to fix blurred diagonal lines.
    * I know it's not nice at all, but it fix a visual bug. */
   cairo_move_to (cr, -size / 2.0, -size / 2.0);
   cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
@@ -457,11 +457,6 @@ unico_draw_frame_gap (DRAW_ARGS,
   /* FIXME Maybe we need to add a check for the GtkBorderStyle,
    * old GTK_SHADOW_IN corresponds to GTK_BORDER_STYLE_INSET. */
 
-/*  unico_cairo_draw_inner_stroke_rect (engine, cr,*/
-/*                                      line_width, line_width,*/
-/*                                      width - line_width * 2, height - line_width * 2,*/
-/*                                      radius - line_width, 0, junction);*/
-
   unico_cairo_draw_frame (engine, cr, 0, 0, width, height, 0, junction);
 
   cairo_restore (cr);
@@ -562,10 +557,10 @@ unico_draw_pane_separator (DRAW_ARGS)
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           NULL);
 
-  /* FIXME(Cimi) add HORIZONTAL case with GTK_STYLE_CLASS_HORIZONTAL */
+  /* FIXME add HORIZONTAL case with GTK_STYLE_CLASS_HORIZONTAL */
   cairo_translate (cr, x + width / 2 - bar_width / 2, y + height / 2 - bar_height / 2 + 0.5);
 
-  /* FIXME(Cimi) translations could be done better */
+  /* FIXME translations could be done better */
   for (i = 0; i < num_bars; i++)
     {
       cairo_move_to (cr, -0.5, bar_y);
@@ -712,13 +707,9 @@ unico_draw_scrollbar_slider (DRAW_ARGS)
 static void
 unico_draw_scrolled_window_frame (DRAW_ARGS)
 {
-  gint radius;
-
-  unico_get_border_radius (engine, &radius);
-
-  unico_cairo_draw_border_rect (engine, cr,
-                                x, y, width, height,
-                                0, 0, gtk_theming_engine_get_junction_sides (engine));
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
 }
 
 static void
@@ -733,116 +724,36 @@ unico_draw_separator (DRAW_ARGS)
    * but doesn't work for separator tool item. */
   if (width > height)
     {
-      cairo_move_to (cr, x, y + height / 2 + line_width / 2);
-      cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
-      unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
+      //cairo_move_to (cr, x, y + height / 2 + line_width / 2);
+      //cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
+      //unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
 
-      cairo_move_to (cr, x, y + height / 2 - line_width / 2);
-      cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
-      unico_cairo_draw_border_from_path (engine, cr, x, y + height / 2 - line_width / 2, width, line_width);
+      //cairo_move_to (cr, x, y + height / 2 - line_width / 2);
+      //cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
+      //unico_cairo_draw_border_from_path (engine, cr, x, y + height / 2 - line_width / 2, width, line_width);
     }
   else
     {
-      cairo_move_to (cr, x + width / 2 + line_width / 2, y);
-      cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
-      unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
+      //cairo_move_to (cr, x + width / 2 + line_width / 2, y);
+      //cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
+      //unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
 
-      cairo_move_to (cr, x + width / 2 - line_width / 2, y);
-      cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
-      unico_cairo_draw_border_from_path (engine, cr, x + width / 2 - line_width / 2, y, line_width, height);
+      //cairo_move_to (cr, x + width / 2 - line_width / 2, y);
+      //cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
+      //unico_cairo_draw_border_from_path (engine, cr, x + width / 2 - line_width / 2, y, line_width, height);
     }
 }
 
 static void
-draw_slider_button_path (cairo_t *cr,
-                         gint     x,
-                         gint     y,
-                         gint     width,
-                         gint     height,
-                         gint     radius)
+unico_draw_slider_button (DRAW_ARGS)
 {
-  cairo_move_to (cr, x + radius, y);
-  cairo_arc (cr, x + width - radius, y + radius, radius, G_PI * 1.5, G_PI * 2);
-  cairo_line_to (cr, x + width, y + height - width / 2.0);
-  cairo_line_to (cr, x + width / 2.0, y + height);
-  cairo_line_to (cr, x, y + height - width / 2.0);
-  cairo_arc (cr, x + radius, y + radius, radius, G_PI, G_PI * 1.5);
-}
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
 
-static void
-unico_draw_slider_button (DRAW_ARGS,
-                          UnicoSliderParameters *slider)
-{
-  gdouble line_width, offset;
-  gint radius;
-
-  unico_get_line_width (engine, &line_width);
-  unico_get_border_radius (engine, &radius);
-  radius = MIN (radius, MIN (width / 2.0, height / 2.0));
-
-  offset = 0;
-  if (unico_has_outer_stroke (engine))
-    offset = line_width;
-
-  cairo_set_line_width (cr, line_width);
-
-  if (!slider->horizontal) /* XXX: could be broken, need to test */
-    unico_cairo_exchange_axis (cr, &x, &y, &width, &height);
-
-  cairo_save (cr);
-
-  cairo_translate (cr, x, y);
-
-  /* Is there a way to avoid this translation? */
-  cairo_translate (cr, 0.5, 0.5);
-
-  /* FIXME I should shrink x, y, width, height following border.
-   * See unico_cairo_draw_background_rect */
-  draw_slider_button_path (cr, offset,
-                               offset,
-                               width - offset * 2,
-                               height - offset * 2,
-                               radius);
-  unico_cairo_draw_background_from_path (engine, cr,
-                                         offset,
-                                         offset,
-                                         width - offset * 2,
-                                         height - offset * 2);
-
-  draw_slider_button_path (cr, line_width / 2.0,
-                               line_width / 2.0,
-                               width - line_width,
-                               height - line_width,
-                               radius + 1);
-  unico_cairo_draw_outer_stroke_from_path (engine, cr,
-                                           line_width / 2.0,
-                                           line_width / 2.0,
-                                           width - line_width,
-                                           height - line_width);
-
-  draw_slider_button_path (cr, line_width / 2.0 + offset + line_width,
-                               line_width / 2.0 + offset + line_width,
-                               width - line_width - offset * 2 - line_width * 2,
-                               height - line_width - offset * 2 - line_width * 2,
-                               radius - 1);
-  unico_cairo_draw_inner_stroke_from_path (engine, cr,
-                                           line_width / 2.0 + offset + line_width,
-                                           line_width / 2.0 + offset + line_width,
-                                           width - line_width - offset * 2 - line_width * 2,
-                                           height - line_width - offset * 2 - line_width * 2);
-
-  draw_slider_button_path (cr, line_width / 2.0 + offset,
-                               line_width / 2.0 + offset,
-                               width - line_width - offset * 2,
-                               height - line_width - offset * 2,
-                               radius);
-  unico_cairo_draw_border_from_path (engine, cr,
-                                     line_width / 2.0 + offset,
-                                     line_width / 2.0 + offset,
-                                     width - line_width - offset * 2,
-                                     height - line_width - offset * 2);
-
-  cairo_restore (cr);
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
 }
 
 static void
@@ -850,25 +761,18 @@ unico_draw_spinbutton_background (DRAW_ARGS)
 {
   GtkJunctionSides junction;
   gdouble line_width;
-  gint radius;
 
   unico_get_line_width (engine, &line_width);
-  unico_get_border_radius (engine, &radius);
 
   junction = gtk_theming_engine_get_junction_sides (engine);
 
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
     y += line_width;
 
-  unico_cairo_draw_background_rect (engine, cr,
-                                    x, y,
-                                    width, height,
-                                    radius, 0, junction);
-
-  unico_cairo_draw_glow (engine, cr,
-                         x, y,
-                         width, height,
-                         radius, 0, junction);
+  unico_cairo_draw_background (engine, cr,
+                               x, y,
+                               width, height,
+                               0, junction);
 }
 
 static void
@@ -876,25 +780,18 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
 {
   GtkJunctionSides junction;
   gdouble line_width;
-  gint radius;
 
   unico_get_line_width (engine, &line_width);
-  unico_get_border_radius (engine, &radius);
 
   junction = gtk_theming_engine_get_junction_sides (engine);
 
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
     y += line_width;
 
-  unico_cairo_draw_inner_stroke_rect (engine, cr,
-                                      x + line_width, y + line_width,
-                                      width - line_width * 2, height - line_width * 2,
-                                      radius - line_width, 0, junction);
-
-  unico_cairo_draw_border_rect (engine, cr,
-                                x, y,
-                                width, height,
-                                radius, 0, junction);
+  unico_cairo_draw_frame (engine, cr,
+                          x, y,
+                          width, height,
+                          0, junction);
 }
 
 static void

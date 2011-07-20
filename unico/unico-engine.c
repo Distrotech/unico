@@ -552,23 +552,11 @@ unico_engine_render_slider (GtkThemingEngine *engine,
   path = gtk_theming_engine_get_path (engine);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    {
-      style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
-    }
+    style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
   else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
-    {
-      style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
-    }
+    style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
   else
-    {
-      UnicoSliderParameters slider;
-
-      slider.horizontal = (orientation == GTK_ORIENTATION_HORIZONTAL);
-      slider.lower = FALSE;
-      slider.fill_level = FALSE;
-
-      style_functions->draw_slider_button (engine, cr, x, y, width, height, &slider);
-    }
+    style_functions->draw_slider_button (engine, cr, x, y, width, height);
 }
 
 void

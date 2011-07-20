@@ -40,13 +40,6 @@ enum {
   SIDE_ALL    = 0xF
 };
 
-typedef struct
-{
-  gboolean lower;
-  gboolean horizontal;
-  gboolean fill_level;
-} UnicoSliderParameters;
-
 typedef enum
 {
   UNICO_STROKE_STYLE_CUSTOM = 0,
@@ -137,8 +130,7 @@ struct _UnicoStyleFunctions
   void (*draw_switch) (DRAW_ARGS,
                        GtkOrientation orientation);
 
-  void (*draw_slider_button) (DRAW_ARGS,
-                              UnicoSliderParameters *slider);
+  void (*draw_slider_button) (DRAW_ARGS);
 
   void (*draw_tab) (DRAW_ARGS,
                     GtkPositionType gap_side);

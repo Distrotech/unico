@@ -1,6 +1,7 @@
 source_h = \
 	$(srcdir)/unico.h \
 	$(srcdir)/exponential-blur.h \
+	$(srcdir)/gtkroundedboxprivate.h \
 	$(srcdir)/raico-blur.h \
 	$(srcdir)/unico-cairo-support.h \
 	$(srcdir)/unico-css-support.h \
@@ -11,6 +12,7 @@ source_h = \
 
 source_c = \
 	$(srcdir)/exponential-blur.c \
+	$(srcdir)/gtkroundedbox.c \
 	$(srcdir)/raico-blur.c \
 	$(srcdir)/unico-cairo-support.c \
 	$(srcdir)/unico-css-support.c \
