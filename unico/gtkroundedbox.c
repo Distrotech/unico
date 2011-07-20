@@ -50,47 +50,41 @@ _gtk_rounded_box_init_rect (GtkRoundedBox *box,
 static void
 gtk_rounded_box_clamp_border_radius (GtkRoundedBox *box)
 {
-  gdouble factor;
+  gdouble factor = 1.0;
 
-  /* clamp left */
-  if (box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical > box->box.height)
-    {
-      factor = box->box.height /
-               (box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical);
+  /* left */
+  if (box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical > 0 &&
+      box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical > box->box.height)
+    factor = MIN (factor, box->box.height / (box->border_radius.top_left.vertical +
+                                             box->border_radius.bottom_left.vertical));
 
-      box->border_radius.top_left.vertical *= factor;
-      box->border_radius.bottom_left.vertical *= factor;
-    }
+  /* top */
+  if (box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal > 0 &&
+      box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal > box->box.width)
+    factor = MIN (factor, box->box.width / (box->border_radius.top_left.horizontal +
+                                            box->border_radius.top_right.horizontal));
 
-  /* clamp top */
-  if (box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal > box->box.width)
-    {
-      factor = box->box.width / 
-               (box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal);
+  /* right */
+  if (box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal > 0 &&
+      box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal > box->box.height)
+    factor = MIN (factor, box->box.height / (box->border_radius.top_right.vertical +
+                                             box->border_radius.bottom_right.horizontal));
 
-      box->border_radius.top_left.horizontal *= factor;
-      box->border_radius.top_right.horizontal *= factor;
-    }
+  /* bottom */
+  if (box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal > 0 &&
+      box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal > box->box.width)
+    factor = MIN (factor, box->box.width / (box->border_radius.bottom_right.horizontal +
+                                            box->border_radius.bottom_left.horizontal));
 
-  /* clamp right */
-  if (box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal > box->box.height)
-    {
-      factor = box->box.height /
-               (box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal);
-
-      box->border_radius.top_right.vertical *= factor;
-      box->border_radius.bottom_right.vertical *= factor;
-    }
-
-  /* clamp bottom */
-  if ((box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal) > box->box.width)
-    {
-      factor = box->box.width / 
-               (box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal);
-
-      box->border_radius.bottom_right.horizontal *= factor;
-      box->border_radius.bottom_left.horizontal *= factor;
-    }
+  /* scale border radius */
+  box->border_radius.top_left.horizontal *= factor;
+  box->border_radius.top_left.vertical *= factor;
+  box->border_radius.top_right.horizontal *= factor;
+  box->border_radius.top_right.vertical *= factor;
+  box->border_radius.bottom_right.horizontal *= factor;
+  box->border_radius.bottom_right.vertical *= factor;
+  box->border_radius.bottom_left.horizontal *= factor;
+  box->border_radius.bottom_left.vertical *= factor;
 }
 
 void
