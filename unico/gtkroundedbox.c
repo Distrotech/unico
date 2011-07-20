@@ -46,6 +46,53 @@ _gtk_rounded_box_init_rect (GtkRoundedBox *box,
   memset (&box->border_radius, 0, sizeof (GtkCssBorderRadius));
 }
 
+/* clamp border radius, following CSS specs */
+static void
+gtk_rounded_box_clamp_border_radius (GtkRoundedBox *box)
+{
+  gdouble factor;
+
+  /* clamp left */
+  if (box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical > box->box.height)
+    {
+      factor = box->box.height /
+               (box->border_radius.top_left.vertical + box->border_radius.bottom_left.vertical);
+
+      box->border_radius.top_left.vertical *= factor;
+      box->border_radius.bottom_left.vertical *= factor;
+    }
+
+  /* clamp top */
+  if (box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal > box->box.width)
+    {
+      factor = box->box.width / 
+               (box->border_radius.top_left.horizontal + box->border_radius.top_right.horizontal);
+
+      box->border_radius.top_left.horizontal *= factor;
+      box->border_radius.top_right.horizontal *= factor;
+    }
+
+  /* clamp right */
+  if (box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal > box->box.height)
+    {
+      factor = box->box.height /
+               (box->border_radius.top_right.vertical + box->border_radius.bottom_right.horizontal);
+
+      box->border_radius.top_right.vertical *= factor;
+      box->border_radius.bottom_right.vertical *= factor;
+    }
+
+  /* clamp bottom */
+  if ((box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal) > box->box.width)
+    {
+      factor = box->box.width / 
+               (box->border_radius.bottom_right.horizontal + box->border_radius.bottom_left.horizontal);
+
+      box->border_radius.bottom_right.horizontal *= factor;
+      box->border_radius.bottom_left.horizontal *= factor;
+    }
+}
+
 void
 _gtk_rounded_box_apply_border_radius (GtkRoundedBox    *box,
                                       GtkThemingEngine *engine,
@@ -72,6 +119,8 @@ _gtk_rounded_box_apply_border_radius (GtkRoundedBox    *box,
     box->border_radius.bottom_right = *bottom_right_radius;
   if (bottom_left_radius && (junction & GTK_JUNCTION_CORNER_BOTTOMLEFT) == 0)
     box->border_radius.bottom_left = *bottom_left_radius;
+
+  gtk_rounded_box_clamp_border_radius (box);
 
   g_free (top_left_radius);
   g_free (top_right_radius);
@@ -127,6 +176,8 @@ _gtk_rounded_box_grow (GtkRoundedBox *box,
   gtk_css_border_radius_grow (&box->border_radius.top_right, right, bottom);
   gtk_css_border_radius_grow (&box->border_radius.bottom_right, right, top);
   gtk_css_border_radius_grow (&box->border_radius.bottom_left, left, bottom);
+
+  gtk_rounded_box_clamp_border_radius (box);
 }
 
 void
