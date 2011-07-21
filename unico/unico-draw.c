@@ -822,7 +822,12 @@ unico_draw_tab (DRAW_ARGS,
   cairo_save (cr);
 
   /* FIXME doesn't work properly with not homogenuos border-width,
-   * especially between tab and notebook */
+   * especially between tab and notebook.
+   * I guess the issue comes from the fact draw_background
+   * is looking at border dimensions while we're not,
+   * or we're doing it wrong.
+   * draw_background is looking at SIDE_BOTTOM and
+   * sets border to 0 for this side */
   switch (gap_side)
   {
     case GTK_POS_TOP:
