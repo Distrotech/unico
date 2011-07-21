@@ -71,6 +71,16 @@ G_GNUC_INTERNAL void unico_cairo_round_rect_inner (cairo_t         *cr,
                                                    guint            sides,
                                                    GtkJunctionSides junction);
 
+G_GNUC_INTERNAL void unico_cairo_set_source_border (GtkThemingEngine *engine,
+                                                    cairo_t          *cr,
+                                                    gdouble           width,
+                                                    gdouble           height);
+
+G_GNUC_INTERNAL void unico_cairo_set_source_inner_stroke (GtkThemingEngine *engine,
+                                                          cairo_t          *cr,
+                                                          gdouble           width,
+                                                          gdouble           height);
+
 G_GNUC_INTERNAL void unico_cairo_style_pattern_set_matrix (cairo_pattern_t *pattern,
                                                            gdouble          width,
                                                            gdouble          height);

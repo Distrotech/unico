@@ -1047,6 +1047,69 @@ unico_cairo_round_rect_inner (cairo_t         *cr,
 }
 
 void
+unico_cairo_set_source_border (GtkThemingEngine *engine,
+                               cairo_t          *cr,
+                               gdouble           width,
+                               gdouble           height)
+{
+  GdkRGBA border_color;
+  GtkBorderStyle border_style;
+  GtkStateFlags state;
+  cairo_pattern_t *border_pat;
+
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_border_color (engine, state, &border_color);
+  gtk_theming_engine_get (engine, state,
+                          "border-style", &border_style,
+                          "-unico-border-gradient", &border_pat,
+                          NULL);
+
+  if (border_pat)
+    {
+      unico_cairo_style_pattern_set_matrix (border_pat, width, height);
+      cairo_set_source (cr, border_pat);
+    }
+  else
+    gdk_cairo_set_source_rgba (cr, &border_color);
+
+
+  if (border_pat != NULL)
+    cairo_pattern_destroy (border_pat);
+}
+
+void
+unico_cairo_set_source_inner_stroke (GtkThemingEngine *engine,
+                                     cairo_t          *cr,
+                                     gdouble           width,
+                                     gdouble           height)
+{
+  GdkRGBA *inner_stroke_color;
+  GtkStateFlags state;
+  cairo_pattern_t *inner_stroke_pat;
+
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get (engine, state,
+                          "-unico-inner-stroke-color", &inner_stroke_color,
+                          "-unico-inner-stroke-gradient", &inner_stroke_pat,
+                          NULL);
+
+  if (inner_stroke_pat)
+    {
+      unico_cairo_style_pattern_set_matrix (inner_stroke_pat, width, height);
+      cairo_set_source (cr, inner_stroke_pat);
+    }
+  else
+    gdk_cairo_set_source_rgba (cr, inner_stroke_color);
+
+  if (inner_stroke_pat != NULL)
+    cairo_pattern_destroy (inner_stroke_pat);
+
+  gdk_rgba_free (inner_stroke_color);
+}
+
+void
 unico_cairo_set_source_color_with_alpha (cairo_t *cr,
                                          GdkRGBA *color,
                                          gdouble  alpha)

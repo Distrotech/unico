@@ -36,8 +36,8 @@ typedef struct _GtkCssBorderCornerRadius GtkCssBorderCornerRadius;
 typedef struct _GtkCssBorderRadius GtkCssBorderRadius;
 
 struct _GtkCssBorderCornerRadius {
-  double horizontal;
-  double vertical;
+  gdouble horizontal;
+  gdouble vertical;
 };
 
 struct _GtkCssBorderRadius {

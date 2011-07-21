@@ -29,11 +29,6 @@
 #include "unico-support.h"
 #include "unico-types.h"
 
-#define UNICO_RECT_SET(rect, _x, _y, _w, _h) (rect).x      = (_x); \
-                                             (rect).y      = (_y); \
-                                             (rect).width  = (_w); \
-                                             (rect).height = (_h);
-
 static void
 unico_draw_arrow (GtkThemingEngine *engine,
                   cairo_t          *cr,
@@ -510,7 +505,6 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   /* FIXME Maybe we need to add a check for the GtkBorderStyle,
    * old GTK_SHADOW_IN corresponds to GTK_BORDER_STYLE_INSET. */
-
   unico_cairo_draw_frame (engine, cr, x, y, width, height, 0, junction);
 
   cairo_restore (cr);
@@ -592,24 +586,34 @@ unico_draw_pane_separator (DRAW_ARGS)
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
 
-  /* FIXME add HORIZONTAL case with GTK_STYLE_CLASS_HORIZONTAL */
-  cairo_translate (cr, x + width / 2 - bar_width / 2, y + height / 2 - bar_height / 2 + 0.5);
+  cairo_save (cr);
 
-  /* FIXME translations could be done better */
+  cairo_translate (cr, x + width / 2, y + height / 2);
+
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_HORIZONTAL))
+    cairo_translate (cr, - bar_width / 2 - 0.5, - bar_height / 2 + 0.5);
+  else
+    {
+      cairo_translate (cr, - bar_height / 2 + 0.5, bar_width / 2 + 0.5);
+      cairo_rotate (cr, - G_PI / 2);
+    }
+
   for (i = 0; i < num_bars; i++)
     {
-      cairo_move_to (cr, -0.5, bar_y);
-      cairo_line_to (cr, bar_width - 0.5, bar_y);
-      gdk_cairo_set_source_rgba (cr, &border_color);
+      cairo_move_to (cr, 0, bar_y);
+      cairo_line_to (cr, bar_width, bar_y);
+      unico_cairo_set_source_border (engine, cr, bar_width, 3);
       cairo_stroke (cr);
 
-      cairo_move_to (cr, -0.5, bar_y + line_width);
-      cairo_line_to (cr, bar_width - 0.5, bar_y + line_width);
-      gdk_cairo_set_source_rgba (cr, inner_stroke_color);
+      cairo_move_to (cr, 0, bar_y + line_width);
+      cairo_line_to (cr, bar_width, bar_y + line_width);
+      unico_cairo_set_source_inner_stroke (engine, cr, bar_width, line_width);
       cairo_stroke (cr);
 
       bar_y += bar_spacing;
     }
+
+  cairo_restore (cr);
 
   gdk_rgba_free (inner_stroke_color);
 }
@@ -726,23 +730,27 @@ unico_draw_separator (DRAW_ARGS)
    * but doesn't work for separator tool item. */
   if (width > height)
     {
-      //cairo_move_to (cr, x, y + height / 2 + line_width / 2);
-      //cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
-      //unico_cairo_draw_inner_stroke_from_path (engine, cr, x, y + height / 2 + line_width / 2, width, line_width);
+      cairo_move_to (cr, x, y + height / 2 + line_width / 2);
+      cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
+      unico_cairo_set_source_inner_stroke (engine, cr, width, line_width);
+      cairo_stroke (cr);
 
-      //cairo_move_to (cr, x, y + height / 2 - line_width / 2);
-      //cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
-      //unico_cairo_draw_border_from_path (engine, cr, x, y + height / 2 - line_width / 2, width, line_width);
+      cairo_move_to (cr, x, y + height / 2 - line_width / 2);
+      cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
+      unico_cairo_set_source_border (engine, cr, width, line_width);
+      cairo_stroke (cr);
     }
   else
     {
-      //cairo_move_to (cr, x + width / 2 + line_width / 2, y);
-      //cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
-      //unico_cairo_draw_inner_stroke_from_path (engine, cr, x + width / 2 + line_width / 2, y, line_width, height);
+      cairo_move_to (cr, x + width / 2 + line_width / 2, y);
+      cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
+      unico_cairo_set_source_inner_stroke (engine, cr, line_width, height);
+      cairo_stroke (cr);
 
-      //cairo_move_to (cr, x + width / 2 - line_width / 2, y);
-      //cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
-      //unico_cairo_draw_border_from_path (engine, cr, x + width / 2 - line_width / 2, y, line_width, height);
+      cairo_move_to (cr, x + width / 2 - line_width / 2, y);
+      cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
+      unico_cairo_set_source_border (engine, cr, line_width, height);
+      cairo_stroke (cr);
     }
 }
 
