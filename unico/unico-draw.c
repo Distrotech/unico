@@ -376,81 +376,130 @@ unico_draw_frame_gap (DRAW_ARGS,
                       gdouble         xy0_gap,
                       gdouble         xy1_gap)
 {
+  GtkBorder border;
+  GtkCssBorderCornerRadius *top_left_radius, *top_right_radius;
+  GtkCssBorderCornerRadius *bottom_left_radius, *bottom_right_radius;
+  GtkCssBorderRadius border_radius = { { 0, },  };
   GtkJunctionSides junction;
-  gint border_width, radius;
+  GtkStateFlags state;
   gdouble x0, y0, x1, y1, xc, yc, wc, hc;
-  gdouble line_width;
 
   xc = yc = wc = hc = 0;
 
+  state = gtk_theming_engine_get_state (engine);
+
   junction = gtk_theming_engine_get_junction_sides (engine);
 
-  unico_get_line_width (engine, &line_width);
-  unico_get_border_radius (engine, &radius);
+  gtk_theming_engine_get_border (engine, state, &border);
+  gtk_theming_engine_get (engine, state,
+                          /* Can't use border-radius as it's an int for
+                           * backwards compat */
+                          "border-top-left-radius", &top_left_radius,
+                          "border-top-right-radius", &top_right_radius,
+                          "border-bottom-right-radius", &bottom_right_radius,
+                          "border-bottom-left-radius", &bottom_left_radius,
+                          NULL);
 
-  border_width = cairo_get_line_width (cr);
-
-  if (unico_has_outer_stroke (engine))
-    border_width = 2 * cairo_get_line_width (cr);
+  if (top_left_radius)
+    border_radius.top_left = *top_left_radius;
+  g_free (top_left_radius);
+  if (top_right_radius)
+    border_radius.top_right = *top_right_radius;
+  g_free (top_right_radius);
+  if (bottom_right_radius)
+    border_radius.bottom_right = *bottom_right_radius;
+  g_free (bottom_right_radius);
+  if (bottom_left_radius)
+    border_radius.bottom_left = *bottom_left_radius;
+  g_free (bottom_left_radius);
 
   cairo_save (cr);
 
   switch (gap_side)
   {
     case GTK_POS_TOP:
-      xc = x + xy0_gap + border_width;
+      xc = x + xy0_gap + border.left;
       yc = y;
-      wc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
-      hc = border_width + cairo_get_line_width (cr);
+      wc = MAX (xy1_gap - xy0_gap - (border.left + border.right), 0);
+      hc = border.top * 2;
 
-      if (xy0_gap < radius)
+      if (unico_has_outer_stroke (engine))
+        {
+          xc += border.left;
+          wc = MAX (xy1_gap - xy0_gap - 2 * (border.left + border.right), 0);
+          hc += border.top;
+        }
+
+      if (xy0_gap < border_radius.top_left.horizontal)
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > width - radius)
+      if (xy1_gap > width - border_radius.top_right.horizontal)
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
-
       break;
     default:
     case GTK_POS_BOTTOM:
-      xc = x + xy0_gap + border_width;
-      yc = y + height - border_width;
-      wc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
-      hc = border_width + cairo_get_line_width (cr);
+      xc = x + xy0_gap + border.left;
+      yc = y + height - border.bottom * 2;
+      wc = MAX (xy1_gap - xy0_gap - (border.left + border.right), 0);
+      hc = border.bottom * 2;
 
-      if (xy0_gap < radius)
+      if (unico_has_outer_stroke (engine))
+        {
+          xc += border.left;
+          yc -= border.bottom;
+          wc = MAX (xy1_gap - xy0_gap - 2 * (border.left + border.right), 0);
+          hc += border.bottom;
+        }
+
+      if (xy0_gap < border_radius.bottom_left.horizontal)
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
-      if (xy1_gap > width - radius)
+      if (xy1_gap > width - border_radius.bottom_right.horizontal)
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
     case GTK_POS_LEFT:
       xc = x;
-      yc = y + xy0_gap + border_width;
-      wc = border_width + cairo_get_line_width (cr);
-      hc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
+      yc = y + xy0_gap + border.top;
+      wc = border.left * 2;
+      hc = MAX (xy1_gap - xy0_gap - (border.top + border.bottom), 0);
 
-      if (xy0_gap < radius)
+      if (unico_has_outer_stroke (engine))
+        {
+          yc += border.top;
+          wc += border.left;
+          hc = MAX (xy1_gap - xy0_gap - 2 * (border.top + border.bottom), 0);
+        }
+
+      if (xy0_gap < border_radius.top_left.vertical)
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > height - radius)
+      if (xy1_gap > height - border_radius.bottom_left.vertical)
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
       break;
     case GTK_POS_RIGHT:
-      xc = x + width - border_width;
-      yc = y + xy0_gap + border_width;
-      wc = border_width + cairo_get_line_width (cr);
-      hc = MAX (xy1_gap - xy0_gap - 2 * border_width, 0);
+      xc = x + width - border.right * 2;
+      yc = y + xy0_gap + border.top;
+      wc = border.right * 2;
+      hc = MAX (xy1_gap - xy0_gap - (border.top + border.bottom), 0);
 
-      if (xy0_gap < radius)
+      if (unico_has_outer_stroke (engine))
+        {
+          xc -= border.right;
+          yc += border.top;
+          wc += border.right;
+          hc = MAX (xy1_gap - xy0_gap - 2 * (border.top + border.bottom), 0);
+        }
+
+      if (xy0_gap < border_radius.top_right.vertical)
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
 
-      if (xy1_gap > height - radius)
+      if (xy1_gap > height - border_radius.bottom_right.vertical)
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
-  }
+    }
 
   cairo_clip_extents (cr, &x0, &y0, &x1, &y1);
   cairo_rectangle (cr, x0, y0, x1 - x0, yc - y0);
@@ -459,12 +508,10 @@ unico_draw_frame_gap (DRAW_ARGS,
   cairo_rectangle (cr, x0, yc + hc, x1 - x0, y1 - (yc + hc));
   cairo_clip (cr);
 
-  cairo_translate (cr, x, y);
-
   /* FIXME Maybe we need to add a check for the GtkBorderStyle,
    * old GTK_SHADOW_IN corresponds to GTK_BORDER_STYLE_INSET. */
 
-  unico_cairo_draw_frame (engine, cr, 0, 0, width, height, 0, junction);
+  unico_cairo_draw_frame (engine, cr, x, y, width, height, 0, junction);
 
   cairo_restore (cr);
 }
@@ -765,27 +812,42 @@ unico_draw_tab (DRAW_ARGS,
   GtkBorder border;
   GtkJunctionSides junction = 0;
   guint hidden_side = 0;
-  gdouble offset = 0, bg_offset = 0;
+  gdouble bg_offset = 0;
   GtkStateFlags state;
 
   state = gtk_theming_engine_get_state (engine); 
 
   gtk_theming_engine_get_border (engine, state, &border);
 
-  /* FIXME offset could change if we deprecate the rotation for the draw_frame */
-  if (unico_has_outer_stroke (engine))
-    offset = border.top;
-
   cairo_save (cr);
 
+  /* FIXME doesn't work properly with not homogenuos border-width,
+   * especially between tab and notebook */
   switch (gap_side)
   {
+    case GTK_POS_TOP:
+      junction = GTK_JUNCTION_TOP;
+      hidden_side = SIDE_TOP;
+
+      if (unico_has_outer_stroke (engine))
+        {
+          y -= border.bottom;
+          height += border.bottom;
+        }
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.bottom;
+
+      cairo_translate (cr, x + width, y + height);
+      cairo_rotate (cr, G_PI);
+      break;
     default:
     case GTK_POS_BOTTOM:
       junction = GTK_JUNCTION_BOTTOM;
       hidden_side = SIDE_BOTTOM;
 
-      height += offset;
+      if (unico_has_outer_stroke (engine))
+        height += border.top;
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
         bg_offset = border.top;
@@ -796,8 +858,11 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_LEFT;
       hidden_side = SIDE_LEFT;
 
-      x -= offset;
-      width += offset;
+      if (unico_has_outer_stroke (engine))
+        {
+          x -= border.right;
+          width += border.right;
+        }
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
         bg_offset = border.right;
@@ -805,24 +870,12 @@ unico_draw_tab (DRAW_ARGS,
       cairo_translate (cr, x + width, y);
       cairo_rotate (cr, G_PI / 2);
       break;
-    case GTK_POS_TOP:
-      junction = GTK_JUNCTION_TOP;
-      hidden_side = SIDE_TOP;
-
-      y -= offset;
-      height += offset;
-
-      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-        bg_offset = border.bottom;
-
-      cairo_translate (cr, x + width, y + height);
-      cairo_rotate (cr, G_PI);
-      break;
     case GTK_POS_RIGHT:
       junction = GTK_JUNCTION_RIGHT;
       hidden_side = SIDE_RIGHT;
 
-      width += offset;
+      if (unico_has_outer_stroke (engine))
+        width += border.left;
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
         bg_offset = border.left;
@@ -839,14 +892,10 @@ unico_draw_tab (DRAW_ARGS,
     unico_cairo_draw_background (engine, cr, 0, 0, height, width + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   cairo_restore (cr);
 
-  cairo_save (cr);
-
   /* FIXME put this in the rotation?
    * the frame on bottom bar has the wrong gradient,
    * while should be reflected */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
-
-  cairo_restore (cr);
 }
 
 void

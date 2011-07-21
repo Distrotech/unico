@@ -23,22 +23,9 @@
 #include <cairo.h>
 #include <gtk/gtk.h>
 
+#include "unico-types.h"
+
 G_BEGIN_DECLS
-
-typedef struct _GtkCssBorderCornerRadius GtkCssBorderCornerRadius;
-typedef struct _GtkCssBorderRadius GtkCssBorderRadius;
-
-struct _GtkCssBorderCornerRadius {
-  double horizontal;
-  double vertical;
-};
-
-struct _GtkCssBorderRadius {
-  GtkCssBorderCornerRadius top_left;
-  GtkCssBorderCornerRadius top_right;
-  GtkCssBorderCornerRadius bottom_right;
-  GtkCssBorderCornerRadius bottom_left;
-};
 
 typedef struct _GtkRoundedBox GtkRoundedBox;
 

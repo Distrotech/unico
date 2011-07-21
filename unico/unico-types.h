@@ -32,6 +32,21 @@
 
 G_BEGIN_DECLS
 
+typedef struct _GtkCssBorderCornerRadius GtkCssBorderCornerRadius;
+typedef struct _GtkCssBorderRadius GtkCssBorderRadius;
+
+struct _GtkCssBorderCornerRadius {
+  double horizontal;
+  double vertical;
+};
+
+struct _GtkCssBorderRadius {
+  GtkCssBorderCornerRadius top_left;
+  GtkCssBorderCornerRadius top_right;
+  GtkCssBorderCornerRadius bottom_right;
+  GtkCssBorderCornerRadius bottom_left;
+};
+
 enum {
   SIDE_LEFT   = 1,
   SIDE_BOTTOM = 1 << 1,
