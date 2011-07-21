@@ -64,8 +64,11 @@ struct _UnicoStyleFunctions
                       gdouble           y,
                       gdouble           size);
 
-  void (*draw_cell) (DRAW_ARGS,
-                     GtkRegionFlags flags);
+  void (*draw_cell_background) (DRAW_ARGS,
+                                GtkRegionFlags flags);
+
+  void (*draw_cell_frame) (DRAW_ARGS,
+                           GtkRegionFlags flags);
 
   void (*draw_check) (DRAW_ARGS);
 

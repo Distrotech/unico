@@ -81,28 +81,53 @@ unico_draw_arrow (GtkThemingEngine *engine,
 }
 
 static void
-unico_draw_cell (DRAW_ARGS,
-                 GtkRegionFlags flags)
+unico_draw_cell_background (DRAW_ARGS,
+                            GtkRegionFlags flags)
 {
   GtkJunctionSides junction;
   guint hidden_side;
 
   junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
 
-  hidden_side = SIDE_RIGHT;
+  hidden_side = SIDE_RIGHT | SIDE_LEFT;
 
-  /* FIXME really needed? or doable through css? */
   if ((flags & GTK_REGION_FIRST) != 0)
-    junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
+    {
+      junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
+      hidden_side &= ~(SIDE_LEFT);
+    }
   if ((flags & GTK_REGION_LAST) != 0)
     {
       junction &= ~(GTK_JUNCTION_CORNER_TOPRIGHT | GTK_JUNCTION_CORNER_BOTTOMRIGHT);
-      hidden_side = 0;
+      hidden_side &= ~(SIDE_RIGHT);
     }
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                hidden_side, junction);
+}
+
+static void
+unico_draw_cell_frame (DRAW_ARGS,
+                       GtkRegionFlags flags)
+{
+  GtkJunctionSides junction;
+  guint hidden_side;
+
+  junction = GTK_JUNCTION_RIGHT | GTK_JUNCTION_LEFT;
+
+  hidden_side = SIDE_RIGHT | SIDE_LEFT;
+
+  if ((flags & GTK_REGION_FIRST) != 0)
+    {
+      junction &= ~(GTK_JUNCTION_CORNER_TOPLEFT | GTK_JUNCTION_CORNER_BOTTOMLEFT);
+      hidden_side &= ~(SIDE_LEFT);
+    }
+  if ((flags & GTK_REGION_LAST) != 0)
+    {
+      junction &= ~(GTK_JUNCTION_CORNER_TOPRIGHT | GTK_JUNCTION_CORNER_BOTTOMRIGHT);
+      hidden_side &= ~(SIDE_RIGHT);
+    }
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
@@ -810,7 +835,8 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   g_assert (functions);
 
   functions->draw_arrow                         = unico_draw_arrow;
-  functions->draw_cell                          = unico_draw_cell;
+  functions->draw_cell_background               = unico_draw_cell_background;
+  functions->draw_cell_frame                    = unico_draw_cell_frame;
   functions->draw_check                         = unico_draw_check;
   functions->draw_combo_button_background       = unico_draw_combo_button_background;
   functions->draw_combo_button_frame            = unico_draw_combo_button_frame;
