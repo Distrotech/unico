@@ -762,43 +762,33 @@ static void
 unico_draw_tab (DRAW_ARGS,
                 GtkPositionType gap_side)
 {
+  GtkBorder border;
   GtkJunctionSides junction = 0;
-  gdouble line_width;
   guint hidden_side = 0;
-  gdouble offset = 0;
+  gdouble offset = 0, bg_offset = 0;
   GtkStateFlags state;
 
   state = gtk_theming_engine_get_state (engine); 
 
-  unico_get_line_width (engine, &line_width);
+  gtk_theming_engine_get_border (engine, state, &border);
 
-  /* FIXME using border.top instead? */
-  offset = 0;
+  /* FIXME offset could change if we deprecate the rotation for the draw_frame */
   if (unico_has_outer_stroke (engine))
-    offset = line_width;
-
-  if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-    offset += line_width;
+    offset = border.top;
 
   cairo_save (cr);
 
   switch (gap_side)
   {
-    case GTK_POS_TOP:
-      junction = GTK_JUNCTION_TOP;
-      hidden_side = SIDE_TOP;
-
-      y -= offset;
-
-      cairo_translate (cr, x + width, y + height);
-      cairo_rotate (cr, G_PI);
-      break;
     default:
     case GTK_POS_BOTTOM:
       junction = GTK_JUNCTION_BOTTOM;
       hidden_side = SIDE_BOTTOM;
 
       height += offset;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.top;
 
       cairo_translate (cr, x, y);
       break;
@@ -807,15 +797,35 @@ unico_draw_tab (DRAW_ARGS,
       hidden_side = SIDE_LEFT;
 
       x -= offset;
+      width += offset;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.right;
 
       cairo_translate (cr, x + width, y);
       cairo_rotate (cr, G_PI / 2);
+      break;
+    case GTK_POS_TOP:
+      junction = GTK_JUNCTION_TOP;
+      hidden_side = SIDE_TOP;
+
+      y -= offset;
+      height += offset;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.bottom;
+
+      cairo_translate (cr, x + width, y + height);
+      cairo_rotate (cr, G_PI);
       break;
     case GTK_POS_RIGHT:
       junction = GTK_JUNCTION_RIGHT;
       hidden_side = SIDE_RIGHT;
 
       width += offset;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.left;
 
       cairo_translate (cr, x, y + height);
       cairo_rotate (cr, - G_PI / 2);
@@ -824,14 +834,16 @@ unico_draw_tab (DRAW_ARGS,
 
   if (gap_side == GTK_POS_TOP ||
       gap_side == GTK_POS_BOTTOM)
-    unico_cairo_draw_background (engine, cr, 0, 0, width, height, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
+    unico_cairo_draw_background (engine, cr, 0, 0, width, height + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   else
-    unico_cairo_draw_background (engine, cr, 0, 0, height, width, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
+    unico_cairo_draw_background (engine, cr, 0, 0, height, width + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   cairo_restore (cr);
 
   cairo_save (cr);
 
-  /* FIXME put this in the rotation? */
+  /* FIXME put this in the rotation?
+   * the frame on bottom bar has the wrong gradient,
+   * while should be reflected */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
 
   cairo_restore (cr);
