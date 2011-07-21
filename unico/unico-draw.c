@@ -766,12 +766,19 @@ unico_draw_tab (DRAW_ARGS,
   gdouble line_width;
   guint hidden_side = 0;
   gdouble offset = 0;
+  GtkStateFlags state;
+
+  state = gtk_theming_engine_get_state (engine); 
 
   unico_get_line_width (engine, &line_width);
 
+  /* FIXME using border.top instead? */
   offset = 0;
   if (unico_has_outer_stroke (engine))
-    offset = line_width * 2;
+    offset = line_width;
+
+  if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+    offset += line_width;
 
   cairo_save (cr);
 
@@ -817,13 +824,14 @@ unico_draw_tab (DRAW_ARGS,
 
   if (gap_side == GTK_POS_TOP ||
       gap_side == GTK_POS_BOTTOM)
-    unico_cairo_draw_background (engine, cr, 0, 0, width, height, 0, GTK_JUNCTION_BOTTOM);
+    unico_cairo_draw_background (engine, cr, 0, 0, width, height, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   else
-    unico_cairo_draw_background (engine, cr, 0, 0, height, width, 0, GTK_JUNCTION_BOTTOM);
+    unico_cairo_draw_background (engine, cr, 0, 0, height, width, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   cairo_restore (cr);
 
   cairo_save (cr);
 
+  /* FIXME put this in the rotation? */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
 
   cairo_restore (cr);
