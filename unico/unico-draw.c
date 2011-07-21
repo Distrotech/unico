@@ -449,13 +449,13 @@ unico_draw_grip (DRAW_ARGS)
 {
   GdkRGBA border_color;
   GdkRGBA *inner_stroke_color;
-  GtkStateFlags flags;
+  GtkStateFlags state;
   gint lx, ly;
 
-  flags = gtk_theming_engine_get_state (engine);
+  state = gtk_theming_engine_get_state (engine);
 
-  gtk_theming_engine_get_border_color (engine, flags, &border_color);
-  gtk_theming_engine_get (engine, flags,
+  gtk_theming_engine_get_border_color (engine, state, &border_color);
+  gtk_theming_engine_get (engine, state,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           NULL);
 
@@ -498,7 +498,7 @@ unico_draw_pane_separator (DRAW_ARGS)
 {
   GdkRGBA border_color;
   GdkRGBA *inner_stroke_color;
-  GtkStateFlags flags;
+  GtkStateFlags state;
   gdouble line_width;
   gint bar_height;
   gint bar_width = 3;
@@ -509,11 +509,16 @@ unico_draw_pane_separator (DRAW_ARGS)
 
   bar_height = num_bars * bar_spacing * line_width;
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get_border_color (engine, flags, &border_color);
-  gtk_theming_engine_get (engine, flags,
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_border_color (engine, state, &border_color);
+  gtk_theming_engine_get (engine, state,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           NULL);
+
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
 
   /* FIXME add HORIZONTAL case with GTK_STYLE_CLASS_HORIZONTAL */
   cairo_translate (cr, x + width / 2 - bar_width / 2, y + height / 2 - bar_height / 2 + 0.5);
@@ -552,16 +557,16 @@ unico_draw_progressbar_activity (DRAW_ARGS)
 static void
 unico_draw_radio (DRAW_ARGS)
 {
-  GtkStateFlags flags;
+  GtkStateFlags state;
   gboolean in_menu;
   gboolean draw_bullet, inconsistent;
 
-  flags = gtk_theming_engine_get_state (engine);
+  state = gtk_theming_engine_get_state (engine);
 
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
 
-  inconsistent = (flags & GTK_STATE_FLAG_INCONSISTENT) != 0;
-  draw_bullet = (flags & GTK_STATE_FLAG_ACTIVE) != 0;
+  inconsistent = (state & GTK_STATE_FLAG_INCONSISTENT) != 0;
+  draw_bullet = (state & GTK_STATE_FLAG_ACTIVE) != 0;
   draw_bullet |= inconsistent;
 
   if (!in_menu)
@@ -578,7 +583,7 @@ unico_draw_radio (DRAW_ARGS)
     {
       GdkRGBA *bullet_color;
 
-      gtk_theming_engine_get (engine, flags,
+      gtk_theming_engine_get (engine, state,
                               "-unico-bullet-color", &bullet_color,
                               NULL);
 
@@ -606,7 +611,7 @@ unico_draw_radio (DRAW_ARGS)
             {
               GdkRGBA *bullet_outline_color;
 
-              gtk_theming_engine_get (engine, flags,
+              gtk_theming_engine_get (engine, state,
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
 

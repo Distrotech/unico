@@ -38,28 +38,26 @@ void
 unico_get_line_width (GtkThemingEngine *engine,
                       gdouble          *line_width)
 {
-  GtkBorder *border;
-  GtkStateFlags flags;
+  GtkBorder border;
+  GtkStateFlags state;
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "border-width", &border,
-                          NULL);
+  state = gtk_theming_engine_get_state (engine);
 
-  *line_width = MIN (MIN (border->top, border->bottom),
-                     MIN (border->left, border->right));
+  gtk_theming_engine_get_border (engine, state, &border);
 
-  gtk_border_free (border);
+  *line_width = MIN (MIN (border.top, border.bottom),
+                     MIN (border.left, border.right));
 }
 
 void
 unico_get_border_radius (GtkThemingEngine *engine,
                          gint             *radius)
 {
-  GtkStateFlags flags;
+  GtkStateFlags state;
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get (engine, state,
                           "border-radius", radius,
                           NULL);
 }
@@ -67,11 +65,12 @@ unico_get_border_radius (GtkThemingEngine *engine,
 gboolean
 unico_has_outer_stroke (GtkThemingEngine *engine)
 {
-  GtkStateFlags flags;
+  GtkStateFlags state;
   UnicoStrokeStyle outer_stroke_style;
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get (engine, state,
                           "-unico-outer-stroke-style", &outer_stroke_style,
                           NULL);
 
