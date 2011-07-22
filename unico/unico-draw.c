@@ -494,7 +494,7 @@ unico_draw_frame_gap (DRAW_ARGS,
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
-    }
+  }
 
   cairo_clip_extents (cr, &x0, &y0, &x1, &y1);
   cairo_rectangle (cr, x0, y0, x1 - x0, yc - y0);
@@ -590,7 +590,7 @@ unico_draw_pane_separator (DRAW_ARGS)
 
   cairo_translate (cr, x + width / 2, y + height / 2);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_HORIZONTAL))
+  if (height > width)
     cairo_translate (cr, - bar_width / 2 - 0.5, - bar_height / 2 + 0.5);
   else
     {

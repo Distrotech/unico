@@ -180,10 +180,10 @@ unico_engine_render_background (GtkThemingEngine *engine,
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
   else if (gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW))
-      style_functions->draw_common (engine, cr, x, y, width, height);
+    style_functions->draw_common (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
-      style_functions->draw_cell_background (engine, cr, x, y, width, height, flags);
+    style_functions->draw_cell_background (engine, cr, x, y, width, height, flags);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_background (engine, cr, x, y, width, height);
   else
@@ -300,7 +300,7 @@ unico_engine_render_frame (GtkThemingEngine *engine,
     style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
-      style_functions->draw_cell_frame (engine, cr, x, y, width, height, flags);
+    style_functions->draw_cell_frame (engine, cr, x, y, width, height, flags);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_frame (engine, cr, x, y, width, height);
   else
@@ -403,9 +403,7 @@ pixbuf_scale_or_ref (GdkPixbuf *src,
       height == gdk_pixbuf_get_height (src))
     return g_object_ref (src);
   else
-    return gdk_pixbuf_scale_simple (src,
-                                    width, height,
-                                    GDK_INTERP_BILINEAR);
+    return gdk_pixbuf_scale_simple (src, width, height, GDK_INTERP_BILINEAR);
 }
 
 static GdkPixbuf*
