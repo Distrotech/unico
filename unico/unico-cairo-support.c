@@ -380,6 +380,66 @@ draw_glow (GtkThemingEngine *engine,
   gdk_rgba_free (glow_color);
 }
 
+static void
+draw_texture (GtkThemingEngine *engine,
+              cairo_t          *cr,
+              gint              x,
+              gint              y,
+              gint              width,
+              gint              height,
+              guint             hidden_side,
+              GtkJunctionSides  junction)
+{
+  GtkStateFlags state;
+  GValue value = { 0, };
+  cairo_pattern_t *texture = NULL;
+  cairo_surface_t *surface = NULL;
+
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_property (engine, "-unico-background-texture", state, &value);
+
+  if (!G_VALUE_HOLDS_BOXED (&value))
+    return;
+
+  texture = g_value_dup_boxed (&value);
+  g_value_unset (&value);
+
+  if (texture != NULL)
+    cairo_pattern_get_surface (texture, &surface);
+
+  if (surface != NULL)
+    {
+      GtkBorder border;
+      GtkRoundedBox border_box;
+      cairo_pattern_t *pat;
+
+      gtk_theming_engine_get_border (engine, state, &border);
+      hide_border_sides (&border, hidden_side);
+
+      cairo_save (cr);
+
+      cairo_translate (cr, x, y);
+
+      _gtk_rounded_box_init_rect (&border_box, 0, 0, width, height);
+      _gtk_rounded_box_apply_border_radius (&border_box, engine, state, junction);
+      _gtk_rounded_box_shrink (&border_box, border.top, border.right, border.bottom, border.left);
+      _gtk_rounded_box_path (&border_box, cr);
+
+      pat = cairo_pattern_create_for_surface (surface);
+      cairo_pattern_set_extend (pat, CAIRO_EXTEND_REPEAT);
+      cairo_set_source (cr, pat);
+      cairo_fill (cr);
+
+      cairo_restore (cr);
+
+      cairo_pattern_destroy (pat);
+    }
+
+  if (texture != NULL)
+    cairo_pattern_destroy (texture);
+}
+
 void
 unico_cairo_draw_background (GtkThemingEngine *engine,
                              cairo_t          *cr,
@@ -412,6 +472,11 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
              x, y,
              width, height,
              hidden_side, junction);
+
+  draw_texture (engine, cr,
+                x, y,
+                width, height,
+                hidden_side, junction);
 }
 
 /* draw the border */

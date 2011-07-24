@@ -49,15 +49,15 @@ render_from_assets_common (GtkThemingEngine *engine,
                            gdouble           width,
                            gdouble           height)
 {
-  GtkStateFlags flags;
+  GtkStateFlags state;
   GValue value = { 0, };
   cairo_pattern_t *asset = NULL;
   cairo_surface_t *surface = NULL;
   gboolean retval = FALSE;
 
-  flags = gtk_theming_engine_get_state (engine);
+  state = gtk_theming_engine_get_state (engine);
 
-  gtk_theming_engine_get_property (engine, "background-image", flags, &value);
+  gtk_theming_engine_get_property (engine, "background-image", state, &value);
 
   if (!G_VALUE_HOLDS_BOXED (&value))
     return FALSE;
@@ -567,6 +567,12 @@ unico_engine_class_init (UnicoEngineClass *klass)
   engine_class->render_line        = unico_engine_render_line;
   engine_class->render_option      = unico_engine_render_option;
   engine_class->render_slider      = unico_engine_render_slider;
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("background-texture",
+                                                            "Background texture",
+                                                            "Background texture",
+                                                            CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("border-gradient",
