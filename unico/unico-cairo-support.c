@@ -311,7 +311,7 @@ draw_glow (GtkThemingEngine *engine,
 {
   GdkRGBA *glow_color;
   GtkBorder border;
-  GtkRoundedBox border_box, padding_box, clip_box;
+  GtkRoundedBox border_box, padding_box;
   GtkStateFlags state;
   cairo_t *cr_surface;
   cairo_surface_t *surface;
@@ -342,8 +342,7 @@ draw_glow (GtkThemingEngine *engine,
   _gtk_rounded_box_init_rect (&border_box, 0, 0, width, height);
   _gtk_rounded_box_apply_border_radius (&border_box, engine, state, junction);
   _gtk_rounded_box_shrink (&border_box, border.top, border.right, border.bottom, border.left);
-  clip_box = border_box;
-  _gtk_rounded_box_path (&clip_box, cr);
+  _gtk_rounded_box_path (&border_box, cr);
 
   cairo_clip (cr);
 
