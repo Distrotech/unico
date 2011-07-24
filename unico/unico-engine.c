@@ -592,6 +592,14 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             "Bullet outline color",
                                                             GDK_TYPE_RGBA, 0));
 
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("centroid-texture",
+                                                            "Centroid texture",
+                                                            "Centroid texture",
+                                                            CAIRO_GOBJECT_TYPE_PATTERN, 0));
+
+
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("focus-border-color",
                                                             "Focus border color",

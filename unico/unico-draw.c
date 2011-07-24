@@ -29,6 +29,59 @@
 #include "unico-support.h"
 #include "unico-types.h"
 
+static gboolean
+draw_centroid_texture (GtkThemingEngine *engine,
+                       cairo_t          *cr,
+                       gdouble           x,
+                       gdouble           y,
+                       gdouble           width,
+                       gdouble           height)
+{
+  GtkStateFlags state;
+  GValue value = { 0, };
+  cairo_pattern_t *texture = NULL;
+  cairo_surface_t *surface = NULL;
+  gboolean retval = FALSE;
+
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_property (engine, "-unico-centroid-texture", state, &value);
+
+  if (!G_VALUE_HOLDS_BOXED (&value))
+    return FALSE;
+
+  texture = g_value_dup_boxed (&value);
+  g_value_unset (&value);
+
+  if (texture != NULL)
+    cairo_pattern_get_surface (texture, &surface);
+
+  if (surface != NULL)
+    {
+      gint image_width, image_height;
+
+      image_width = cairo_image_surface_get_width (surface);
+      image_height = cairo_image_surface_get_height (surface);
+
+      cairo_save (cr);
+
+      cairo_set_source_surface (cr, surface, (gint) (x + width / 2 - image_width / 2),
+                                             (gint) (y + height / 2 - image_height / 2));
+
+      cairo_paint (cr);
+
+      cairo_restore (cr);
+
+      retval = TRUE;
+    }
+
+  if (texture != NULL)
+    cairo_pattern_destroy (texture);
+
+  return retval;
+}
+
+
 static void
 unico_draw_arrow (GtkThemingEngine *engine,
                   cairo_t          *cr,
@@ -571,20 +624,23 @@ unico_draw_pane_separator (DRAW_ARGS)
   gint i, bar_y = 1;
   gint num_bars = 3, bar_spacing = 3;
 
+  state = gtk_theming_engine_get_state (engine);
+
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
+
+  if (draw_centroid_texture (engine, cr, x, y, width, height))
+    return;
+
   unico_get_line_width (engine, &line_width);
 
   bar_height = num_bars * bar_spacing * line_width;
-
-  state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border_color (engine, state, &border_color);
   gtk_theming_engine_get (engine, state,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           NULL);
-
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
 
   cairo_save (cr);
 
@@ -762,6 +818,9 @@ unico_draw_slider (DRAW_ARGS,
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
+
+  draw_centroid_texture (engine, cr, x, y, width, height);
+
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, gtk_theming_engine_get_junction_sides (engine));
