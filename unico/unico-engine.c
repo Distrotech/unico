@@ -179,9 +179,8 @@ unico_engine_render_background (GtkThemingEngine *engine,
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
-  else if (gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW))
-    style_functions->draw_common (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
+  else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
     style_functions->draw_cell_background (engine, cr, x, y, width, height, flags);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
@@ -298,7 +297,8 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_FRAME) &&
            gtk_widget_path_is_type (path, GTK_TYPE_SCROLLED_WINDOW))
     style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
+  else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
     style_functions->draw_cell_frame (engine, cr, x, y, width, height, flags);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
