@@ -379,6 +379,7 @@ draw_glow (GtkThemingEngine *engine,
   gdk_rgba_free (glow_color);
 }
 
+/* draw a repeated texture */
 static void
 draw_texture (GtkThemingEngine *engine,
               cairo_t          *cr,

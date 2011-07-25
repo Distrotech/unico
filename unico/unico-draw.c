@@ -29,6 +29,7 @@
 #include "unico-support.h"
 #include "unico-types.h"
 
+/* draw a texture placed on the centroid */
 static gboolean
 draw_centroid_texture (GtkThemingEngine *engine,
                        cairo_t          *cr,
@@ -58,16 +59,10 @@ draw_centroid_texture (GtkThemingEngine *engine,
 
   if (surface != NULL)
     {
-      gint image_width, image_height;
-
-      image_width = cairo_image_surface_get_width (surface);
-      image_height = cairo_image_surface_get_height (surface);
-
       cairo_save (cr);
 
-      cairo_set_source_surface (cr, surface, (gint) (x + width / 2 - image_width / 2),
-                                             (gint) (y + height / 2 - image_height / 2));
-
+      cairo_set_source_surface (cr, surface, (gint) (x + width / 2 - cairo_image_surface_get_width (surface) / 2),
+                                             (gint) (y + height / 2 - cairo_image_surface_get_height (surface) / 2));
       cairo_paint (cr);
 
       cairo_restore (cr);
@@ -192,7 +187,6 @@ unico_draw_check (DRAW_ARGS)
   state = gtk_theming_engine_get_state (engine);
 
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
-
   inconsistent = (state & GTK_STATE_FLAG_INCONSISTENT) != 0;
   draw_bullet = (state & GTK_STATE_FLAG_ACTIVE) != 0;
   draw_bullet |= inconsistent;
@@ -220,8 +214,8 @@ unico_draw_check (DRAW_ARGS)
           cairo_save (cr);
 
           cairo_set_line_width (cr, 2.0);
-          cairo_move_to (cr, 3, (double) height / 2.0);
-          cairo_line_to (cr, width - 3, (double) height / 2.0);
+          cairo_move_to (cr, 3, (gdouble) height / 2.0);
+          cairo_line_to (cr, width - 3, (gdouble) height / 2.0);
 
           cairo_restore (cr);
         }
@@ -231,7 +225,7 @@ unico_draw_check (DRAW_ARGS)
 
           if (in_menu)
             {
-              cairo_scale (cr, (double) width / 18.0, (double) height / 18.0);
+              cairo_scale (cr, (gdouble) width / 18.0, (gdouble) height / 18.0);
               cairo_translate (cr, 2.0, 3.0);
             }
           else
@@ -242,8 +236,9 @@ unico_draw_check (DRAW_ARGS)
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
 
-              cairo_scale (cr, (double) width / 18.0, (double) height / 18.0);
+              cairo_scale (cr, (gdouble) width / 18.0, (gdouble) height / 18.0);
 
+              /* thick's outline */
               cairo_move_to (cr, 5.0, 5.65);
               cairo_line_to (cr, 8.95, 9.57);
               cairo_line_to (cr, 16.0, 2.54);
@@ -262,6 +257,7 @@ unico_draw_check (DRAW_ARGS)
               gdk_rgba_free (bullet_outline_color);
             }
 
+          /* thick */
           cairo_move_to (cr, 0.0, 6.0);
           cairo_line_to (cr, 0.0, 8.0);
           cairo_line_to (cr, 4.0, 12.0);
@@ -714,7 +710,6 @@ unico_draw_radio (DRAW_ARGS)
   state = gtk_theming_engine_get_state (engine);
 
   in_menu = gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM);
-
   inconsistent = (state & GTK_STATE_FLAG_INCONSISTENT) != 0;
   draw_bullet = (state & GTK_STATE_FLAG_ACTIVE) != 0;
   draw_bullet |= inconsistent;
@@ -744,8 +739,8 @@ unico_draw_radio (DRAW_ARGS)
           cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
           cairo_set_line_width (cr, 2.0);
 
-          cairo_move_to(cr, 5, (double) height / 2.0);
-          cairo_line_to(cr, width - 5, (double) height / 2.0);
+          cairo_move_to(cr, 5, (gdouble) height / 2.0);
+          cairo_line_to(cr, width - 5, (gdouble) height / 2.0);
 
           gdk_cairo_set_source_rgba (cr, bullet_color);
           cairo_stroke (cr);
@@ -755,8 +750,8 @@ unico_draw_radio (DRAW_ARGS)
       else
         {
           if (in_menu)
-            cairo_arc (cr, x + (double) width / 2.0, y + (double) height / 2.0,
-                           (double) (width + height) / 4.0 - 4, 0, G_PI * 2);
+            cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
+                           (gdouble) (width + height) / 4.0 - 4, 0, G_PI * 2);
           else
             {
               GdkRGBA *bullet_outline_color;
@@ -765,17 +760,19 @@ unico_draw_radio (DRAW_ARGS)
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
 
-              cairo_arc (cr, x + (double) width / 2.0, y + (double) height / 2.0,
-                             (double) (width + height) / 4.0 - 4, 0, G_PI * 2);
+              /* bullet's outline */
+              cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
+                             (gdouble) (width + height) / 4.0 - 4, 0, G_PI * 2);
               gdk_cairo_set_source_rgba (cr, bullet_outline_color);
               cairo_fill (cr);
 
-              cairo_arc (cr, x + (double) width / 2.0, y + (double) height / 2.0,
-                             (double) (width + height) / 4.0 - 5, 0, G_PI * 2);
+              cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
+                             (gdouble) (width + height) / 4.0 - 5, 0, G_PI * 2);
 
               gdk_rgba_free (bullet_outline_color);
             }
 
+          /* bullet */
           gdk_cairo_set_source_rgba (cr, bullet_color);
           cairo_fill (cr);
         }
