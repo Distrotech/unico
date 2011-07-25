@@ -108,6 +108,13 @@ struct _UnicoStyleFunctions
 
   void (*draw_grip) (DRAW_ARGS);
 
+  void (*draw_line) (GtkThemingEngine *engine,
+                     cairo_t          *cr,
+                     gdouble           x0,
+                     gdouble           y0,
+                     gdouble           x1,
+                     gdouble           y1);
+
   void (*draw_notebook) (DRAW_ARGS,
                          GtkPositionType gap_side,
                          gdouble         xy0_gap,

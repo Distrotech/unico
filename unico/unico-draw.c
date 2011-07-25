@@ -599,6 +599,52 @@ unico_draw_grip (DRAW_ARGS)
 }
 
 static void
+add_path_line (cairo_t *cr,
+               gdouble  x0,
+               gdouble  y0,
+               gdouble  x1,
+               gdouble  y1)
+{
+  /* Adjust endpoints */
+  if (y0 == y1)
+    {
+      y0 += 0.5;
+      y1 += 0.5;
+      x0 += 0.5;
+      x1 -= 0.5;
+    }
+  else if (x0 == x1)
+    {
+      x0 += 0.5;
+      x1 += 0.5;
+      y0 += 0.5;
+      y1 -= 0.5;
+    }
+
+  cairo_move_to (cr, x0, y0);
+  cairo_line_to (cr, x1, y1);
+}
+
+static void
+unico_draw_line (GtkThemingEngine *engine,
+                 cairo_t          *cr,
+                 gdouble           x0,
+                 gdouble           y0,
+                 gdouble           x1,
+                 gdouble           y1)
+{
+  cairo_save (cr);
+
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_SQUARE);
+
+  add_path_line (cr, x0, y0, x1, y1);
+  unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
+  cairo_stroke (cr);
+
+  cairo_restore (cr);
+}
+
+static void
 unico_draw_notebook (DRAW_ARGS,
                      GtkPositionType gap_side,
                      gdouble         xy0_gap,
@@ -615,16 +661,8 @@ unico_draw_notebook (DRAW_ARGS,
 static void
 unico_draw_pane_separator (DRAW_ARGS)
 {
-  GdkRGBA border_color;
-  GdkRGBA *inner_stroke_color;
-  GtkStateFlags state;
   gdouble line_width;
-  gint bar_height;
-  gint bar_width = 3;
-  gint i, bar_y = 1;
-  gint num_bars = 3, bar_spacing = 3;
-
-  state = gtk_theming_engine_get_state (engine);
+  gint i, bar_y, num_bars, bar_spacing, bar_width, bar_height;
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
@@ -635,12 +673,11 @@ unico_draw_pane_separator (DRAW_ARGS)
 
   unico_get_line_width (engine, &line_width);
 
+  bar_y = 1;
+  num_bars = 3;
+  bar_spacing = 3;
+  bar_width = 3;
   bar_height = num_bars * bar_spacing * line_width;
-
-  gtk_theming_engine_get_border_color (engine, state, &border_color);
-  gtk_theming_engine_get (engine, state,
-                          "-unico-inner-stroke-color", &inner_stroke_color,
-                          NULL);
 
   cairo_save (cr);
 
@@ -670,8 +707,6 @@ unico_draw_pane_separator (DRAW_ARGS)
     }
 
   cairo_restore (cr);
-
-  gdk_rgba_free (inner_stroke_color);
 }
 
 static void
@@ -988,6 +1023,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
   functions->draw_grip                          = unico_draw_grip;
+  functions->draw_line                          = unico_draw_line;
   functions->draw_notebook                      = unico_draw_notebook;
   functions->draw_pane_separator                = unico_draw_pane_separator;
   functions->draw_progressbar_activity          = unico_draw_progressbar_activity;

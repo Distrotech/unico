@@ -42,16 +42,16 @@
 G_DEFINE_DYNAMIC_TYPE (UnicoEngine, unico_engine, GTK_TYPE_THEMING_ENGINE)
 
 static gboolean
-render_from_assets_common (GtkThemingEngine *engine,
-                           cairo_t          *cr,
-                           gdouble           x,
-                           gdouble           y,
-                           gdouble           width,
-                           gdouble           height)
+render_from_texture (GtkThemingEngine *engine,
+                     cairo_t          *cr,
+                     gdouble           x,
+                     gdouble           y,
+                     gdouble           width,
+                     gdouble           height)
 {
   GtkStateFlags state;
   GValue value = { 0, };
-  cairo_pattern_t *asset = NULL;
+  cairo_pattern_t *texture = NULL;
   cairo_surface_t *surface = NULL;
   gboolean retval = FALSE;
 
@@ -62,11 +62,11 @@ render_from_assets_common (GtkThemingEngine *engine,
   if (!G_VALUE_HOLDS_BOXED (&value))
     return FALSE;
 
-  asset = g_value_dup_boxed (&value);
+  texture = g_value_dup_boxed (&value);
   g_value_unset (&value);
 
-  if (asset != NULL)
-    cairo_pattern_get_surface (asset, &surface);
+  if (texture != NULL)
+    cairo_pattern_get_surface (texture, &surface);
 
   if (surface != NULL)
     {
@@ -83,37 +83,28 @@ render_from_assets_common (GtkThemingEngine *engine,
       retval = TRUE;
     }
 
-  if (asset != NULL)
-    cairo_pattern_destroy (asset);
+  if (texture != NULL)
+    cairo_pattern_destroy (texture);
 
   return retval;
 }
 
 static void
-trim_allocation_for_scale (GtkThemingEngine *engine,
-                           gdouble          *x,
-                           gdouble          *y,
-                           gdouble          *width,
-                           gdouble          *height)
+trim_scale_allocation (GtkThemingEngine *engine,
+                       gdouble          *x,
+                       gdouble          *y,
+                       gdouble          *width,
+                       gdouble          *height)
 {
-  const GtkWidgetPath *path;
-
-  path = gtk_theming_engine_get_path (engine);
-
-  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
-      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH) ||
-       gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR)))
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
     {
-      if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
-        {
-          *y += *height / 2.0 - 2.0;
-          *height = 5;
-        }
-      else
-        {
-          *x += *width / 2.0 - 2.0;
-          *width = 5;
-        }
+      *y += *height / 2.0 - 2.0;
+      *height = 5;
+    }
+  else
+    {
+      *x += *width / 2.0 - 2.0;
+      *width = 5;
     }
 }
 
@@ -126,10 +117,15 @@ unico_engine_render_activity (GtkThemingEngine *engine,
                               gdouble           height)
 {
   UnicoStyleFunctions *style_functions;
+  const GtkWidgetPath *path;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+  path = gtk_theming_engine_get_path (engine);
+
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE))
+    trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR))
     style_functions->draw_progressbar_activity (engine, cr, x, y, width, height);
@@ -171,7 +167,9 @@ unico_engine_render_background (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
 
-  trim_allocation_for_scale (engine, &x, &y, &width, &height);
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
+    trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
       gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
@@ -205,7 +203,7 @@ unico_engine_render_check (GtkThemingEngine *engine,
 
   if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
     {
-      if (render_from_assets_common (engine, cr, x, y, width, height))
+      if (render_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
@@ -284,7 +282,9 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
 
-  trim_allocation_for_scale (engine, &x, &y, &width, &height);
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
+    trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
     style_functions->draw_separator (engine, cr, x, y, width, height);
@@ -356,127 +356,6 @@ unico_engine_render_handle (GtkThemingEngine *engine,
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_handle (engine, cr, x, y, width, height);
 }
 
-static GdkPixbuf*
-pixbuf_set_transparency (GdkPixbuf *pixbuf,
-                         gdouble    alpha_percent)
-{
-  GdkPixbuf *target;
-  guchar *data, *current;
-  guint x, y, rowstride, height, width;
-
-  g_return_val_if_fail (pixbuf != NULL, NULL);
-  g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
-
-  /* Returns a copy of pixbuf with it's non-completely-transparent pixels to
-     have an alpha level "alpha_percent" of their original value. */
-
-  target = gdk_pixbuf_add_alpha (pixbuf, FALSE, 0, 0, 0);
-
-  if (alpha_percent == 1.0)
-    return target;
-
-  width = gdk_pixbuf_get_width (target);
-  height = gdk_pixbuf_get_height (target);
-  rowstride = gdk_pixbuf_get_rowstride (target);
-  data = gdk_pixbuf_get_pixels (target);
-
-  for (y = 0; y < height; y++)
-    {
-      for (x = 0; x < width; x++)
-        {
-          /* The "4" is the number of chars per pixel, in this case, RGBA,
-             the 3 means "skip to the alpha" */
-          current = data + (y * rowstride) + (x * 4) + 3;
-          *(current) = (guchar) (*(current) * alpha_percent);
-        }
-    }
-
-  return target;
-}
-
-static GdkPixbuf*
-pixbuf_scale_or_ref (GdkPixbuf *src,
-                     gint       width,
-                     gint       height)
-{
-  if (width == gdk_pixbuf_get_width (src) &&
-      height == gdk_pixbuf_get_height (src))
-    return g_object_ref (src);
-  else
-    return gdk_pixbuf_scale_simple (src, width, height, GDK_INTERP_BILINEAR);
-}
-
-static GdkPixbuf*
-unico_engine_render_icon_pixbuf (GtkThemingEngine    *engine,
-                                 const GtkIconSource *source,
-                                 GtkIconSize          size)
-{
-  GdkPixbuf *scaled;
-  GdkPixbuf *stated;
-  GdkPixbuf *base_pixbuf;
-  GdkScreen *screen;
-  GtkSettings *settings;
-  GtkStateFlags flags;
-  gint width = 1;
-  gint height = 1;
-
-  base_pixbuf = gtk_icon_source_get_pixbuf (source);
-  screen = gtk_theming_engine_get_screen (engine);
-  settings = gtk_settings_get_for_screen (screen);
-  flags = gtk_theming_engine_get_state (engine);
-
-  g_return_val_if_fail (base_pixbuf != NULL, NULL);
-
-  if (size != (GtkIconSize) -1 && !gtk_icon_size_lookup_for_settings (settings, size, &width, &height))
-    {
-      g_warning (G_STRLOC ": invalid icon size '%d'", size);
-      return NULL;
-    }
-
-  /* If the size was wildcarded, and we're allowed to scale, then scale; otherwise,
-   * leave it alone.
-   */
-  if (size != (GtkIconSize)-1 && gtk_icon_source_get_size_wildcarded (source))
-    scaled = pixbuf_scale_or_ref (base_pixbuf, width, height);
-  else
-    scaled = g_object_ref (base_pixbuf);
-
-  /* If the state was wildcarded, then generate a state. */
-  if (gtk_icon_source_get_state_wildcarded (source))
-    {
-      if (flags & GTK_STATE_FLAG_INSENSITIVE)
-        {
-          stated = pixbuf_set_transparency (scaled, 0.3);
-          gdk_pixbuf_saturate_and_pixelate (stated, stated, 0.1, FALSE);
-
-          g_object_unref (scaled);
-        }
-      else if (flags & GTK_STATE_FLAG_PRELIGHT)
-        {
-          stated = gdk_pixbuf_copy (scaled);
-          gdk_pixbuf_saturate_and_pixelate (scaled, stated, 1.2, FALSE);
-
-          g_object_unref (scaled);
-        }
-      else
-        stated = scaled;
-    }
-  else
-    stated = scaled;
-
-  return stated;
-}
-
-static void
-unico_engine_render_layout (GtkThemingEngine *engine,
-                            cairo_t          *cr,
-                            gdouble           x,
-                            gdouble           y,
-                            PangoLayout      *layout)
-{
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_layout (engine, cr, x, y, layout);
-}
-
 static void
 unico_engine_render_line (GtkThemingEngine *engine,
                           cairo_t          *cr,
@@ -485,7 +364,13 @@ unico_engine_render_line (GtkThemingEngine *engine,
                           gdouble           x1,
                           gdouble           y1)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_line (engine, cr, x0, y0, x1, y1);
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  style_functions->draw_line (engine, cr, x0, y0, x1, y1);
 }
 
 static void
@@ -504,7 +389,7 @@ unico_engine_render_option (GtkThemingEngine *engine,
 
   if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
     {
-      if (render_from_assets_common (engine, cr, x, y, width, height))
+      if (render_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
@@ -528,7 +413,7 @@ unico_engine_render_slider (GtkThemingEngine *engine,
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCALE))
     {
-      if (render_from_assets_common (engine, cr, x, y, width, height))
+      if (render_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
@@ -562,8 +447,6 @@ unico_engine_class_init (UnicoEngineClass *klass)
   engine_class->render_frame       = unico_engine_render_frame;
   engine_class->render_frame_gap   = unico_engine_render_frame_gap;
   engine_class->render_handle      = unico_engine_render_handle;
-  engine_class->render_icon_pixbuf = unico_engine_render_icon_pixbuf;
-  engine_class->render_layout      = unico_engine_render_layout;
   engine_class->render_line        = unico_engine_render_line;
   engine_class->render_option      = unico_engine_render_option;
   engine_class->render_slider      = unico_engine_render_slider;
