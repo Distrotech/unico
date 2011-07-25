@@ -599,13 +599,13 @@ unico_draw_grip (DRAW_ARGS)
 }
 
 static void
-add_path_line (cairo_t *cr,
-               gdouble  x0,
-               gdouble  y0,
-               gdouble  x1,
-               gdouble  y1)
+unico_draw_line (GtkThemingEngine *engine,
+                 cairo_t          *cr,
+                 gdouble           x0,
+                 gdouble           y0,
+                 gdouble           x1,
+                 gdouble           y1)
 {
-  /* Adjust endpoints */
   if (y0 == y1)
     {
       y0 += 0.5;
@@ -623,25 +623,8 @@ add_path_line (cairo_t *cr,
 
   cairo_move_to (cr, x0, y0);
   cairo_line_to (cr, x1, y1);
-}
-
-static void
-unico_draw_line (GtkThemingEngine *engine,
-                 cairo_t          *cr,
-                 gdouble           x0,
-                 gdouble           y0,
-                 gdouble           x1,
-                 gdouble           y1)
-{
-  cairo_save (cr);
-
-  cairo_set_line_cap (cr, CAIRO_LINE_CAP_SQUARE);
-
-  add_path_line (cr, x0, y0, x1, y1);
   unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
   cairo_stroke (cr);
-
-  cairo_restore (cr);
 }
 
 static void
