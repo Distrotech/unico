@@ -26,7 +26,6 @@
 
 #include "unico.h"
 #include "unico-cairo-support.h"
-#include "unico-css-support.h"
 #include "unico-draw.h"
 #include "unico-engine.h"
 #include "unico-support.h"
@@ -528,6 +527,12 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-width",
+                                                            "Inner stroke width",
+                                                            "Inner stroke width",
+                                                            GTK_TYPE_BORDER, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("outer-stroke-color",
                                                             "Outer stroke color",
                                                             "Outer stroke color",
@@ -540,11 +545,10 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_enum ("outer-stroke-style",
-                                                           "Outer stroke style",
-                                                           "Outer stroke style",
-                                                           UNICO_TYPE_STROKE_STYLE,
-                                                           UNICO_STROKE_STYLE_NONE, 0));
+                                        g_param_spec_boxed ("outer-stroke-width",
+                                                            "Outer stroke width",
+                                                            "Outer stroke width",
+                                                            GTK_TYPE_BORDER, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("text-shadow-color",

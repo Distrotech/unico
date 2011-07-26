@@ -63,16 +63,7 @@ unico_get_border_radius (GtkThemingEngine *engine,
 }
 
 gboolean
-unico_has_outer_stroke (GtkThemingEngine *engine)
+unico_gtk_border_is_zero (GtkBorder *border)
 {
-  GtkStateFlags state;
-  UnicoStrokeStyle outer_stroke_style;
-
-  state = gtk_theming_engine_get_state (engine);
-
-  gtk_theming_engine_get (engine, state,
-                          "-unico-outer-stroke-style", &outer_stroke_style,
-                          NULL);
-
-  return outer_stroke_style != UNICO_STROKE_STYLE_NONE;
+  return (border->top == 0) && (border->bottom == 0) && (border->left == 0) && (border->right == 0);
 }

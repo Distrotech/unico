@@ -45,16 +45,16 @@ hide_border_sides (GtkBorder *border,
 
 /* shrink coordinate using GtkBorder */
 static void
-shrink_with_border (GtkBorder border,
-                    gint     *x,
-                    gint     *y,
-                    gint     *width,
-                    gint     *height)
+shrink_with_border (GtkBorder *border,
+                    gint      *x,
+                    gint      *y,
+                    gint      *width,
+                    gint      *height)
 {
-  *x += border.left;
-  *y += border.top;
-  *width -= border.left + border.right;
-  *height -= border.top + border.bottom;
+  *x += border->left;
+  *y += border->top;
+  *width -= border->left + border->right;
+  *height -= border->top + border->bottom;
 }
 
 /* draw the background */
@@ -451,17 +451,21 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
                              GtkJunctionSides  junction)
 {
   GtkBorder border;
+  GtkBorder *outer_border;
   GtkStateFlags state;
-  gint radius;
 
-  unico_get_border_radius (engine, &radius);
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border (engine, state, &border);
-  hide_border_sides (&border, hidden_side);
 
-  if (unico_has_outer_stroke (engine))
-    shrink_with_border (border, &x, &y, &width, &height);
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
+
+  hide_border_sides (&border, hidden_side);
+  hide_border_sides (outer_border, hidden_side);
+
+  shrink_with_border (outer_border, &x, &y, &width, &height);
 
   draw_background (engine, cr,
                    x, y,
@@ -477,6 +481,8 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
                 x, y,
                 width, height,
                 hidden_side, junction);
+
+  gtk_border_free (outer_border);
 }
 
 /* draw the border */
@@ -830,20 +836,23 @@ draw_inner_stroke (GtkThemingEngine *engine,
                    GtkJunctionSides  junction)
 {
   GdkRGBA *inner_stroke_color;
-  GtkBorder border;
+  GtkBorder *inner_border;
   GtkRoundedBox border_box, padding_box;
   GtkStateFlags state; 
   cairo_pattern_t *inner_stroke_pat;
 
   state = gtk_theming_engine_get_state (engine);
 
-  gtk_theming_engine_get_border (engine, state, &border);
-  hide_border_sides (&border, hidden_side);
-
   gtk_theming_engine_get (engine, state,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           "-unico-inner-stroke-gradient", &inner_stroke_pat,
+                          "-unico-inner-stroke-width", &inner_border,
                           NULL);
+
+  hide_border_sides (inner_border, hidden_side);
+
+  if (unico_gtk_border_is_zero (inner_border))
+    goto end_draw_inner_stroke;
 
   cairo_save (cr);
 
@@ -854,7 +863,10 @@ draw_inner_stroke (GtkThemingEngine *engine,
   _gtk_rounded_box_init_rect (&border_box, 0, 0, width, height);
   _gtk_rounded_box_apply_border_radius (&border_box, engine, state, junction);
   padding_box = border_box;
-  _gtk_rounded_box_shrink (&padding_box, border.top, border.right, border.bottom, border.left);
+  _gtk_rounded_box_shrink (&padding_box, inner_border->top,
+                                         inner_border->right,
+                                         inner_border->bottom,
+                                         inner_border->left);
 
   if (inner_stroke_pat)
     {
@@ -869,6 +881,9 @@ draw_inner_stroke (GtkThemingEngine *engine,
   cairo_fill (cr);
 
   cairo_restore (cr);
+
+end_draw_inner_stroke:
+  gtk_border_free (inner_border);
 
   if (inner_stroke_pat != NULL)
     cairo_pattern_destroy (inner_stroke_pat);
@@ -888,20 +903,23 @@ draw_outer_stroke (GtkThemingEngine *engine,
                    GtkJunctionSides  junction)
 {
   GdkRGBA *outer_stroke_color;
-  GtkBorder border;
+  GtkBorder *outer_border;
   GtkRoundedBox border_box, padding_box;
   GtkStateFlags state; 
   cairo_pattern_t *outer_stroke_pat;
 
   state = gtk_theming_engine_get_state (engine);
 
-  gtk_theming_engine_get_border (engine, state, &border);
-  hide_border_sides (&border, hidden_side);
-
   gtk_theming_engine_get (engine, state,
                           "-unico-outer-stroke-color", &outer_stroke_color,
                           "-unico-outer-stroke-gradient", &outer_stroke_pat,
+                          "-unico-outer-stroke-width", &outer_border,
                           NULL);
+
+  hide_border_sides (outer_border, hidden_side);
+
+  if (unico_gtk_border_is_zero (outer_border))
+    goto end_draw_outer_stroke;
 
   cairo_save (cr);
 
@@ -912,7 +930,10 @@ draw_outer_stroke (GtkThemingEngine *engine,
   _gtk_rounded_box_init_rect (&border_box, 0, 0, width, height);
   _gtk_rounded_box_apply_border_radius (&border_box, engine, state, junction);
   padding_box = border_box;
-  _gtk_rounded_box_shrink (&padding_box, border.top, border.right, border.bottom, border.left);
+  _gtk_rounded_box_shrink (&padding_box, outer_border->top,
+                                         outer_border->right,
+                                         outer_border->bottom,
+                                         outer_border->left);
 
   if (outer_stroke_pat)
     {
@@ -927,6 +948,9 @@ draw_outer_stroke (GtkThemingEngine *engine,
   cairo_fill (cr);
 
   cairo_restore (cr);
+
+end_draw_outer_stroke:
+  gtk_border_free (outer_border);
 
   if (outer_stroke_pat != NULL)
     cairo_pattern_destroy (outer_stroke_pat);
@@ -945,21 +969,28 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
                         GtkJunctionSides  junction)
 {
   GtkBorder border;
+  GtkBorder *outer_border;
   GtkStateFlags state;
 
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border (engine, state, &border);
-  hide_border_sides (&border, hidden_side);
 
-  if (unico_has_outer_stroke (engine))
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
+
+  hide_border_sides (&border, hidden_side);
+  hide_border_sides (outer_border, hidden_side);
+
+  if (!unico_gtk_border_is_zero (outer_border))
     {
       draw_outer_stroke (engine, cr,
                          x, y,
                          width, height,
                          hidden_side, junction);
 
-      shrink_with_border (border, &x, &y, &width, &height);
+      shrink_with_border (outer_border, &x, &y, &width, &height);
     }
 
   draw_inner_stroke (engine, cr,
@@ -971,6 +1002,8 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
                x, y,
                width, height,
                hidden_side, junction);
+
+  gtk_border_free (outer_border);
 }
 
 void

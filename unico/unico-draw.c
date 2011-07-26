@@ -421,11 +421,13 @@ unico_draw_frame_gap (DRAW_ARGS,
                       gdouble         xy1_gap)
 {
   GtkBorder border;
+  GtkBorder *outer_border;
   GtkCssBorderCornerRadius *top_left_radius, *top_right_radius;
   GtkCssBorderCornerRadius *bottom_left_radius, *bottom_right_radius;
   GtkCssBorderRadius border_radius = { { 0, },  };
   GtkJunctionSides junction;
   GtkStateFlags state;
+  gboolean has_outer_stroke = FALSE;
   gdouble x0, y0, x1, y1, xc, yc, wc, hc;
 
   xc = yc = wc = hc = 0;
@@ -442,7 +444,11 @@ unico_draw_frame_gap (DRAW_ARGS,
                           "border-top-right-radius", &top_right_radius,
                           "border-bottom-right-radius", &bottom_right_radius,
                           "border-bottom-left-radius", &bottom_left_radius,
+                          "-unico-outer-stroke-width", &outer_border,
                           NULL);
+
+  if (!unico_gtk_border_is_zero (outer_border))
+    has_outer_stroke = TRUE;
 
   if (top_left_radius)
     border_radius.top_left = *top_left_radius;
@@ -467,11 +473,11 @@ unico_draw_frame_gap (DRAW_ARGS,
       wc = MAX (xy1_gap - xy0_gap - (border.left + border.right), 0);
       hc = border.top * 2;
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          xc += border.left;
-          wc = MAX (xy1_gap - xy0_gap - 2 * (border.left + border.right), 0);
-          hc += border.top;
+          xc += outer_border->left;
+          wc = MAX (xy1_gap - xy0_gap - (outer_border->left + outer_border->right) - (border.left + border.right), 0);
+          hc += outer_border->top;
         }
 
       if (xy0_gap < border_radius.top_left.horizontal)
@@ -487,12 +493,12 @@ unico_draw_frame_gap (DRAW_ARGS,
       wc = MAX (xy1_gap - xy0_gap - (border.left + border.right), 0);
       hc = border.bottom * 2;
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          xc += border.left;
-          yc -= border.bottom;
-          wc = MAX (xy1_gap - xy0_gap - 2 * (border.left + border.right), 0);
-          hc += border.bottom;
+          xc += outer_border->left;
+          yc -= outer_border->bottom;
+          wc = MAX (xy1_gap - xy0_gap - (outer_border->left + outer_border->right) - (border.left + border.right), 0);
+          hc += outer_border->bottom;
         }
 
       if (xy0_gap < border_radius.bottom_left.horizontal)
@@ -508,11 +514,11 @@ unico_draw_frame_gap (DRAW_ARGS,
       wc = border.left * 2;
       hc = MAX (xy1_gap - xy0_gap - (border.top + border.bottom), 0);
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          yc += border.top;
-          wc += border.left;
-          hc = MAX (xy1_gap - xy0_gap - 2 * (border.top + border.bottom), 0);
+          yc += outer_border->top;
+          wc += outer_border->left;
+          hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
       if (xy0_gap < border_radius.top_left.vertical)
@@ -528,12 +534,12 @@ unico_draw_frame_gap (DRAW_ARGS,
       wc = border.right * 2;
       hc = MAX (xy1_gap - xy0_gap - (border.top + border.bottom), 0);
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          xc -= border.right;
-          yc += border.top;
-          wc += border.right;
-          hc = MAX (xy1_gap - xy0_gap - 2 * (border.top + border.bottom), 0);
+          xc -= outer_border->right;
+          yc += outer_border->top;
+          wc += outer_border->right;
+          hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
       if (xy0_gap < border_radius.top_right.vertical)
@@ -557,6 +563,8 @@ unico_draw_frame_gap (DRAW_ARGS,
   unico_cairo_draw_frame (engine, cr, x, y, width, height, 0, junction);
 
   cairo_restore (cr);
+
+  gtk_border_free (outer_border);
 }
 
 static void
@@ -892,14 +900,22 @@ unico_draw_tab (DRAW_ARGS,
                 GtkPositionType gap_side)
 {
   GtkBorder border;
+  GtkBorder *outer_border;
   GtkJunctionSides junction = 0;
-  guint hidden_side = 0;
-  gdouble bg_offset = 0;
   GtkStateFlags state;
+  gboolean has_outer_stroke = FALSE;
+  gdouble bg_offset = 0;
+  guint hidden_side = 0;
 
   state = gtk_theming_engine_get_state (engine); 
 
   gtk_theming_engine_get_border (engine, state, &border);
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
+
+  if (!unico_gtk_border_is_zero (outer_border))
+    has_outer_stroke = TRUE;
 
   cairo_save (cr);
 
@@ -916,10 +932,10 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_TOP;
       hidden_side = SIDE_TOP;
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          y -= border.bottom;
-          height += border.bottom;
+          y -= outer_border->bottom;
+          height += outer_border->bottom;
         }
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
@@ -933,8 +949,8 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_BOTTOM;
       hidden_side = SIDE_BOTTOM;
 
-      if (unico_has_outer_stroke (engine))
-        height += border.top;
+      if (has_outer_stroke)
+        height += outer_border->top;
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
         bg_offset = border.top;
@@ -945,10 +961,10 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_LEFT;
       hidden_side = SIDE_LEFT;
 
-      if (unico_has_outer_stroke (engine))
+      if (has_outer_stroke)
         {
-          x -= border.right;
-          width += border.right;
+          x -= outer_border->right;
+          width += outer_border->right;
         }
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
@@ -961,8 +977,8 @@ unico_draw_tab (DRAW_ARGS,
       junction = GTK_JUNCTION_RIGHT;
       hidden_side = SIDE_RIGHT;
 
-      if (unico_has_outer_stroke (engine))
-        width += border.left;
+      if (has_outer_stroke)
+        width += outer_border->left;
 
       if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
         bg_offset = border.left;
@@ -983,6 +999,8 @@ unico_draw_tab (DRAW_ARGS,
    * the frame on bottom bar has the wrong gradient,
    * while should be reflected */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
+
+  gtk_border_free (outer_border);
 }
 
 void

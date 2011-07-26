@@ -39,7 +39,7 @@ G_GNUC_INTERNAL void unico_get_line_width (GtkThemingEngine *engine,
 G_GNUC_INTERNAL void unico_get_border_radius (GtkThemingEngine *engine,
                                               gint             *radius);
 
-G_GNUC_INTERNAL gboolean unico_has_outer_stroke (GtkThemingEngine *engine);
+G_GNUC_INTERNAL gboolean unico_gtk_border_is_zero (GtkBorder *border);
 
 G_END_DECLS
 

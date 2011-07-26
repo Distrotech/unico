@@ -4,7 +4,6 @@ source_h = \
 	$(srcdir)/gtkroundedboxprivate.h \
 	$(srcdir)/raico-blur.h \
 	$(srcdir)/unico-cairo-support.h \
-	$(srcdir)/unico-css-support.h \
 	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-draw.h \
 	$(srcdir)/unico-engine.h \
@@ -15,7 +14,6 @@ source_c = \
 	$(srcdir)/gtkroundedbox.c \
 	$(srcdir)/raico-blur.c \
 	$(srcdir)/unico-cairo-support.c \
-	$(srcdir)/unico-css-support.c \
 	$(srcdir)/unico-draw.c \
 	$(srcdir)/unico-engine.c \
 	$(srcdir)/unico-support.c \
