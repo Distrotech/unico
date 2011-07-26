@@ -26,12 +26,15 @@
 #include "unico-support.h"
 #include "unico-types.h"
 
-void
-unico_lookup_functions (UnicoEngine          *engine,
-                        UnicoStyleFunctions **functions)
+gboolean
+unico_gdk_rgba_is_default (GdkRGBA *color)
 {
-  if (functions)
-    *functions = &engine->style_functions[UNICO_STYLE_DEFAULT];
+  GdkRGBA default_color;
+
+  /* pink is default GdkRGBA color set in gtk/gtkstyleproperty.c */
+  gdk_rgba_parse (&default_color, "pink");
+
+  return gdk_rgba_equal (&default_color, color);
 }
 
 void
@@ -66,4 +69,12 @@ gboolean
 unico_gtk_border_is_zero (GtkBorder *border)
 {
   return (border->top == 0) && (border->bottom == 0) && (border->left == 0) && (border->right == 0);
+}
+
+void
+unico_lookup_functions (UnicoEngine          *engine,
+                        UnicoStyleFunctions **functions)
+{
+  if (functions)
+    *functions = &engine->style_functions[UNICO_STYLE_DEFAULT];
 }

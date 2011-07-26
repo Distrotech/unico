@@ -470,7 +470,6 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             "Bullet outline color",
                                                             GDK_TYPE_RGBA, 0));
 
-
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("centroid-texture",
                                                             "Centroid texture",
@@ -521,6 +520,30 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-top-color",
+                                                            "Inner stroke top color",
+                                                            "Inner stroke top color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-right-color",
+                                                            "Inner stroke right color",
+                                                            "Inner stroke right color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-bottom-color",
+                                                            "Inner stroke bottom color",
+                                                            "Inner stroke bottom color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-left-color",
+                                                            "Inner stroke left color",
+                                                            "Inner stroke left color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("inner-stroke-gradient",
                                                             "Inner stroke gradient",
                                                             "Inner stroke gradient",
@@ -536,6 +559,30 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                         g_param_spec_boxed ("outer-stroke-color",
                                                             "Outer stroke color",
                                                             "Outer stroke color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-top-color",
+                                                            "Outer stroke top color",
+                                                            "Outer stroke top color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-right-color",
+                                                            "Outer stroke right color",
+                                                            "Outer stroke right color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-bottom-color",
+                                                            "Outer stroke bottom color",
+                                                            "Outer stroke bottom color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-left-color",
+                                                            "Outer stroke left color",
+                                                            "Outer stroke left color",
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
