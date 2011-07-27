@@ -25,8 +25,6 @@
 
 #include <gtk/gtk.h>
 
-#include "unico-types.h"
-
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL void unico_cairo_draw_background (GtkThemingEngine *engine,
@@ -53,12 +51,6 @@ G_GNUC_INTERNAL gboolean unico_cairo_draw_from_texture (GtkThemingEngine *engine
                                                         gdouble           y,
                                                         gdouble           width,
                                                         gdouble           height);
-
-G_GNUC_INTERNAL void unico_cairo_exchange_axis (cairo_t *cr,
-                                                gint    *x,
-                                                gint    *y,
-                                                gint    *width,
-                                                gint    *height);
 
 G_GNUC_INTERNAL void unico_cairo_round_rect (cairo_t         *cr,
                                              gdouble          x,
@@ -87,14 +79,6 @@ G_GNUC_INTERNAL void unico_cairo_set_source_inner_stroke (GtkThemingEngine *engi
                                                           cairo_t          *cr,
                                                           gdouble           width,
                                                           gdouble           height);
-
-G_GNUC_INTERNAL void unico_cairo_style_pattern_set_matrix (cairo_pattern_t *pattern,
-                                                           gdouble          width,
-                                                           gdouble          height);
-
-G_GNUC_INTERNAL void unico_cairo_set_source_color_with_alpha (cairo_t *cr,
-                                                              GdkRGBA *color,
-                                                              gdouble  alpha);
 
 G_END_DECLS
 

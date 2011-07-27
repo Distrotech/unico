@@ -101,10 +101,7 @@ unico_engine_render_background (GtkThemingEngine *engine,
     unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-      gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
-    style_functions->draw_combo_button_background (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
   else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
@@ -213,14 +210,8 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
     style_functions->draw_separator (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
-    style_functions->draw_combo_button_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
     style_functions->draw_spinbutton_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_FRAME) &&
-           gtk_widget_path_is_type (path, GTK_TYPE_SCROLLED_WINDOW))
-    style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
   else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))

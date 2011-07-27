@@ -20,8 +20,8 @@
  *
  */
 
-#include <gtk/gtk.h>
 #include <cairo.h>
+#include <gtk/gtk.h>
 
 #include "math.h"
 #include "unico-cairo-support.h"
@@ -106,7 +106,7 @@ unico_draw_arrow (GtkThemingEngine *engine,
 
   cairo_save (cr);
 
-  /* use floor function to adjust those doubles. */
+  /* use floor function to adjust doubles */
   y = floor (y);
   x = floor (x);
   size = floor (size);
@@ -118,11 +118,11 @@ unico_draw_arrow (GtkThemingEngine *engine,
   cairo_rotate (cr, angle - G_PI_2);
   cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME This +1 / -1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug. */
-  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug */
+  cairo_move_to (cr, - size / 2.0, - size / 2.0);
   cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
-  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_rel_line_to (cr, - size / 2.0 - 1, size / 2.0);
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -289,24 +289,6 @@ unico_draw_check (DRAW_ARGS)
 }
 
 static void
-unico_draw_combo_button_background (DRAW_ARGS)
-{
-  /* playground for junctions */
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
-unico_draw_combo_button_frame (DRAW_ARGS)
-{
-  /* playground for junctions */
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
 unico_draw_common (DRAW_ARGS)
 {
   unico_cairo_draw_background (engine, cr,
@@ -347,6 +329,7 @@ unico_draw_expander (DRAW_ARGS)
 
   cairo_save (cr);
 
+  /* use floor function to adjust doubles */
   size = floor (MIN (width, height));
 
   x += width / 2 - size / 2;
@@ -359,11 +342,11 @@ unico_draw_expander (DRAW_ARGS)
   cairo_rotate (cr, angle);
   cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME This +1 / -1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug. */
-  cairo_move_to (cr, -size / 2.0, -size / 2.0);
+  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
+   * I know it's not nice at all, but it fix a visual bug */
+  cairo_move_to (cr, - size / 2.0, - size / 2.0);
   cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
-  cairo_rel_line_to (cr, -size / 2.0 - 1, size / 2.0);
+  cairo_rel_line_to (cr, - size / 2.0 - 1, size / 2.0);
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -389,10 +372,10 @@ unico_draw_extension (DRAW_ARGS,
 
   state = gtk_theming_engine_get_state (engine); 
 
-  gtk_theming_engine_get_border (engine, state, &border);
   gtk_theming_engine_get (engine, state,
                           "-unico-outer-stroke-width", &outer_border,
                           NULL);
+  gtk_theming_engine_get_border (engine, state, &border);
 
   if (!unico_gtk_border_is_zero (outer_border))
     has_outer_stroke = TRUE;
@@ -475,8 +458,7 @@ unico_draw_extension (DRAW_ARGS,
     unico_cairo_draw_background (engine, cr, 0, 0, height, width + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
   cairo_restore (cr);
 
-  /* FIXME put this in the rotation?
-   * the frame on bottom bar has the wrong gradient,
+  /* FIXME the frame on bottom bar has the wrong gradient,
    * while should be reflected */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
 
@@ -499,7 +481,6 @@ unico_draw_focus (DRAW_ARGS)
                           "-unico-focus-fill-color", &fill_color,
                           "-unico-focus-outer-stroke-color", &outer_stroke_color,
                           NULL);
-
   gtk_theming_engine_get_style (engine,
                                 "focus-line-width", &line_width,
                                 NULL);  
@@ -508,18 +489,21 @@ unico_draw_focus (DRAW_ARGS)
 
   cairo_set_line_width (cr, line_width);
 
+  /* first layer, background */
   unico_cairo_round_rect (cr, x, y,
                               width, height,
                               radius, SIDE_ALL, GTK_JUNCTION_NONE);
   gdk_cairo_set_source_rgba (cr, fill_color);
   cairo_fill (cr);
 
+  /* second layer, outer stroke */
   unico_cairo_round_rect_inner (cr, x - line_width, y - line_width,
                                     width + line_width * 2, height + line_width * 2,
                                     radius + 1, SIDE_ALL, GTK_JUNCTION_NONE);
   gdk_cairo_set_source_rgba (cr, outer_stroke_color);
   cairo_stroke (cr);
 
+  /* third layer, border */
   unico_cairo_round_rect_inner (cr, x, y,
                                     width, height,
                                     radius, SIDE_ALL, GTK_JUNCTION_NONE);
@@ -551,11 +535,10 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   xc = yc = wc = hc = 0;
 
-  state = gtk_theming_engine_get_state (engine);
-
   junction = gtk_theming_engine_get_junction_sides (engine);
 
-  gtk_theming_engine_get_border (engine, state, &border);
+  state = gtk_theming_engine_get_state (engine);
+
   gtk_theming_engine_get (engine, state,
                           /* Can't use border-radius as it's an int for
                            * backwards compat */
@@ -565,6 +548,7 @@ unico_draw_frame_gap (DRAW_ARGS,
                           "border-bottom-left-radius", &bottom_left_radius,
                           "-unico-outer-stroke-width", &outer_border,
                           NULL);
+  gtk_theming_engine_get_border (engine, state, &border);
 
   if (!unico_gtk_border_is_zero (outer_border))
     has_outer_stroke = TRUE;
@@ -670,6 +654,7 @@ unico_draw_frame_gap (DRAW_ARGS,
       break;
   }
 
+  /* clip the gap */
   cairo_clip_extents (cr, &x0, &y0, &x1, &y1);
   cairo_rectangle (cr, x0, y0, x1 - x0, yc - y0);
   cairo_rectangle (cr, x0, yc, xc - x0, hc);
@@ -677,8 +662,7 @@ unico_draw_frame_gap (DRAW_ARGS,
   cairo_rectangle (cr, x0, yc + hc, x1 - x0, y1 - (yc + hc));
   cairo_clip (cr);
 
-  /* FIXME Maybe we need to add a check for the GtkBorderStyle,
-   * old GTK_SHADOW_IN corresponds to GTK_BORDER_STYLE_INSET. */
+  /* draw the frame, gap area will not be drawn */
   unico_cairo_draw_frame (engine, cr, x, y, width, height, 0, junction);
 
   cairo_restore (cr);
@@ -696,15 +680,17 @@ unico_draw_grip (DRAW_ARGS)
 
   state = gtk_theming_engine_get_state (engine);
 
-  gtk_theming_engine_get_border_color (engine, state, &border_color);
   gtk_theming_engine_get (engine, state,
                           "-unico-inner-stroke-color", &inner_stroke_color,
                           NULL);
+  gtk_theming_engine_get_border_color (engine, state, &border_color);
 
-  for (ly = 0; ly < 4; ly++) /* vertically, four rows of dots */
+  for (ly = 0; ly < 4; ly++)
     {
-      for (lx = 0; lx <= ly; lx++) /* horizontally */
+      /* vertically, four rows of dots */
+      for (lx = 0; lx <= ly; lx++)
         {
+          /* horizontally */
           int ny = (3.5 - ly) * 3;
           int nx = lx * 3;
 
@@ -756,6 +742,7 @@ unico_draw_handle (DRAW_ARGS)
 
   for (i = 0; i < num_bars; i++)
     {
+      /* draw bars */
       cairo_move_to (cr, 0, bar_y);
       cairo_line_to (cr, bar_width, bar_y);
       unico_cairo_set_source_border (engine, cr, bar_width, 3);
@@ -898,15 +885,6 @@ unico_draw_radio (DRAW_ARGS)
 }
 
 static void
-unico_draw_scrolled_window_frame (DRAW_ARGS)
-{
-  /* play with the junctions, if needed */
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
-}
-
-static void
 unico_draw_separator (DRAW_ARGS)
 {
   gdouble line_width;
@@ -965,11 +943,11 @@ unico_draw_spinbutton_background (DRAW_ARGS)
   GtkJunctionSides junction;
   GtkStateFlags state;
 
+  junction = gtk_theming_engine_get_junction_sides (engine);
+
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border (engine, state, &border);
-
-  junction = gtk_theming_engine_get_junction_sides (engine);
 
   /* FIXME this code always adds padding,
    * even when outer stroke for the spinbutton frame is none */
@@ -988,11 +966,11 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
   GtkJunctionSides junction;
   GtkStateFlags state;
 
+  junction = gtk_theming_engine_get_junction_sides (engine);
+
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border (engine, state, &border);
-
-  junction = gtk_theming_engine_get_junction_sides (engine);
 
   /* FIXME this code always adds padding,
    * even when outer stroke for the spinbutton frame is none */
@@ -1014,8 +992,6 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_cell_background               = unico_draw_cell_background;
   functions->draw_cell_frame                    = unico_draw_cell_frame;
   functions->draw_check                         = unico_draw_check;
-  functions->draw_combo_button_background       = unico_draw_combo_button_background;
-  functions->draw_combo_button_frame            = unico_draw_combo_button_frame;
   functions->draw_common                        = unico_draw_common;
   functions->draw_common_background             = unico_draw_common_background;
   functions->draw_common_frame                  = unico_draw_common_frame;
@@ -1028,7 +1004,6 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_line                          = unico_draw_line;
   functions->draw_notebook                      = unico_draw_notebook;
   functions->draw_radio                         = unico_draw_radio;
-  functions->draw_scrolled_window_frame         = unico_draw_scrolled_window_frame;
   functions->draw_separator                     = unico_draw_separator;
   functions->draw_slider                        = unico_draw_slider;
   functions->draw_spinbutton_background         = unico_draw_spinbutton_background;

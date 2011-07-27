@@ -89,10 +89,6 @@ struct _UnicoStyleFunctions
 
   void (*draw_check) (DRAW_ARGS);
 
-  void (*draw_combo_button_background) (DRAW_ARGS);
-
-  void (*draw_combo_button_frame) (DRAW_ARGS);
-
   void (*draw_common) (DRAW_ARGS);
 
   void (*draw_common_background) (DRAW_ARGS);
@@ -128,8 +124,6 @@ struct _UnicoStyleFunctions
                          gdouble         xy1_gap);
 
   void (*draw_radio) (DRAW_ARGS);
-
-  void (*draw_scrolled_window_frame) (DRAW_ARGS);
 
   void (*draw_separator) (DRAW_ARGS);
 
