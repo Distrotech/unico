@@ -76,6 +76,17 @@ draw_centroid_texture (GtkThemingEngine *engine,
   return retval;
 }
 
+static void
+unico_draw_activity (DRAW_ARGS)
+{
+  /* playground for effects */
+  unico_cairo_draw_background (engine, cr,
+                               x, y, width, height,
+                               0, gtk_theming_engine_get_junction_sides (engine));
+  unico_cairo_draw_frame (engine, cr,
+                          x, y, width, height,
+                          0, gtk_theming_engine_get_junction_sides (engine));
+}
 
 static void
 unico_draw_arrow (GtkThemingEngine *engine,
@@ -365,6 +376,114 @@ unico_draw_expander (DRAW_ARGS)
 }
 
 static void
+unico_draw_extension (DRAW_ARGS,
+                      GtkPositionType gap_side)
+{
+  GtkBorder border;
+  GtkBorder *outer_border;
+  GtkJunctionSides junction = 0;
+  GtkStateFlags state;
+  gboolean has_outer_stroke = FALSE;
+  gdouble bg_offset = 0;
+  guint hidden_side = 0;
+
+  state = gtk_theming_engine_get_state (engine); 
+
+  gtk_theming_engine_get_border (engine, state, &border);
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
+
+  if (!unico_gtk_border_is_zero (outer_border))
+    has_outer_stroke = TRUE;
+
+  cairo_save (cr);
+
+  /* FIXME doesn't work properly with not homogenuos border-width,
+   * especially between tab and notebook.
+   * I guess the issue comes from the fact draw_background
+   * is looking at border dimensions while we're not,
+   * or we're doing it wrong.
+   * draw_background is looking at SIDE_BOTTOM and
+   * sets border to 0 for this side */
+  switch (gap_side)
+  {
+    case GTK_POS_TOP:
+      junction = GTK_JUNCTION_TOP;
+      hidden_side = SIDE_TOP;
+
+      if (has_outer_stroke)
+        {
+          y -= outer_border->bottom;
+          height += outer_border->bottom;
+        }
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.bottom;
+
+      cairo_translate (cr, x + width, y + height);
+      cairo_rotate (cr, G_PI);
+      break;
+    default:
+    case GTK_POS_BOTTOM:
+      junction = GTK_JUNCTION_BOTTOM;
+      hidden_side = SIDE_BOTTOM;
+
+      if (has_outer_stroke)
+        height += outer_border->top;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.top;
+
+      cairo_translate (cr, x, y);
+      break;
+    case GTK_POS_LEFT:
+      junction = GTK_JUNCTION_LEFT;
+      hidden_side = SIDE_LEFT;
+
+      if (has_outer_stroke)
+        {
+          x -= outer_border->right;
+          width += outer_border->right;
+        }
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.right;
+
+      cairo_translate (cr, x + width, y);
+      cairo_rotate (cr, G_PI / 2);
+      break;
+    case GTK_POS_RIGHT:
+      junction = GTK_JUNCTION_RIGHT;
+      hidden_side = SIDE_RIGHT;
+
+      if (has_outer_stroke)
+        width += outer_border->left;
+
+      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
+        bg_offset = border.left;
+
+      cairo_translate (cr, x, y + height);
+      cairo_rotate (cr, - G_PI / 2);
+      break;
+  }
+
+  if (gap_side == GTK_POS_TOP ||
+      gap_side == GTK_POS_BOTTOM)
+    unico_cairo_draw_background (engine, cr, 0, 0, width, height + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
+  else
+    unico_cairo_draw_background (engine, cr, 0, 0, height, width + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
+  cairo_restore (cr);
+
+  /* FIXME put this in the rotation?
+   * the frame on bottom bar has the wrong gradient,
+   * while should be reflected */
+  unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
+
+  gtk_border_free (outer_border);
+}
+
+static void
 unico_draw_focus (DRAW_ARGS)
 {
   GdkRGBA *fill_color, *border_color, *outer_stroke_color;
@@ -603,50 +722,7 @@ unico_draw_grip (DRAW_ARGS)
 }
 
 static void
-unico_draw_line (GtkThemingEngine *engine,
-                 cairo_t          *cr,
-                 gdouble           x0,
-                 gdouble           y0,
-                 gdouble           x1,
-                 gdouble           y1)
-{
-  if (y0 == y1)
-    {
-      y0 += 0.5;
-      y1 += 0.5;
-      x0 += 0.5;
-      x1 -= 0.5;
-    }
-  else if (x0 == x1)
-    {
-      x0 += 0.5;
-      x1 += 0.5;
-      y0 += 0.5;
-      y1 -= 0.5;
-    }
-
-  cairo_move_to (cr, x0, y0);
-  cairo_line_to (cr, x1, y1);
-  unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
-  cairo_stroke (cr);
-}
-
-static void
-unico_draw_notebook (DRAW_ARGS,
-                     GtkPositionType gap_side,
-                     gdouble         xy0_gap,
-                     gdouble         xy1_gap)
-{
-  unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
-  unico_draw_frame_gap (engine, cr,
-                        x, y, width, height,
-                        gap_side, xy0_gap, xy1_gap);
-}
-
-static void
-unico_draw_pane_separator (DRAW_ARGS)
+unico_draw_handle (DRAW_ARGS)
 {
   gdouble line_width;
   gint i, bar_y, num_bars, bar_spacing, bar_width, bar_height;
@@ -697,15 +773,47 @@ unico_draw_pane_separator (DRAW_ARGS)
 }
 
 static void
-unico_draw_progressbar_activity (DRAW_ARGS)
+unico_draw_line (GtkThemingEngine *engine,
+                 cairo_t          *cr,
+                 gdouble           x0,
+                 gdouble           y0,
+                 gdouble           x1,
+                 gdouble           y1)
 {
-  /* playground for effects */
+  /* line endings */
+  if (y0 == y1)
+    {
+      y0 += 0.5;
+      y1 += 0.5;
+      x0 += 0.5;
+      x1 -= 0.5;
+    }
+  else if (x0 == x1)
+    {
+      x0 += 0.5;
+      x1 += 0.5;
+      y0 += 0.5;
+      y1 -= 0.5;
+    }
+
+  cairo_move_to (cr, x0, y0);
+  cairo_line_to (cr, x1, y1);
+  unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
+  cairo_stroke (cr);
+}
+
+static void
+unico_draw_notebook (DRAW_ARGS,
+                     GtkPositionType gap_side,
+                     gdouble         xy0_gap,
+                     gdouble         xy1_gap)
+{
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, gtk_theming_engine_get_junction_sides (engine));
-  unico_cairo_draw_frame (engine, cr,
-                          x, y, width, height,
-                          0, gtk_theming_engine_get_junction_sides (engine));
+  unico_draw_frame_gap (engine, cr,
+                        x, y, width, height,
+                        gap_side, xy0_gap, xy1_gap);
 }
 
 static void
@@ -792,6 +900,7 @@ unico_draw_radio (DRAW_ARGS)
 static void
 unico_draw_scrolled_window_frame (DRAW_ARGS)
 {
+  /* play with the junctions, if needed */
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, gtk_theming_engine_get_junction_sides (engine));
@@ -895,119 +1004,12 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
                           0, junction);
 }
 
-static void
-unico_draw_tab (DRAW_ARGS,
-                GtkPositionType gap_side)
-{
-  GtkBorder border;
-  GtkBorder *outer_border;
-  GtkJunctionSides junction = 0;
-  GtkStateFlags state;
-  gboolean has_outer_stroke = FALSE;
-  gdouble bg_offset = 0;
-  guint hidden_side = 0;
-
-  state = gtk_theming_engine_get_state (engine); 
-
-  gtk_theming_engine_get_border (engine, state, &border);
-  gtk_theming_engine_get (engine, state,
-                          "-unico-outer-stroke-width", &outer_border,
-                          NULL);
-
-  if (!unico_gtk_border_is_zero (outer_border))
-    has_outer_stroke = TRUE;
-
-  cairo_save (cr);
-
-  /* FIXME doesn't work properly with not homogenuos border-width,
-   * especially between tab and notebook.
-   * I guess the issue comes from the fact draw_background
-   * is looking at border dimensions while we're not,
-   * or we're doing it wrong.
-   * draw_background is looking at SIDE_BOTTOM and
-   * sets border to 0 for this side */
-  switch (gap_side)
-  {
-    case GTK_POS_TOP:
-      junction = GTK_JUNCTION_TOP;
-      hidden_side = SIDE_TOP;
-
-      if (has_outer_stroke)
-        {
-          y -= outer_border->bottom;
-          height += outer_border->bottom;
-        }
-
-      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-        bg_offset = border.bottom;
-
-      cairo_translate (cr, x + width, y + height);
-      cairo_rotate (cr, G_PI);
-      break;
-    default:
-    case GTK_POS_BOTTOM:
-      junction = GTK_JUNCTION_BOTTOM;
-      hidden_side = SIDE_BOTTOM;
-
-      if (has_outer_stroke)
-        height += outer_border->top;
-
-      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-        bg_offset = border.top;
-
-      cairo_translate (cr, x, y);
-      break;
-    case GTK_POS_LEFT:
-      junction = GTK_JUNCTION_LEFT;
-      hidden_side = SIDE_LEFT;
-
-      if (has_outer_stroke)
-        {
-          x -= outer_border->right;
-          width += outer_border->right;
-        }
-
-      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-        bg_offset = border.right;
-
-      cairo_translate (cr, x + width, y);
-      cairo_rotate (cr, G_PI / 2);
-      break;
-    case GTK_POS_RIGHT:
-      junction = GTK_JUNCTION_RIGHT;
-      hidden_side = SIDE_RIGHT;
-
-      if (has_outer_stroke)
-        width += outer_border->left;
-
-      if ((state & GTK_STATE_FLAG_ACTIVE) != 0)
-        bg_offset = border.left;
-
-      cairo_translate (cr, x, y + height);
-      cairo_rotate (cr, - G_PI / 2);
-      break;
-  }
-
-  if (gap_side == GTK_POS_TOP ||
-      gap_side == GTK_POS_BOTTOM)
-    unico_cairo_draw_background (engine, cr, 0, 0, width, height + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
-  else
-    unico_cairo_draw_background (engine, cr, 0, 0, height, width + bg_offset, SIDE_BOTTOM, GTK_JUNCTION_BOTTOM);
-  cairo_restore (cr);
-
-  /* FIXME put this in the rotation?
-   * the frame on bottom bar has the wrong gradient,
-   * while should be reflected */
-  unico_cairo_draw_frame (engine, cr, x, y, width, height, hidden_side, junction);
-
-  gtk_border_free (outer_border);
-}
-
 void
 unico_register_style_default (UnicoStyleFunctions *functions)
 {
   g_assert (functions);
 
+  functions->draw_activity                      = unico_draw_activity;
   functions->draw_arrow                         = unico_draw_arrow;
   functions->draw_cell_background               = unico_draw_cell_background;
   functions->draw_cell_frame                    = unico_draw_cell_frame;
@@ -1018,18 +1020,17 @@ unico_register_style_default (UnicoStyleFunctions *functions)
   functions->draw_common_background             = unico_draw_common_background;
   functions->draw_common_frame                  = unico_draw_common_frame;
   functions->draw_expander                      = unico_draw_expander;
+  functions->draw_extension                     = unico_draw_extension;
   functions->draw_focus                         = unico_draw_focus;
   functions->draw_frame_gap                     = unico_draw_frame_gap;
   functions->draw_grip                          = unico_draw_grip;
+  functions->draw_handle                        = unico_draw_handle;
   functions->draw_line                          = unico_draw_line;
   functions->draw_notebook                      = unico_draw_notebook;
-  functions->draw_pane_separator                = unico_draw_pane_separator;
-  functions->draw_progressbar_activity          = unico_draw_progressbar_activity;
   functions->draw_radio                         = unico_draw_radio;
   functions->draw_scrolled_window_frame         = unico_draw_scrolled_window_frame;
   functions->draw_separator                     = unico_draw_separator;
   functions->draw_slider                        = unico_draw_slider;
   functions->draw_spinbutton_background         = unico_draw_spinbutton_background;
   functions->draw_spinbutton_frame              = unico_draw_spinbutton_frame;
-  functions->draw_tab                           = unico_draw_tab;
 }

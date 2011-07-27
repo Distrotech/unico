@@ -72,6 +72,8 @@ typedef struct _UnicoStyleFunctions UnicoStyleFunctions;
 
 struct _UnicoStyleFunctions
 {
+  void (*draw_activity) (DRAW_ARGS);
+
   void (*draw_arrow) (GtkThemingEngine *engine,
                       cairo_t          *cr,
                       gdouble           angle,
@@ -99,6 +101,9 @@ struct _UnicoStyleFunctions
 
   void (*draw_expander) (DRAW_ARGS);
 
+  void (*draw_extension) (DRAW_ARGS,
+                          GtkPositionType gap_side);
+
   void (*draw_focus) (DRAW_ARGS);
 
   void (*draw_frame_gap) (DRAW_ARGS,
@@ -107,6 +112,8 @@ struct _UnicoStyleFunctions
                           gdouble         xy1_gap);
 
   void (*draw_grip) (DRAW_ARGS);
+
+  void (*draw_handle) (DRAW_ARGS);
 
   void (*draw_line) (GtkThemingEngine *engine,
                      cairo_t          *cr,
@@ -120,10 +127,6 @@ struct _UnicoStyleFunctions
                          gdouble         xy0_gap,
                          gdouble         xy1_gap);
 
-  void (*draw_pane_separator) (DRAW_ARGS);
-
-  void (*draw_progressbar_activity) (DRAW_ARGS);
-
   void (*draw_radio) (DRAW_ARGS);
 
   void (*draw_scrolled_window_frame) (DRAW_ARGS);
@@ -136,9 +139,6 @@ struct _UnicoStyleFunctions
   void (*draw_spinbutton_background) (DRAW_ARGS);
 
   void (*draw_spinbutton_frame) (DRAW_ARGS);
-
-  void (*draw_tab) (DRAW_ARGS,
-                    GtkPositionType gap_side);
 };
 
 G_END_DECLS

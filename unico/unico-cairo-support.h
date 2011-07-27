@@ -47,6 +47,13 @@ G_GNUC_INTERNAL void unico_cairo_draw_frame (GtkThemingEngine *engine,
                                              guint             hidden_side,
                                              GtkJunctionSides  junction);
 
+G_GNUC_INTERNAL gboolean unico_cairo_draw_from_texture (GtkThemingEngine *engine,
+                                                        cairo_t          *cr,
+                                                        gdouble           x,
+                                                        gdouble           y,
+                                                        gdouble           width,
+                                                        gdouble           height);
+
 G_GNUC_INTERNAL void unico_cairo_exchange_axis (cairo_t *cr,
                                                 gint    *x,
                                                 gint    *y,

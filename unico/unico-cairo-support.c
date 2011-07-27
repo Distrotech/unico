@@ -1134,6 +1134,54 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
   gtk_border_free (outer_border);
 }
 
+gboolean
+unico_cairo_draw_from_texture (GtkThemingEngine *engine,
+                               cairo_t          *cr,
+                               gdouble           x,
+                               gdouble           y,
+                               gdouble           width,
+                               gdouble           height)
+{
+  GtkStateFlags state;
+  GValue value = { 0, };
+  cairo_pattern_t *texture = NULL;
+  cairo_surface_t *surface = NULL;
+  gboolean retval = FALSE;
+
+  state = gtk_theming_engine_get_state (engine);
+
+  gtk_theming_engine_get_property (engine, "background-image", state, &value);
+
+  if (!G_VALUE_HOLDS_BOXED (&value))
+    return FALSE;
+
+  texture = g_value_dup_boxed (&value);
+  g_value_unset (&value);
+
+  if (texture != NULL)
+    cairo_pattern_get_surface (texture, &surface);
+
+  if (surface != NULL)
+    {
+      cairo_save (cr);
+
+      cairo_scale (cr, width / cairo_image_surface_get_width (surface),
+                       height / cairo_image_surface_get_height (surface));
+      cairo_set_source_surface (cr, surface, x, y);
+
+      cairo_paint (cr);
+
+      cairo_restore (cr);
+
+      retval = TRUE;
+    }
+
+  if (texture != NULL)
+    cairo_pattern_destroy (texture);
+
+  return retval;
+}
+
 void
 unico_cairo_exchange_axis (cairo_t *cr,
                            gint    *x,

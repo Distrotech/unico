@@ -43,6 +43,12 @@ G_GNUC_INTERNAL gboolean unico_gtk_border_is_zero (GtkBorder *border);
 G_GNUC_INTERNAL void unico_lookup_functions (UnicoEngine          *engine,
                                              UnicoStyleFunctions **functions);
 
+G_GNUC_INTERNAL void unico_trim_scale_allocation (GtkThemingEngine *engine,
+                                                  gdouble          *x,
+                                                  gdouble          *y,
+                                                  gdouble          *width,
+                                                  gdouble          *height);
+
 G_END_DECLS
 
 #endif /* UNICO_SUPPORT_H */

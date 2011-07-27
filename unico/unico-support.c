@@ -75,6 +75,28 @@ void
 unico_lookup_functions (UnicoEngine          *engine,
                         UnicoStyleFunctions **functions)
 {
+  /* only one style is defined now,
+   * add here a check for a theming engine css property,
+   * for example -unico-style, and assign new styles */
   if (functions)
     *functions = &engine->style_functions[UNICO_STYLE_DEFAULT];
+}
+
+void
+unico_trim_scale_allocation (GtkThemingEngine *engine,
+                             gdouble          *x,
+                             gdouble          *y,
+                             gdouble          *width,
+                             gdouble          *height)
+{
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
+    {
+      *y += *height / 2.0 - 2.0;
+      *height = 5;
+    }
+  else
+    {
+      *x += *width / 2.0 - 2.0;
+      *width = 5;
+    }
 }

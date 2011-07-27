@@ -40,73 +40,6 @@
 
 G_DEFINE_DYNAMIC_TYPE (UnicoEngine, unico_engine, GTK_TYPE_THEMING_ENGINE)
 
-static gboolean
-render_from_texture (GtkThemingEngine *engine,
-                     cairo_t          *cr,
-                     gdouble           x,
-                     gdouble           y,
-                     gdouble           width,
-                     gdouble           height)
-{
-  GtkStateFlags state;
-  GValue value = { 0, };
-  cairo_pattern_t *texture = NULL;
-  cairo_surface_t *surface = NULL;
-  gboolean retval = FALSE;
-
-  state = gtk_theming_engine_get_state (engine);
-
-  gtk_theming_engine_get_property (engine, "background-image", state, &value);
-
-  if (!G_VALUE_HOLDS_BOXED (&value))
-    return FALSE;
-
-  texture = g_value_dup_boxed (&value);
-  g_value_unset (&value);
-
-  if (texture != NULL)
-    cairo_pattern_get_surface (texture, &surface);
-
-  if (surface != NULL)
-    {
-      cairo_save (cr);
-
-      cairo_scale (cr, width / cairo_image_surface_get_width (surface),
-                       height / cairo_image_surface_get_height (surface));
-      cairo_set_source_surface (cr, surface, x, y);
-
-      cairo_paint (cr);
-
-      cairo_restore (cr);
-
-      retval = TRUE;
-    }
-
-  if (texture != NULL)
-    cairo_pattern_destroy (texture);
-
-  return retval;
-}
-
-static void
-trim_scale_allocation (GtkThemingEngine *engine,
-                       gdouble          *x,
-                       gdouble          *y,
-                       gdouble          *width,
-                       gdouble          *height)
-{
-  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
-    {
-      *y += *height / 2.0 - 2.0;
-      *height = 5;
-    }
-  else
-    {
-      *x += *width / 2.0 - 2.0;
-      *width = 5;
-    }
-}
-
 static void
 unico_engine_render_activity (GtkThemingEngine *engine,
                               cairo_t          *cr,
@@ -124,12 +57,9 @@ unico_engine_render_activity (GtkThemingEngine *engine,
   path = gtk_theming_engine_get_path (engine);
 
   if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE))
-    trim_scale_allocation (engine, &x, &y, &width, &height);
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR))
-    style_functions->draw_progressbar_activity (engine, cr, x, y, width, height);
-  else
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_activity (engine, cr, x, y, width, height);
+  style_functions->draw_activity (engine, cr, x, y, width, height);
 }
 
 static void
@@ -168,7 +98,7 @@ unico_engine_render_background (GtkThemingEngine *engine,
 
   if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
       gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
-    trim_scale_allocation (engine, &x, &y, &width, &height);
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
       gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
@@ -180,8 +110,6 @@ unico_engine_render_background (GtkThemingEngine *engine,
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
     style_functions->draw_cell_background (engine, cr, x, y, width, height, flags);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_background (engine, cr, x, y, width, height);
   else
     style_functions->draw_common_background (engine, cr, x, y, width, height);
 }
@@ -202,7 +130,7 @@ unico_engine_render_check (GtkThemingEngine *engine,
 
   if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
     {
-      if (render_from_texture (engine, cr, x, y, width, height))
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
@@ -241,10 +169,7 @@ unico_engine_render_extension (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-  if (gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_TAB, NULL))
-    style_functions->draw_tab (engine, cr, x, y, width, height, gap_side);
-  else
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_extension (engine, cr, x, y, width, height, gap_side);
+  style_functions->draw_extension (engine, cr, x, y, width, height, gap_side);
 }
 
 static void
@@ -283,7 +208,7 @@ unico_engine_render_frame (GtkThemingEngine *engine,
 
   if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
       gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
-    trim_scale_allocation (engine, &x, &y, &width, &height);
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
     style_functions->draw_separator (engine, cr, x, y, width, height);
@@ -300,8 +225,6 @@ unico_engine_render_frame (GtkThemingEngine *engine,
            gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
     style_functions->draw_cell_frame (engine, cr, x, y, width, height, flags);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_frame (engine, cr, x, y, width, height);
   else
     style_functions->draw_common_frame (engine, cr, x, y, width, height);
 }
@@ -345,10 +268,8 @@ unico_engine_render_handle (GtkThemingEngine *engine,
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_GRIP))
     style_functions->draw_grip (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PANE_SEPARATOR))
-    style_functions->draw_pane_separator (engine, cr, x, y, width, height);
   else
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_handle (engine, cr, x, y, width, height);
+    style_functions->draw_handle (engine, cr, x, y, width, height);
 }
 
 static void
@@ -384,7 +305,7 @@ unico_engine_render_option (GtkThemingEngine *engine,
 
   if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
     {
-      if (render_from_texture (engine, cr, x, y, width, height))
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
@@ -408,7 +329,7 @@ unico_engine_render_slider (GtkThemingEngine *engine,
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCALE))
     {
-      if (render_from_texture (engine, cr, x, y, width, height))
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
         return;
     }
 
