@@ -35,7 +35,7 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 PKG_PROG_PKG_CONFIG
 
 AC_SUBST(glib_req, 2.26.0)
-AC_SUBST(gtk_req, 3.1.6)
+AC_SUBST(gtk_req, 3.1.10)
 AC_SUBST(cairo_req, 1.10)
 
 PKG_CHECK_MODULES(DEPS, glib-2.0 >= $glib_req gtk+-3.0 >= $gtk_req cairo >= $cairo_req)
