@@ -59,7 +59,10 @@ unico_engine_render_activity (GtkThemingEngine *engine,
   if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE))
     unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
-  style_functions->draw_activity (engine, cr, x, y, width, height);
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINNER))
+    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_activity (engine, cr, x, y, width, height);
+  else
+    style_functions->draw_activity (engine, cr, x, y, width, height);
 }
 
 static void

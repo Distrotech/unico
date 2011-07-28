@@ -4,9 +4,9 @@ source_h = \
 	$(srcdir)/gtkroundedboxprivate.h \
 	$(srcdir)/raico-blur.h \
 	$(srcdir)/unico-cairo-support.h \
-	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-draw.h \
 	$(srcdir)/unico-engine.h \
+	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-types.h
 
 source_c = \
