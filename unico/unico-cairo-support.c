@@ -59,39 +59,15 @@ hide_border_sides (GtkBorder *border,
 /* shrink coordinate using GtkBorder */
 static void
 shrink_with_border (GtkBorder *border,
-                    gint      *x,
-                    gint      *y,
-                    gint      *width,
-                    gint      *height)
+                    gdouble   *x,
+                    gdouble   *y,
+                    gdouble   *width,
+                    gdouble   *height)
 {
   *x += border->left;
   *y += border->top;
   *width -= border->left + border->right;
   *height -= border->top + border->bottom;
-}
-
-/* adjust the pattern using dimensions */
-static void
-style_pattern_set_matrix (cairo_pattern_t *pat,
-                          gdouble          width,
-                          gdouble          height)
-{
-  cairo_matrix_t matrix;
-  gint w, h;
-
-  if (cairo_pattern_get_type (pat) == CAIRO_PATTERN_TYPE_SURFACE)
-    {
-      cairo_surface_t *surface;
-
-      cairo_pattern_get_surface (pat, &surface);
-      w = cairo_image_surface_get_width (surface);
-      h = cairo_image_surface_get_height (surface);
-    }
-  else
-    w = h = 1;
-
-  cairo_matrix_init_scale (&matrix, (gdouble) w / width, (gdouble) h / height);
-  cairo_pattern_set_matrix (pat, &matrix);
 }
 
 /* draw the background */
@@ -230,6 +206,7 @@ draw_background (GtkThemingEngine *engine,
           else
             {
               /* two different patterns, paint them with alpha */
+              /* BUG
               cairo_save (cr);
 
               cairo_rectangle (cr, 0, 0, width, height);
@@ -246,6 +223,7 @@ draw_background (GtkThemingEngine *engine,
               new_pat = cairo_pop_group (cr);
 
               cairo_restore (cr);
+              */
             }
         }
       else if (bg_pat || other_pat)
@@ -326,8 +304,9 @@ draw_background (GtkThemingEngine *engine,
   if (bg_pat)
     {
       /* pattern */
-      style_pattern_set_matrix (bg_pat, width, height);
+      cairo_scale (cr, width, height);
       cairo_set_source (cr, bg_pat);
+      cairo_scale (cr, 1.0 / width, 1.0 / height);
     }
   else
     /* one color */
@@ -345,10 +324,10 @@ draw_background (GtkThemingEngine *engine,
 static void
 draw_glow (GtkThemingEngine *engine,
            cairo_t          *cr,
-           gint              x,
-           gint              y,
-           gint              width,
-           gint              height,
+           gdouble           x,
+           gdouble           y,
+           gdouble           width,
+           gdouble           height,
            guint             hidden_side,
            GtkJunctionSides  junction)
 {
@@ -428,10 +407,10 @@ end_draw_glow:
 static void
 draw_texture (GtkThemingEngine *engine,
               cairo_t          *cr,
-              gint              x,
-              gint              y,
-              gint              width,
-              gint              height,
+              gdouble           x,
+              gdouble           y,
+              gdouble           width,
+              gdouble           height,
               guint             hidden_side,
               GtkJunctionSides  junction)
 {
@@ -491,14 +470,13 @@ draw_texture (GtkThemingEngine *engine,
 void
 unico_cairo_draw_background (GtkThemingEngine *engine,
                              cairo_t          *cr,
-                             gint              x,
-                             gint              y,
-                             gint              width,
-                             gint              height,
+                             gdouble           x,
+                             gdouble           y,
+                             gdouble           width,
+                             gdouble           height,
                              guint             hidden_side,
                              GtkJunctionSides  junction)
 {
-  GtkBorder border;
   GtkBorder *outer_border;
   GtkStateFlags state;
 
@@ -507,9 +485,7 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
   gtk_theming_engine_get (engine, state,
                           "-unico-outer-stroke-width", &outer_border,
                           NULL);
-  gtk_theming_engine_get_border (engine, state, &border);
 
-  hide_border_sides (&border, hidden_side);
   hide_border_sides (outer_border, hidden_side);
 
   shrink_with_border (outer_border, &x, &y, &width, &height);
@@ -663,6 +639,7 @@ draw_border (GtkThemingEngine *engine,
           else
             {
               /* two different patterns, paint them with alpha */
+              /* BUG
               cairo_save (cr);
 
               cairo_rectangle (cr, 0, 0, width, height);
@@ -679,6 +656,7 @@ draw_border (GtkThemingEngine *engine,
               new_pat = cairo_pop_group (cr);
 
               cairo_restore (cr);
+              */
             }
         }
       else if (border_pat || other_pat)
@@ -809,8 +787,9 @@ draw_border (GtkThemingEngine *engine,
       if (border_pat)
         {
           /* pattern */
-          style_pattern_set_matrix (border_pat, width, height);
+          cairo_scale (cr, width, height);
           cairo_set_source (cr, border_pat);
+          cairo_scale (cr, 1.0 / width, 1.0 / height);
 
           _gtk_rounded_box_path (&border_box, cr);
           _gtk_rounded_box_path (&padding_box, cr);
@@ -935,8 +914,9 @@ draw_inner_stroke (GtkThemingEngine *engine,
   if (inner_stroke_pat)
     {
       /* pattern */
-      style_pattern_set_matrix (inner_stroke_pat, width, height);
+      cairo_scale (cr, width, height);
       cairo_set_source (cr, inner_stroke_pat);
+      cairo_scale (cr, 1.0 / width, 1.0 / height);
 
       _gtk_rounded_box_path (&border_box, cr);
       _gtk_rounded_box_path (&padding_box, cr);
@@ -1064,8 +1044,9 @@ draw_outer_stroke (GtkThemingEngine *engine,
   if (outer_stroke_pat)
     {
       /* pattern */
-      style_pattern_set_matrix (outer_stroke_pat, width, height);
+      cairo_scale (cr, width, height);
       cairo_set_source (cr, outer_stroke_pat);
+      cairo_scale (cr, 1.0 / width, 1.0 / height);
 
       _gtk_rounded_box_path (&border_box, cr);
       _gtk_rounded_box_path (&padding_box, cr);
@@ -1139,10 +1120,10 @@ end_draw_outer_stroke:
 void
 unico_cairo_draw_frame (GtkThemingEngine *engine,
                         cairo_t          *cr,
-                        gint              x,
-                        gint              y,
-                        gint              width,
-                        gint              height,
+                        gdouble           x,
+                        gdouble           y,
+                        gdouble           width,
+                        gdouble           height,
                         guint             hidden_side,
                         GtkJunctionSides  junction)
 {
@@ -1372,8 +1353,9 @@ unico_cairo_set_source_border (GtkThemingEngine *engine,
   if (border_pat)
     {
       /* pattern */
-      style_pattern_set_matrix (border_pat, width, height);
+      cairo_scale (cr, width, height);
       cairo_set_source (cr, border_pat);
+      cairo_scale (cr, 1.0 / width, 1.0 / height);
     }
   else
     /* one color */
@@ -1403,8 +1385,9 @@ unico_cairo_set_source_inner_stroke (GtkThemingEngine *engine,
   if (inner_stroke_pat)
     {
       /* pattern */
-      style_pattern_set_matrix (inner_stroke_pat, width, height);
+      cairo_scale (cr, width, height);
       cairo_set_source (cr, inner_stroke_pat);
+      cairo_scale (cr, 1.0 / width, 1.0 / height);
     }
   else
     /* one color */

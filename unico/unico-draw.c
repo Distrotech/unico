@@ -891,6 +891,9 @@ unico_draw_separator (DRAW_ARGS)
 
   unico_get_line_width (engine, &line_width);
 
+  if (line_width == 0)
+    return;
+
   /* FIXME right code should be
    * if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
    * but doesn't work for separator tool item. */

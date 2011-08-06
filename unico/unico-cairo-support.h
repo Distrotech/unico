@@ -29,19 +29,19 @@ G_BEGIN_DECLS
 
 G_GNUC_INTERNAL void unico_cairo_draw_background (GtkThemingEngine *engine,
                                                   cairo_t          *cr,
-                                                  gint              x,
-                                                  gint              y,
-                                                  gint              width,
-                                                  gint              height,
+                                                  gdouble           x,
+                                                  gdouble           y,
+                                                  gdouble           width,
+                                                  gdouble           height,
                                                   guint             hidden_side,
                                                   GtkJunctionSides  junction);
 
 G_GNUC_INTERNAL void unico_cairo_draw_frame (GtkThemingEngine *engine,
                                              cairo_t          *cr,
-                                             gint              x,
-                                             gint              y,
-                                             gint              width,
-                                             gint              height,
+                                             gdouble           x,
+                                             gdouble           y,
+                                             gdouble           width,
+                                             gdouble           height,
                                              guint             hidden_side,
                                              GtkJunctionSides  junction);
 
