@@ -34,10 +34,10 @@
  **/
 void
 _gtk_rounded_box_init_rect (GtkRoundedBox *box,
-                            double         x,
-                            double         y,
-                            double         width,
-                            double         height)
+                            gdouble        x,
+                            gdouble        y,
+                            gdouble        width,
+                            gdouble        height)
 {
   box->box.x = x;
   box->box.y = y;
@@ -124,8 +124,8 @@ _gtk_rounded_box_apply_border_radius (GtkRoundedBox    *box,
 
 static void
 gtk_css_border_radius_grow (GtkCssBorderCornerRadius *corner,
-                            double                    horizontal,
-                            double                    vertical)
+                            gdouble                   horizontal,
+                            gdouble                   vertical)
 {
   corner->horizontal += horizontal;
   corner->vertical += vertical;
@@ -139,10 +139,10 @@ gtk_css_border_radius_grow (GtkCssBorderCornerRadius *corner,
 
 void
 _gtk_rounded_box_grow (GtkRoundedBox *box,
-                       double         top,
-                       double         right,
-                       double         bottom,
-                       double         left)
+                       gdouble        top,
+                       gdouble        right,
+                       gdouble        bottom,
+                       gdouble        left)
 {
   if (box->box.width + left + right < 0)
     {
@@ -174,18 +174,18 @@ _gtk_rounded_box_grow (GtkRoundedBox *box,
 
 void
 _gtk_rounded_box_shrink (GtkRoundedBox *box,
-                         double         top,
-                         double         right,
-                         double         bottom,
-                         double         left)
+                         gdouble        top,
+                         gdouble        right,
+                         gdouble        bottom,
+                         gdouble        left)
 {
   _gtk_rounded_box_grow (box, -top, -right, -bottom, -left);
 }
 
 void
 _gtk_rounded_box_move (GtkRoundedBox *box,
-                       double         dx,
-                       double         dy)
+                       gdouble        dx,
+                       gdouble        dy)
 {
   box->box.x += dx;
   box->box.y += dy;
@@ -193,9 +193,12 @@ _gtk_rounded_box_move (GtkRoundedBox *box,
 
 static void
 _cairo_ellipsis (cairo_t *cr,
-                 double xc, double yc,
-                 double xradius, double yradius,
-                 double angle1, double angle2)
+                 gdouble  xc,
+                 gdouble  yc,
+                 gdouble  xradius,
+                 gdouble  yradius,
+                 gdouble  angle1,
+                 gdouble  angle2)
 {
   if (xradius <= 0.0 || yradius <= 0.0)
     {
@@ -212,9 +215,12 @@ _cairo_ellipsis (cairo_t *cr,
 
 static void
 _cairo_ellipsis_negative (cairo_t *cr,
-                          double xc, double yc,
-                          double xradius, double yradius,
-                          double angle1, double angle2)
+                          gdouble  xc,
+                          gdouble  yc,
+                          gdouble  xradius,
+                          gdouble  yradius,
+                          gdouble  angle1,
+                          gdouble  angle2)
 {
   if (xradius <= 0.0 || yradius <= 0.0)
     {

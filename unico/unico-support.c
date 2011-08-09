@@ -52,19 +52,6 @@ unico_get_line_width (GtkThemingEngine *engine,
                      MIN (border.left, border.right));
 }
 
-void
-unico_get_border_radius (GtkThemingEngine *engine,
-                         gint             *radius)
-{
-  GtkStateFlags state;
-
-  state = gtk_theming_engine_get_state (engine);
-
-  gtk_theming_engine_get (engine, state,
-                          "border-radius", radius,
-                          NULL);
-}
-
 gboolean
 unico_gtk_border_is_zero (GtkBorder *border)
 {
@@ -91,12 +78,12 @@ unico_trim_scale_allocation (GtkThemingEngine *engine,
 {
   if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
     {
-      *y += *height / 2.0 - 2.0;
+      *y += (gint) (*height / 2.0) - 2.0;
       *height = 5;
     }
   else
     {
-      *x += *width / 2.0 - 2.0;
+      *x += (gint) (*width / 2.0) - 2.0;
       *width = 5;
     }
 }

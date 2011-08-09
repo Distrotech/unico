@@ -36,41 +36,51 @@ struct _GtkRoundedBox {
 };
 
 void            _gtk_rounded_box_init_rect                      (GtkRoundedBox       *box,
-                                                                 double               x,
-                                                                 double               y,
-                                                                 double               width,
-                                                                 double               height);
+                                                                 gdouble              x,
+                                                                 gdouble              y,
+                                                                 gdouble              width,
+                                                                 gdouble              height);
+
 void            _gtk_rounded_box_apply_border_radius            (GtkRoundedBox       *box,
                                                                  GtkThemingEngine    *engine,
                                                                  GtkStateFlags        state,
                                                                  GtkJunctionSides     junction);
+
 void            _gtk_rounded_box_grow                           (GtkRoundedBox       *box,
-                                                                 double               top,
-                                                                 double               right,
-                                                                 double               bottom,
-                                                                 double               left);
+                                                                 gdouble              top,
+                                                                 gdouble              right,
+                                                                 gdouble              bottom,
+                                                                 gdouble              left);
+
 void            _gtk_rounded_box_shrink                         (GtkRoundedBox       *box,
-                                                                 double               top,
-                                                                 double               right,
-                                                                 double               bottom,
-                                                                 double               left);
+                                                                 gdouble              top,
+                                                                 gdouble              right,
+                                                                 gdouble              bottom,
+                                                                 gdouble              left);
+
 void            _gtk_rounded_box_move                           (GtkRoundedBox       *box,
-                                                                 double               dx,
-                                                                 double               dy);
+                                                                 gdouble              dx,
+                                                                 gdouble              dy);
+
 void            _gtk_rounded_box_path                           (const GtkRoundedBox *box,
                                                                  cairo_t             *cr);
+
 void            _gtk_rounded_box_path_top                       (const GtkRoundedBox *outer,
                                                                  const GtkRoundedBox *inner,
                                                                  cairo_t             *cr);
+
 void            _gtk_rounded_box_path_right                     (const GtkRoundedBox *outer,
                                                                  const GtkRoundedBox *inner,
                                                                  cairo_t             *cr);
+
 void            _gtk_rounded_box_path_bottom                    (const GtkRoundedBox *outer,
                                                                  const GtkRoundedBox *inner,
                                                                  cairo_t             *cr);
+
 void            _gtk_rounded_box_path_left                      (const GtkRoundedBox *outer,
                                                                  const GtkRoundedBox *inner,
                                                                  cairo_t             *cr);
+
 void            _gtk_rounded_box_clip_path                      (const GtkRoundedBox *box,
                                                                  cairo_t             *cr);
 

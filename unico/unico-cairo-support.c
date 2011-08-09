@@ -653,7 +653,7 @@ draw_border (GtkThemingEngine *engine,
               cairo_set_source (cr, other_pat);
               cairo_paint_with_alpha (cr, progress);
 
-              cairo_set_source (cr, bg_pat);
+              cairo_set_source (cr, border_pat);
               cairo_paint_with_alpha (cr, 1.0 - progress);
 
               new_pat = cairo_pop_group (cr);

@@ -114,15 +114,15 @@ unico_draw_arrow (GtkThemingEngine *engine,
   size -= size_reduction;
 
   cairo_translate (cr, size_reduction / 2, size_reduction / 2);
-  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_translate (cr, x + (gint) (size / 2.0) + 0.5, y + (gint) (size / 2.0) + 0.5);
   cairo_rotate (cr, angle - G_PI_2);
   cairo_translate (cr, (gint) (size / 4.0), 0);
 
   /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
    * I know it's not nice at all, but it fix a visual bug */
-  cairo_move_to (cr, - size / 2.0, - size / 2.0);
-  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
-  cairo_rel_line_to (cr, - size / 2.0 - 1, size / 2.0);
+  cairo_move_to (cr, - (gint) (size / 2.0), - (gint) (size / 2.0));
+  cairo_rel_line_to (cr, (gint) (size / 2.0) + 1, (gint) (size / 2.0));
+  cairo_rel_line_to (cr, - (gint) (size / 2.0) - 1, (gint) (size / 2.0));
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -225,8 +225,8 @@ unico_draw_check (DRAW_ARGS)
           cairo_save (cr);
 
           cairo_set_line_width (cr, 2.0);
-          cairo_move_to (cr, 3, (gdouble) height / 2.0);
-          cairo_line_to (cr, width - 3, (gdouble) height / 2.0);
+          cairo_move_to (cr, 3, height / 2.0);
+          cairo_line_to (cr, width - 3, height / 2.0);
 
           cairo_restore (cr);
         }
@@ -236,7 +236,7 @@ unico_draw_check (DRAW_ARGS)
 
           if (in_menu)
             {
-              cairo_scale (cr, (gdouble) width / 18.0, (gdouble) height / 18.0);
+              cairo_scale (cr, width / 18.0, height / 18.0);
               cairo_translate (cr, 2.0, 3.0);
             }
           else
@@ -247,7 +247,7 @@ unico_draw_check (DRAW_ARGS)
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
 
-              cairo_scale (cr, (gdouble) width / 18.0, (gdouble) height / 18.0);
+              cairo_scale (cr, width / 18.0, height / 18.0);
 
               /* thick's outline */
               cairo_move_to (cr, 5.0, 5.65);
@@ -320,7 +320,7 @@ unico_draw_expander (DRAW_ARGS)
 {
   GtkStateFlags state;
   GdkRGBA color;
-  gdouble size;
+  gint size;
   gdouble angle = G_PI_2;
 
   state = gtk_theming_engine_get_state (engine);
@@ -332,15 +332,15 @@ unico_draw_expander (DRAW_ARGS)
   /* use floor function to adjust doubles */
   size = floor (MIN (width, height));
 
-  x += width / 2 - size / 2;
-  y += height / 2 - size / 2;
+  x += (gint) (width / 2) - size / 2;
+  y += (gint) (height / 2) - size / 2;
 
   if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
     angle = 0;
 
   cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
   cairo_rotate (cr, angle);
-  cairo_translate (cr, (gint) (size / 4.0), 0);
+  cairo_translate (cr, size / 4.0, 0);
 
   /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
    * I know it's not nice at all, but it fix a visual bug */
@@ -736,7 +736,7 @@ unico_draw_handle (DRAW_ARGS)
 
   cairo_save (cr);
 
-  cairo_translate (cr, x + width / 2, y + height / 2);
+  cairo_translate (cr, x + (gint) (width / 2), y + (gint) (height / 2));
 
   if (height > width)
     cairo_translate (cr, - bar_width / 2 - 0.5, - bar_height / 2 + 0.5);
@@ -848,8 +848,8 @@ unico_draw_radio (DRAW_ARGS)
           cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
           cairo_set_line_width (cr, 2.0);
 
-          cairo_move_to(cr, 5, (gdouble) height / 2.0);
-          cairo_line_to(cr, width - 5, (gdouble) height / 2.0);
+          cairo_move_to(cr, 5, height / 2.0);
+          cairo_line_to(cr, width - 5, height / 2.0);
 
           gdk_cairo_set_source_rgba (cr, bullet_color);
           cairo_stroke (cr);
@@ -859,8 +859,8 @@ unico_draw_radio (DRAW_ARGS)
       else
         {
           if (in_menu)
-            cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
-                           (gdouble) (width + height) / 4.0 - 4, 0, G_PI * 2);
+            cairo_arc (cr, x + width / 2.0, y + height / 2.0,
+                           width + height / 4.0 - 4, 0, G_PI * 2);
           else
             {
               GdkRGBA *bullet_outline_color;
@@ -870,13 +870,13 @@ unico_draw_radio (DRAW_ARGS)
                                       NULL);
 
               /* bullet's outline */
-              cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
-                             (gdouble) (width + height) / 4.0 - 4, 0, G_PI * 2);
+              cairo_arc (cr, x + width / 2.0, y + height / 2.0,
+                             (width + height) / 4.0 - 4, 0, G_PI * 2);
               gdk_cairo_set_source_rgba (cr, bullet_outline_color);
               cairo_fill (cr);
 
-              cairo_arc (cr, x + (gdouble) width / 2.0, y + (gdouble) height / 2.0,
-                             (gdouble) (width + height) / 4.0 - 5, 0, G_PI * 2);
+              cairo_arc (cr, x + width / 2.0, y + height / 2.0,
+                             (width + height) / 4.0 - 5, 0, G_PI * 2);
 
               gdk_rgba_free (bullet_outline_color);
             }
@@ -905,25 +905,25 @@ unico_draw_separator (DRAW_ARGS)
    * but doesn't work for separator tool item. */
   if (width > height)
     {
-      cairo_move_to (cr, x, y + height / 2 + line_width / 2);
-      cairo_line_to (cr, x + width, y + height / 2 + line_width / 2);
+      cairo_move_to (cr, x, y + (gint) (height / 2) + line_width / 2);
+      cairo_line_to (cr, x + width, y + (gint) (height / 2) + line_width / 2);
       unico_cairo_set_source_inner_stroke (engine, cr, width, line_width);
       cairo_stroke (cr);
 
-      cairo_move_to (cr, x, y + height / 2 - line_width / 2);
-      cairo_line_to (cr, x + width, y + height / 2 - line_width / 2);
+      cairo_move_to (cr, x, y + (gint) (height / 2) - line_width / 2);
+      cairo_line_to (cr, x + width, y + (gint) (height / 2) - line_width / 2);
       unico_cairo_set_source_border (engine, cr, width, line_width);
       cairo_stroke (cr);
     }
   else
     {
-      cairo_move_to (cr, x + width / 2 + line_width / 2, y);
-      cairo_line_to (cr, x + width / 2 + line_width / 2, y + height);
+      cairo_move_to (cr, x + (gint) (width / 2) + line_width / 2, y);
+      cairo_line_to (cr, x + (gint) (width / 2) + line_width / 2, y + height);
       unico_cairo_set_source_inner_stroke (engine, cr, line_width, height);
       cairo_stroke (cr);
 
-      cairo_move_to (cr, x + width / 2 - line_width / 2, y);
-      cairo_line_to (cr, x + width / 2 - line_width / 2, y + height);
+      cairo_move_to (cr, x + (gint) (width / 2) - line_width / 2, y);
+      cairo_line_to (cr, x + (gint) (width / 2) - line_width / 2, y + height);
       unico_cairo_set_source_border (engine, cr, line_width, height);
       cairo_stroke (cr);
     }
@@ -958,6 +958,12 @@ unico_draw_spinbutton_background (DRAW_ARGS)
 
   gtk_theming_engine_get_border (engine, state, &border);
 
+  /* deal with double, maybe a Gtk+ bug */
+  x = floor (x);
+  y = floor (y);
+  width = floor (width);
+  height = floor (height);
+
   /* FIXME this code always adds padding,
    * even when outer stroke for the spinbutton frame is none */
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
@@ -980,6 +986,12 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get_border (engine, state, &border);
+
+  /* deal with double, maybe a Gtk+ bug */
+  x = floor (x);
+  y = floor (y);
+  width = floor (width);
+  height = floor (height);
 
   /* FIXME this code always adds padding,
    * even when outer stroke for the spinbutton frame is none */

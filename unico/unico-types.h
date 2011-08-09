@@ -24,11 +24,11 @@
 #define UNICO_TYPES_H
 
 #define DRAW_ARGS GtkThemingEngine *engine, \
-                  cairo_t *cr, \
-                  gint x, \
-                  gint y, \
-                  gint width, \
-                  gint height
+                  cairo_t          *cr, \
+                  gdouble           x, \
+                  gdouble           y, \
+                  gdouble           width, \
+                  gdouble           height
 
 G_BEGIN_DECLS
 
@@ -54,13 +54,6 @@ enum {
   SIDE_TOP    = 1 << 3,
   SIDE_ALL    = 0xF
 };
-
-typedef enum
-{
-  UNICO_STROKE_STYLE_CUSTOM = 0,
-  UNICO_STROKE_STYLE_INSET = 1,
-  UNICO_STROKE_STYLE_NONE = 2
-} UnicoStrokeStyle;
 
 typedef enum
 {
