@@ -470,7 +470,7 @@ unico_draw_focus (DRAW_ARGS)
 {
   GdkRGBA *fill_color, *border_color, *outer_stroke_color;
   GtkStateFlags state;
-  gint line_width;
+  gint focus_pad, line_width;
   gint radius;
 
   state = gtk_theming_engine_get_state (engine);
@@ -482,8 +482,14 @@ unico_draw_focus (DRAW_ARGS)
                           "-unico-focus-outer-stroke-color", &outer_stroke_color,
                           NULL);
   gtk_theming_engine_get_style (engine,
+                                "focus-padding", &focus_pad,
                                 "focus-line-width", &line_width,
                                 NULL);  
+
+  x += focus_pad;
+  y += focus_pad;
+  width -= focus_pad * 2;
+  height -= focus_pad * 2;
 
   cairo_save (cr);
 

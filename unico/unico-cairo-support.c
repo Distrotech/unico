@@ -206,24 +206,25 @@ draw_background (GtkThemingEngine *engine,
           else
             {
               /* two different patterns, paint them with alpha */
-              /* BUG
               cairo_save (cr);
 
+              cairo_reset_clip (cr);
               cairo_rectangle (cr, 0, 0, width, height);
               cairo_clip (cr);
 
               cairo_push_group (cr);
 
               cairo_scale (cr, width, height);
+
               cairo_set_source (cr, other_pat);
               cairo_paint_with_alpha (cr, progress);
+
               cairo_set_source (cr, bg_pat);
               cairo_paint_with_alpha (cr, 1.0 - progress);
 
               new_pat = cairo_pop_group (cr);
 
               cairo_restore (cr);
-              */
             }
         }
       else if (bg_pat || other_pat)
@@ -639,24 +640,25 @@ draw_border (GtkThemingEngine *engine,
           else
             {
               /* two different patterns, paint them with alpha */
-              /* BUG
               cairo_save (cr);
 
+              cairo_reset_clip (cr);
               cairo_rectangle (cr, 0, 0, width, height);
               cairo_clip (cr);
 
               cairo_push_group (cr);
 
               cairo_scale (cr, width, height);
+
               cairo_set_source (cr, other_pat);
               cairo_paint_with_alpha (cr, progress);
-              cairo_set_source (cr, border_pat);
+
+              cairo_set_source (cr, bg_pat);
               cairo_paint_with_alpha (cr, 1.0 - progress);
 
               new_pat = cairo_pop_group (cr);
 
               cairo_restore (cr);
-              */
             }
         }
       else if (border_pat || other_pat)
