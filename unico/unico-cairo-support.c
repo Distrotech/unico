@@ -86,8 +86,8 @@ draw_background (GtkThemingEngine *engine,
   GtkRoundedBox border_box;
   GtkStateFlags state;
   cairo_pattern_t *bg_pat;
-  gboolean running;
   gdouble progress;
+  gboolean running;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -115,10 +115,10 @@ draw_background (GtkThemingEngine *engine,
 
   if (running)
     {
-      cairo_pattern_t *other_pat;
-      GtkStateFlags other_state;
       GdkRGBA other_bg;
+      GtkStateFlags other_state;
       cairo_pattern_t *new_pat = NULL;
+      cairo_pattern_t *other_pat;
 
       if (state & GTK_STATE_FLAG_PRELIGHT)
         {
@@ -338,8 +338,8 @@ draw_glow (GtkThemingEngine *engine,
   GtkStateFlags state;
   cairo_t *cr_surface;
   cairo_surface_t *surface;
-  raico_blur_t* blur = NULL;
   gint bradius = 0;
+  raico_blur_t* blur = NULL;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -524,13 +524,13 @@ draw_border (GtkThemingEngine *engine,
              GtkJunctionSides  junction)
 {
   GdkRGBA *colors[4];
-  GtkStateFlags state;
   GtkBorder border;
   GtkBorderStyle border_style;
   GtkRoundedBox border_box, padding_box;
+  GtkStateFlags state;
   cairo_pattern_t *border_pat;
-  gdouble progress;
   gboolean running;
+  gdouble progress;
   static const guint current_side[4] = { SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM, SIDE_LEFT };
   guint i, j;
 
@@ -556,9 +556,9 @@ draw_border (GtkThemingEngine *engine,
 
   if (running)
     {
-      cairo_pattern_t *other_pat;
       GtkStateFlags other_state;
       cairo_pattern_t *new_pat = NULL;
+      cairo_pattern_t *other_pat;
 
       if (state & GTK_STATE_FLAG_PRELIGHT)
         {
@@ -870,8 +870,8 @@ draw_inner_stroke (GtkThemingEngine *engine,
                    guint             hidden_side,
                    GtkJunctionSides  junction)
 {
-  GdkRGBA *inner_stroke_color;
   GdkRGBA *colors[4];
+  GdkRGBA *inner_stroke_color;
   GtkBorder *inner_border;
   GtkRoundedBox border_box, padding_box;
   GtkStateFlags state; 
@@ -1326,8 +1326,8 @@ unico_cairo_round_rect_inner (cairo_t         *cr,
   line_width = cairo_get_line_width (cr);
 
   /* center the rounded rectangle using line_width */
-  unico_cairo_round_rect (cr, x + (line_width / 2.0),
-                          y + (line_width / 2.0),
+  unico_cairo_round_rect (cr, x + line_width / 2.0,
+                          y + line_width / 2.0,
                           width - line_width,
                           height - line_width,
                           radius, sides, junction);

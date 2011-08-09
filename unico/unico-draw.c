@@ -958,7 +958,7 @@ unico_draw_spinbutton_background (DRAW_ARGS)
 
   gtk_theming_engine_get_border (engine, state, &border);
 
-  /* deal with double, maybe a Gtk+ bug */
+  /* use floor function to adjust doubles */
   x = floor (x);
   y = floor (y);
   width = floor (width);
@@ -987,7 +987,7 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
 
   gtk_theming_engine_get_border (engine, state, &border);
 
-  /* deal with double, maybe a Gtk+ bug */
+  /* use floor function to adjust doubles */
   x = floor (x);
   y = floor (y);
   width = floor (width);

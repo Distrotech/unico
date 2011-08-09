@@ -42,16 +42,13 @@ typedef struct _UnicoEngineClass UnicoEngineClass;
 struct _UnicoEngine
 {
   GtkThemingEngine parent_instance;
-
   UnicoStyleFunctions style_functions[UNICO_NUM_STYLES];
-
   UnicoStyles style;
 };
 
 struct _UnicoEngineClass
 {
   GtkThemingEngineClass parent_class;
-
   UnicoStyleFunctions style_functions[UNICO_NUM_STYLES];
 };
 
