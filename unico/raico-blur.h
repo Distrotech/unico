@@ -23,8 +23,8 @@
 #ifndef _RAICO_BLUR_H
 #define _RAICO_BLUR_H
 
-#include <glib.h>
 #include <cairo.h>
+#include <glib.h>
 
 typedef enum _raico_blur_quality_t
 {

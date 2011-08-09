@@ -22,8 +22,8 @@
 
 #include <cairo.h>
 #include <gtk/gtk.h>
+#include <math.h>
 
-#include "math.h"
 #include "unico-cairo-support.h"
 #include "unico-draw.h"
 #include "unico-support.h"

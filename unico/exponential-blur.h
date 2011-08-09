@@ -26,8 +26,8 @@
 #ifndef _EXPONENTIAL_BLUR_H
 #define _EXPONENTIAL_BLUR_H
 
-#include <glib.h>
 #include <cairo.h>
+#include <glib.h>
 
 void
 surface_exponential_blur (cairo_surface_t* surface,

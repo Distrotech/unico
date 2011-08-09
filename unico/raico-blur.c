@@ -20,8 +20,8 @@
  *
  */
 
-#include "raico-blur.h"
 #include "exponential-blur.h"
+#include "raico-blur.h"
 
 struct _raico_blur_private_t
 {
