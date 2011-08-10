@@ -512,6 +512,22 @@ unico_cairo_draw_background (GtkThemingEngine *engine,
   gtk_border_free (outer_border);
 }
 
+/* shade a color */
+static void
+color_shade (const GdkRGBA *color,
+             gdouble        factor,
+             GdkRGBA       *color_return)
+{
+  GtkSymbolicColor *literal, *shade;
+
+  literal = gtk_symbolic_color_new_literal (color);
+  shade = gtk_symbolic_color_new_shade (literal, factor);
+  gtk_symbolic_color_unref (literal);
+
+  gtk_symbolic_color_resolve (shade, NULL, color_return);
+  gtk_symbolic_color_unref (shade);
+}
+
 /* draw the border */
 static void
 draw_border (GtkThemingEngine *engine,
@@ -759,12 +775,12 @@ draw_border (GtkThemingEngine *engine,
     case GTK_BORDER_STYLE_SOLID:
       break;
     case GTK_BORDER_STYLE_INSET:
-      /* FIXME not implemented yet,
-       * shade colors[i] */
+      color_shade (colors[1], 1.8, colors[1]);
+      color_shade (colors[2], 1.8, colors[2]);
       break;
     case GTK_BORDER_STYLE_OUTSET:
-      /* FIXME not implemented yet,
-       * shade colors[i] */
+      color_shade (colors[0], 1.8, colors[0]);
+      color_shade (colors[3], 1.8, colors[3]);
       break;
   }
 

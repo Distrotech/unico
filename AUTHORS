@@ -1,1 +1,7 @@
-Andrea Cimitan <andrea.cimitan@canonical.com>
+Unico is a work by Andrea Cimitan <andrea.cimitan@canonical.com>
+
+
+This software would never exist without the precious work of:
+- Carlos Garnacho, for the Gtk+ CSS Style Context API
+- Benjamin Otte, for the help and the good snippets of code I've taken from Gtk+
+- Cosimo Cecchi, for the help and the collaboration
