@@ -75,8 +75,9 @@ LTLIBRARIES = $(engine_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libunico_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 =
-am__objects_2 = libunico_la-unico-cairo-support.lo \
-	libunico_la-unico-css-support.lo libunico_la-unico-draw.lo \
+am__objects_2 = libunico_la-exponential-blur.lo \
+	libunico_la-gtkroundedbox.lo libunico_la-raico-blur.lo \
+	libunico_la-unico-cairo-support.lo libunico_la-unico-draw.lo \
 	libunico_la-unico-engine.lo libunico_la-unico-support.lo \
 	libunico_la-unico-theme.lo
 am_libunico_la_OBJECTS = $(am__objects_1) $(am__objects_2)
@@ -254,16 +255,20 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 source_h = \
 	$(srcdir)/unico.h \
+	$(srcdir)/exponential-blur.h \
+	$(srcdir)/gtkroundedboxprivate.h \
+	$(srcdir)/raico-blur.h \
 	$(srcdir)/unico-cairo-support.h \
-	$(srcdir)/unico-css-support.h \
-	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-draw.h \
 	$(srcdir)/unico-engine.h \
+	$(srcdir)/unico-support.h \
 	$(srcdir)/unico-types.h
 
 source_c = \
+	$(srcdir)/exponential-blur.c \
+	$(srcdir)/gtkroundedbox.c \
+	$(srcdir)/raico-blur.c \
 	$(srcdir)/unico-cairo-support.c \
-	$(srcdir)/unico-css-support.c \
 	$(srcdir)/unico-draw.c \
 	$(srcdir)/unico-engine.c \
 	$(srcdir)/unico-support.c \
@@ -349,8 +354,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-exponential-blur.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-gtkroundedbox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-raico-blur.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-unico-cairo-support.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-unico-css-support.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-unico-draw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-unico-engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libunico_la-unico-support.Plo@am__quote@
@@ -380,6 +387,30 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+libunico_la-exponential-blur.lo: $(srcdir)/exponential-blur.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-exponential-blur.lo -MD -MP -MF $(DEPDIR)/libunico_la-exponential-blur.Tpo -c -o libunico_la-exponential-blur.lo `test -f '$(srcdir)/exponential-blur.c' || echo '$(srcdir)/'`$(srcdir)/exponential-blur.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libunico_la-exponential-blur.Tpo $(DEPDIR)/libunico_la-exponential-blur.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/exponential-blur.c' object='libunico_la-exponential-blur.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -c -o libunico_la-exponential-blur.lo `test -f '$(srcdir)/exponential-blur.c' || echo '$(srcdir)/'`$(srcdir)/exponential-blur.c
+
+libunico_la-gtkroundedbox.lo: $(srcdir)/gtkroundedbox.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-gtkroundedbox.lo -MD -MP -MF $(DEPDIR)/libunico_la-gtkroundedbox.Tpo -c -o libunico_la-gtkroundedbox.lo `test -f '$(srcdir)/gtkroundedbox.c' || echo '$(srcdir)/'`$(srcdir)/gtkroundedbox.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libunico_la-gtkroundedbox.Tpo $(DEPDIR)/libunico_la-gtkroundedbox.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/gtkroundedbox.c' object='libunico_la-gtkroundedbox.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -c -o libunico_la-gtkroundedbox.lo `test -f '$(srcdir)/gtkroundedbox.c' || echo '$(srcdir)/'`$(srcdir)/gtkroundedbox.c
+
+libunico_la-raico-blur.lo: $(srcdir)/raico-blur.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-raico-blur.lo -MD -MP -MF $(DEPDIR)/libunico_la-raico-blur.Tpo -c -o libunico_la-raico-blur.lo `test -f '$(srcdir)/raico-blur.c' || echo '$(srcdir)/'`$(srcdir)/raico-blur.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libunico_la-raico-blur.Tpo $(DEPDIR)/libunico_la-raico-blur.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/raico-blur.c' object='libunico_la-raico-blur.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -c -o libunico_la-raico-blur.lo `test -f '$(srcdir)/raico-blur.c' || echo '$(srcdir)/'`$(srcdir)/raico-blur.c
+
 libunico_la-unico-cairo-support.lo: $(srcdir)/unico-cairo-support.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-unico-cairo-support.lo -MD -MP -MF $(DEPDIR)/libunico_la-unico-cairo-support.Tpo -c -o libunico_la-unico-cairo-support.lo `test -f '$(srcdir)/unico-cairo-support.c' || echo '$(srcdir)/'`$(srcdir)/unico-cairo-support.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libunico_la-unico-cairo-support.Tpo $(DEPDIR)/libunico_la-unico-cairo-support.Plo
@@ -387,14 +418,6 @@ libunico_la-unico-cairo-support.lo: $(srcdir)/unico-cairo-support.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/unico-cairo-support.c' object='libunico_la-unico-cairo-support.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -c -o libunico_la-unico-cairo-support.lo `test -f '$(srcdir)/unico-cairo-support.c' || echo '$(srcdir)/'`$(srcdir)/unico-cairo-support.c
-
-libunico_la-unico-css-support.lo: $(srcdir)/unico-css-support.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-unico-css-support.lo -MD -MP -MF $(DEPDIR)/libunico_la-unico-css-support.Tpo -c -o libunico_la-unico-css-support.lo `test -f '$(srcdir)/unico-css-support.c' || echo '$(srcdir)/'`$(srcdir)/unico-css-support.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libunico_la-unico-css-support.Tpo $(DEPDIR)/libunico_la-unico-css-support.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/unico-css-support.c' object='libunico_la-unico-css-support.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -c -o libunico_la-unico-css-support.lo `test -f '$(srcdir)/unico-css-support.c' || echo '$(srcdir)/'`$(srcdir)/unico-css-support.c
 
 libunico_la-unico-draw.lo: $(srcdir)/unico-draw.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libunico_la_CFLAGS) $(CFLAGS) -MT libunico_la-unico-draw.lo -MD -MP -MF $(DEPDIR)/libunico_la-unico-draw.Tpo -c -o libunico_la-unico-draw.lo `test -f '$(srcdir)/unico-draw.c' || echo '$(srcdir)/'`$(srcdir)/unico-draw.c

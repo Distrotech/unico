@@ -1,5 +1,5 @@
 /* The Unico Theming Engine for Gtk+.
- * Copyright (C) 2011 Canonical Ltd
+ * Copyright (C) 2009 Canonical Ltd
  *
  * This  library is free  software; you can  redistribute it and/or
  * modify it  under  the terms  of the  GNU Lesser  General  Public
@@ -16,31 +16,22 @@
  * Software Foundation, Inc., 51  Franklin St, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  *
- * Authored by Andrea Cimitan <andrea.cimitan@canonical.com>
+ * Authored by Mirco "MacSlow" Mueller <mirco.mueller@canonical.com>
+ *
+ * Notes:
+ *   based on exponential-blur algorithm by Jani Huhtanen
  *
  */
 
-#include <gtk/gtk.h>
+#ifndef _EXPONENTIAL_BLUR_H
+#define _EXPONENTIAL_BLUR_H
 
-#include "unico-css-support.h"
+#include <cairo.h>
+#include <glib.h>
 
-GType
-unico_stroke_style_get_type (void)
-{
-  static GType etype = 0;
+void
+surface_exponential_blur (cairo_surface_t* surface,
+                          guint            radius);
 
-  if (G_UNLIKELY (etype == 0))
-    {
-      static const GEnumValue values[] = {
-        { UNICO_STROKE_STYLE_CUSTOM, "UNICO_STROKE_STYLE_CUSTOM", "custom" },
-        { UNICO_STROKE_STYLE_INSET, "UNICO_STROKE_STYLE_INSET", "inset" },
-        { UNICO_STROKE_STYLE_NONE, "UNICO_STROKE_STYLE_NONE", "none" },
-        { 0, NULL, NULL }
-      };
-
-      etype = g_enum_register_static (g_intern_static_string ("UnicoStrokeStyle"), values);
-    }
-
-  return etype;
-}
+#endif // _EXPONENTIAL_BLUR_H
 

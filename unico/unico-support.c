@@ -26,54 +26,64 @@
 #include "unico-support.h"
 #include "unico-types.h"
 
-void
-unico_lookup_functions (UnicoEngine          *engine,
-                        UnicoStyleFunctions **functions)
+gboolean
+unico_gdk_rgba_is_default (GdkRGBA *color)
 {
-  if (functions)
-    *functions = &engine->style_functions[UNICO_STYLE_DEFAULT];
+  GdkRGBA default_color;
+
+  /* pink is default GdkRGBA color set in gtk/gtkstyleproperty.c */
+  gdk_rgba_parse (&default_color, "pink");
+
+  return gdk_rgba_equal (&default_color, color);
 }
 
 void
 unico_get_line_width (GtkThemingEngine *engine,
                       gdouble          *line_width)
 {
-  GtkBorder *border;
-  GtkStateFlags flags;
+  GtkBorder border;
+  GtkStateFlags state;
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "border-width", &border,
-                          NULL);
+  state = gtk_theming_engine_get_state (engine);
 
-  *line_width = MIN (MIN (border->top, border->bottom),
-                     MIN (border->left, border->right));
+  gtk_theming_engine_get_border (engine, state, &border);
 
-  gtk_border_free (border);
-}
-
-void
-unico_get_border_radius (GtkThemingEngine *engine,
-                         gint             *radius)
-{
-  GtkStateFlags flags;
-
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "border-radius", radius,
-                          NULL);
+  *line_width = MIN (MIN (border.top, border.bottom),
+                     MIN (border.left, border.right));
 }
 
 gboolean
-unico_has_outer_stroke (GtkThemingEngine *engine)
+unico_gtk_border_is_zero (GtkBorder *border)
 {
-  GtkStateFlags flags;
-  UnicoStrokeStyle outer_stroke_style;
+  return (border->top == 0) && (border->bottom == 0) && (border->left == 0) && (border->right == 0);
+}
 
-  flags = gtk_theming_engine_get_state (engine);
-  gtk_theming_engine_get (engine, flags,
-                          "-unico-outer-stroke-style", &outer_stroke_style,
-                          NULL);
+void
+unico_lookup_functions (UnicoEngine          *engine,
+                        UnicoStyleFunctions **functions)
+{
+  /* only one style is defined now,
+   * add here a check for a theming engine css property,
+   * for example -unico-style, and assign new styles */
+  if (functions)
+    *functions = &engine->style_functions[UNICO_STYLE_DEFAULT];
+}
 
-  return outer_stroke_style != UNICO_STROKE_STYLE_NONE;
+void
+unico_trim_scale_allocation (GtkThemingEngine *engine,
+                             gdouble          *x,
+                             gdouble          *y,
+                             gdouble          *width,
+                             gdouble          *height)
+{
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
+    {
+      *y += (gint) (*height / 2.0) - 2.0;
+      *height = 5;
+    }
+  else
+    {
+      *x += (gint) (*width / 2.0) - 2.0;
+      *width = 5;
+    }
 }

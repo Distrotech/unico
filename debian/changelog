@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 10 Aug 2011 11:38:14 -0400
+
 gtk3-engines-unico (0.1.0+r74-0ubuntu1) oneiric; urgency=low
 
   * New upstream release.

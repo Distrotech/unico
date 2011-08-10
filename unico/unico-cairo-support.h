@@ -25,101 +25,32 @@
 
 #include <gtk/gtk.h>
 
-#include "unico-types.h"
-
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL void unico_cairo_draw_background (GtkThemingEngine *engine,
                                                   cairo_t          *cr,
-                                                  gint              x,
-                                                  gint              y,
-                                                  gint              width,
-                                                  gint              height,
+                                                  gdouble           x,
+                                                  gdouble           y,
+                                                  gdouble           width,
+                                                  gdouble           height,
                                                   guint             hidden_side,
                                                   GtkJunctionSides  junction);
 
-G_GNUC_INTERNAL void unico_cairo_draw_background_from_path (GtkThemingEngine *engine,
-                                                            cairo_t          *cr,
-                                                            gdouble           x,
-                                                            gdouble           y,
-                                                            gdouble           width,
-                                                            gdouble           height);
+G_GNUC_INTERNAL void unico_cairo_draw_frame (GtkThemingEngine *engine,
+                                             cairo_t          *cr,
+                                             gdouble           x,
+                                             gdouble           y,
+                                             gdouble           width,
+                                             gdouble           height,
+                                             guint             hidden_side,
+                                             GtkJunctionSides  junction);
 
-G_GNUC_INTERNAL void unico_cairo_draw_background_rect (GtkThemingEngine *engine,
-                                                       cairo_t          *cr,
-                                                       gdouble           x,
-                                                       gdouble           y,
-                                                       gdouble           width,
-                                                       gdouble           height,
-                                                       gint              radius,
-                                                       guint             hidden_side,
-                                                       GtkJunctionSides  junction);
-
-G_GNUC_INTERNAL void unico_cairo_draw_border_from_path (GtkThemingEngine *engine,
+G_GNUC_INTERNAL gboolean unico_cairo_draw_from_texture (GtkThemingEngine *engine,
                                                         cairo_t          *cr,
                                                         gdouble           x,
                                                         gdouble           y,
                                                         gdouble           width,
                                                         gdouble           height);
-
-G_GNUC_INTERNAL void unico_cairo_draw_border_rect (GtkThemingEngine *engine,
-                                                   cairo_t          *cr,
-                                                   gdouble           x,
-                                                   gdouble           y,
-                                                   gdouble           width,
-                                                   gdouble           height,
-                                                   gint              radius,
-                                                   guint             hidden_side,
-                                                   GtkJunctionSides  junction);
-
-G_GNUC_INTERNAL void unico_cairo_draw_frame (GtkThemingEngine *engine,
-                                             cairo_t          *cr,
-                                             gint              x,
-                                             gint              y,
-                                             gint              width,
-                                             gint              height,
-                                             guint             hidden_side,
-                                             GtkJunctionSides  junction);
-
-G_GNUC_INTERNAL void unico_cairo_draw_inner_stroke_from_path (GtkThemingEngine *engine,
-                                                              cairo_t          *cr,
-                                                              gdouble           x,
-                                                              gdouble           y,
-                                                              gdouble           width,
-                                                              gdouble           height);
-
-G_GNUC_INTERNAL void unico_cairo_draw_inner_stroke_rect (GtkThemingEngine *engine,
-                                                         cairo_t          *cr,
-                                                         gdouble           x,
-                                                         gdouble           y,
-                                                         gdouble           width,
-                                                         gdouble           height,
-                                                         gint              radius,
-                                                         guint             hidden_side,
-                                                         GtkJunctionSides  junction);
-
-G_GNUC_INTERNAL void unico_cairo_draw_outer_stroke_from_path (GtkThemingEngine *engine,
-                                                              cairo_t          *cr,
-                                                              gdouble           x,
-                                                              gdouble           y,
-                                                              gdouble           width,
-                                                              gdouble           height);
-
-G_GNUC_INTERNAL void unico_cairo_draw_outer_stroke_rect (GtkThemingEngine *engine,
-                                                         cairo_t          *cr,
-                                                         gdouble           x,
-                                                         gdouble           y,
-                                                         gdouble           width,
-                                                         gdouble           height,
-                                                         gint              radius,
-                                                         guint             hidden_side,
-                                                         GtkJunctionSides  junction);
-
-G_GNUC_INTERNAL void unico_cairo_exchange_axis (cairo_t *cr,
-                                                gint    *x,
-                                                gint    *y,
-                                                gint    *width,
-                                                gint    *height);
 
 G_GNUC_INTERNAL void unico_cairo_round_rect (cairo_t         *cr,
                                              gdouble          x,
@@ -139,13 +70,15 @@ G_GNUC_INTERNAL void unico_cairo_round_rect_inner (cairo_t         *cr,
                                                    guint            sides,
                                                    GtkJunctionSides junction);
 
-G_GNUC_INTERNAL void unico_cairo_style_pattern_set_matrix (cairo_pattern_t *pattern,
-                                                           gdouble          width,
-                                                           gdouble          height);
+G_GNUC_INTERNAL void unico_cairo_set_source_border (GtkThemingEngine *engine,
+                                                    cairo_t          *cr,
+                                                    gdouble           width,
+                                                    gdouble           height);
 
-G_GNUC_INTERNAL void unico_cairo_set_source_color_with_alpha (cairo_t *cr,
-                                                              GdkRGBA *color,
-                                                              gdouble  alpha);
+G_GNUC_INTERNAL void unico_cairo_set_source_inner_stroke (GtkThemingEngine *engine,
+                                                          cairo_t          *cr,
+                                                          gdouble           width,
+                                                          gdouble           height);
 
 G_END_DECLS
 

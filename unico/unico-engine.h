@@ -29,12 +29,12 @@
 
 G_BEGIN_DECLS
 
-#define UNICO_TYPE_ENGINE              (unico_engine_get_type ())
-#define UNICO_ENGINE(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), UNICO_TYPE_ENGINE, UnicoEngine))
-#define UNICO_ENGINE_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), UNICO_TYPE_ENGINE, UnicoEngineClass))
-#define UNICO_IS_ENGINE(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), UNICO_TYPE_ENGINE))
-#define UNICO_IS_ENGINE_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), UNICO_TYPE_ENGINE))
-#define UNICO_ENGINE_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), UNICO_TYPE_ENGINE, UnicoEngineClass))
+#define UNICO_TYPE_ENGINE            (unico_engine_get_type ())
+#define UNICO_ENGINE(object)         (G_TYPE_CHECK_INSTANCE_CAST ((object), UNICO_TYPE_ENGINE, UnicoEngine))
+#define UNICO_ENGINE_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), UNICO_TYPE_ENGINE, UnicoEngineClass))
+#define UNICO_IS_ENGINE(object)      (G_TYPE_CHECK_INSTANCE_TYPE ((object), UNICO_TYPE_ENGINE))
+#define UNICO_IS_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), UNICO_TYPE_ENGINE))
+#define UNICO_ENGINE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), UNICO_TYPE_ENGINE, UnicoEngineClass))
 
 typedef struct _UnicoEngine UnicoEngine;
 typedef struct _UnicoEngineClass UnicoEngineClass;
@@ -42,16 +42,13 @@ typedef struct _UnicoEngineClass UnicoEngineClass;
 struct _UnicoEngine
 {
   GtkThemingEngine parent_instance;
-
   UnicoStyleFunctions style_functions[UNICO_NUM_STYLES];
-
   UnicoStyles style;
 };
 
 struct _UnicoEngineClass
 {
   GtkThemingEngineClass parent_class;
-
   UnicoStyleFunctions style_functions[UNICO_NUM_STYLES];
 };
 
