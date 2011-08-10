@@ -24,13 +24,28 @@
 #define UNICO_TYPES_H
 
 #define DRAW_ARGS GtkThemingEngine *engine, \
-                  cairo_t *cr, \
-                  gint x, \
-                  gint y, \
-                  gint width, \
-                  gint height
+                  cairo_t          *cr, \
+                  gdouble           x, \
+                  gdouble           y, \
+                  gdouble           width, \
+                  gdouble           height
 
 G_BEGIN_DECLS
+
+typedef struct _GtkCssBorderCornerRadius GtkCssBorderCornerRadius;
+typedef struct _GtkCssBorderRadius GtkCssBorderRadius;
+
+struct _GtkCssBorderCornerRadius {
+  gdouble horizontal;
+  gdouble vertical;
+};
+
+struct _GtkCssBorderRadius {
+  GtkCssBorderCornerRadius top_left;
+  GtkCssBorderCornerRadius top_right;
+  GtkCssBorderCornerRadius bottom_right;
+  GtkCssBorderCornerRadius bottom_left;
+};
 
 enum {
   SIDE_LEFT   = 1,
@@ -39,20 +54,6 @@ enum {
   SIDE_TOP    = 1 << 3,
   SIDE_ALL    = 0xF
 };
-
-typedef struct
-{
-  gboolean lower;
-  gboolean horizontal;
-  gboolean fill_level;
-} UnicoSliderParameters;
-
-typedef enum
-{
-  UNICO_STROKE_STYLE_CUSTOM = 0,
-  UNICO_STROKE_STYLE_INSET = 1,
-  UNICO_STROKE_STYLE_NONE = 2
-} UnicoStrokeStyle;
 
 typedef enum
 {
@@ -64,6 +65,8 @@ typedef struct _UnicoStyleFunctions UnicoStyleFunctions;
 
 struct _UnicoStyleFunctions
 {
+  void (*draw_activity) (DRAW_ARGS);
+
   void (*draw_arrow) (GtkThemingEngine *engine,
                       cairo_t          *cr,
                       gdouble           angle,
@@ -71,26 +74,24 @@ struct _UnicoStyleFunctions
                       gdouble           y,
                       gdouble           size);
 
-  void (*draw_cell) (DRAW_ARGS,
-                     GtkRegionFlags flags);
+  void (*draw_cell_background) (DRAW_ARGS,
+                                GtkRegionFlags flags);
+
+  void (*draw_cell_frame) (DRAW_ARGS,
+                           GtkRegionFlags flags);
 
   void (*draw_check) (DRAW_ARGS);
 
-  void (*draw_column_header_background) (DRAW_ARGS,
-                                         GtkRegionFlags flags);
-
-  void (*draw_column_header_frame) (DRAW_ARGS,
-                                    GtkRegionFlags flags);
-
-  void (*draw_combo_button_background) (DRAW_ARGS);
-
-  void (*draw_combo_button_frame) (DRAW_ARGS);
+  void (*draw_common) (DRAW_ARGS);
 
   void (*draw_common_background) (DRAW_ARGS);
 
   void (*draw_common_frame) (DRAW_ARGS);
 
   void (*draw_expander) (DRAW_ARGS);
+
+  void (*draw_extension) (DRAW_ARGS,
+                          GtkPositionType gap_side);
 
   void (*draw_focus) (DRAW_ARGS);
 
@@ -99,41 +100,32 @@ struct _UnicoStyleFunctions
                           gdouble         xy0_gap,
                           gdouble         xy1_gap);
 
-  void (*draw_icon_view) (DRAW_ARGS);
+  void (*draw_grip) (DRAW_ARGS);
 
-  void (*draw_menubaritem_background) (DRAW_ARGS);
+  void (*draw_handle) (DRAW_ARGS);
 
-  void (*draw_menubaritem_frame) (DRAW_ARGS);
+  void (*draw_line) (GtkThemingEngine *engine,
+                     cairo_t          *cr,
+                     gdouble           x0,
+                     gdouble           y0,
+                     gdouble           x1,
+                     gdouble           y1);
 
   void (*draw_notebook) (DRAW_ARGS,
                          GtkPositionType gap_side,
                          gdouble         xy0_gap,
                          gdouble         xy1_gap);
 
-  void (*draw_progressbar_fill_background) (DRAW_ARGS);
-
-  void (*draw_progressbar_fill_frame) (DRAW_ARGS);
-
   void (*draw_radio) (DRAW_ARGS);
-
-  void (*draw_scrollbar_slider) (DRAW_ARGS);
-
-  void (*draw_scrollbar_stepper_background) (DRAW_ARGS);
-
-  void (*draw_scrollbar_stepper_frame) (DRAW_ARGS);
-
-  void (*draw_scrolled_window_frame) (DRAW_ARGS);
 
   void (*draw_separator) (DRAW_ARGS);
 
-  void (*draw_switch) (DRAW_ARGS,
+  void (*draw_slider) (DRAW_ARGS,
                        GtkOrientation orientation);
 
-  void (*draw_slider_button) (DRAW_ARGS,
-                              UnicoSliderParameters *slider);
+  void (*draw_spinbutton_background) (DRAW_ARGS);
 
-  void (*draw_tab) (DRAW_ARGS,
-                    GtkPositionType gap_side);
+  void (*draw_spinbutton_frame) (DRAW_ARGS);
 };
 
 G_END_DECLS

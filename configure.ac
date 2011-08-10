@@ -2,7 +2,7 @@ AC_PREREQ(2.63)
 
 # Package
 
-AC_INIT([unico],[0.1.0+r74],[https://bugs.launchpad.net/unico],[unico])
+AC_INIT([unico],[1.0],[https://bugs.launchpad.net/unico],[unico])
 AC_CONFIG_SRCDIR([unico/unico.h])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_AUX_DIR([build])
@@ -35,7 +35,7 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 PKG_PROG_PKG_CONFIG
 
 AC_SUBST(glib_req, 2.26.0)
-AC_SUBST(gtk_req, 3.1.6)
+AC_SUBST(gtk_req, 3.1.10)
 AC_SUBST(cairo_req, 1.10)
 
 PKG_CHECK_MODULES(DEPS, glib-2.0 >= $glib_req gtk+-3.0 >= $gtk_req cairo >= $cairo_req)
@@ -60,7 +60,7 @@ AS_CASE([$enable_debug],
           DEBUG_CFLAGS="-D_DEBUG"
         ],
         [no],
-        [DEBUG_CFLAGS="-DNDEBUG -DG_DISABLE_CAST_CHECKS -DG_DISABLE_CHECKS -DG_DISABLE_ASSERT"],
+        [DEBUG_CFLAGS="-DNDEBUG"],
         [AC_MSG_ERROR([Unknown argument for --enable-debug])]
 )
 AC_SUBST(DEBUG_CFLAGS)

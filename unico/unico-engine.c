@@ -26,7 +26,6 @@
 
 #include "unico.h"
 #include "unico-cairo-support.h"
-#include "unico-css-support.h"
 #include "unico-draw.h"
 #include "unico-engine.h"
 #include "unico-support.h"
@@ -41,81 +40,6 @@
 
 G_DEFINE_DYNAMIC_TYPE (UnicoEngine, unico_engine, GTK_TYPE_THEMING_ENGINE)
 
-static gboolean
-render_from_assets_common (GtkThemingEngine *engine,
-                           cairo_t          *cr,
-                           gdouble           x,
-                           gdouble           y,
-                           gdouble           width,
-                           gdouble           height)
-{
-  GtkStateFlags flags;
-  GValue value = { 0, };
-  cairo_pattern_t *asset = NULL;
-  cairo_surface_t *surface = NULL;
-  gboolean retval = FALSE;
-
-  flags = gtk_theming_engine_get_state (engine);
-
-	gtk_theming_engine_get_property (engine, "background-image", flags, &value);
-
-  if (!G_VALUE_HOLDS_BOXED (&value))
-    return FALSE;
-
-  asset = g_value_dup_boxed (&value);
-  g_value_unset (&value);
-
-  if (asset != NULL)
-    cairo_pattern_get_surface (asset, &surface);
-
-  if (surface != NULL)
-    {
-      cairo_save (cr);
-
-      cairo_scale (cr, width / cairo_image_surface_get_width (surface),
-                       height / cairo_image_surface_get_height (surface));
-      cairo_set_source_surface (cr, surface, x, y);
-      cairo_paint (cr);
-
-      cairo_restore (cr);
-
-      retval = TRUE;
-    }
-
-  if (asset != NULL)
-    cairo_pattern_destroy (asset);
-
-  return retval;
-}
-
-static void
-trim_allocation_for_scale (GtkThemingEngine *engine,
-                           gdouble          *x,
-                           gdouble          *y,
-                           gdouble          *width,
-                           gdouble          *height)
-{
-  const GtkWidgetPath *path;
-
-  path = gtk_theming_engine_get_path (engine);
-
-  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
-      (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH) ||
-       gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR)))
-    {
-      if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VERTICAL))
-        {
-          *y += *height / 2.0 - 2.0;
-          *height = 4;
-        }
-      else
-        {
-          *x += *width / 2.0 - 2.0;
-          *width = 4;
-        }
-    }
-}
-
 static void
 unico_engine_render_activity (GtkThemingEngine *engine,
                               cairo_t          *cr,
@@ -125,18 +49,20 @@ unico_engine_render_activity (GtkThemingEngine *engine,
                               gdouble           height)
 {
   UnicoStyleFunctions *style_functions;
+  const GtkWidgetPath *path;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+  path = gtk_theming_engine_get_path (engine);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_PROGRESSBAR))
-    {
-      style_functions->draw_progressbar_fill_background (engine, cr, x, y, width, height);
-      style_functions->draw_progressbar_fill_frame (engine, cr, x, y, width, height);
-    }
-  else
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE))
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
+
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINNER))
     GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_activity (engine, cr, x, y, width, height);
+  else
+    style_functions->draw_activity (engine, cr, x, y, width, height);
 }
 
 static void
@@ -167,35 +93,23 @@ unico_engine_render_background (GtkThemingEngine *engine,
   UnicoStyleFunctions *style_functions;
   const GtkWidgetPath *path;
   GtkRegionFlags flags;
-  gint len;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
-  len = gtk_widget_path_length (path);
 
-  trim_allocation_for_scale (engine, &x, &y, &width, &height);
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
   if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-      gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
-    style_functions->draw_column_header_background (engine, cr, x, y, width, height, flags);    
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
-    style_functions->draw_combo_button_background (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    style_functions->draw_scrollbar_stepper_background (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
-    style_functions->draw_menubaritem_background (engine, cr, x, y, width, height);
-  else if (gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW))
-      style_functions->draw_icon_view (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
+    style_functions->draw_spinbutton_background (engine, cr, x, y, width, height);
+  else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
            gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
-      style_functions->draw_cell (engine, cr, x, y, width, height, flags);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_background (engine, cr, x, y, width, height);
+    style_functions->draw_cell_background (engine, cr, x, y, width, height, flags);
   else
     style_functions->draw_common_background (engine, cr, x, y, width, height);
 }
@@ -214,11 +128,11 @@ unico_engine_render_check (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-	if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
-	  {
-	    if (render_from_assets_common (engine, cr, x, y, width, height))
-		    return;
-	  }
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
+    {
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
+        return;
+    }
 
   style_functions->draw_check (engine, cr, x, y, width, height);
 }
@@ -255,10 +169,7 @@ unico_engine_render_extension (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-  if (gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_TAB, NULL))
-    style_functions->draw_tab (engine, cr, x, y, width, height, gap_side);
-  else
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_extension (engine, cr, x, y, width, height, gap_side);
+  style_functions->draw_extension (engine, cr, x, y, width, height, gap_side);
 }
 
 static void
@@ -289,35 +200,25 @@ unico_engine_render_frame (GtkThemingEngine *engine,
   UnicoStyleFunctions *style_functions;
   const GtkWidgetPath *path;
   GtkRegionFlags flags;
-  gint len;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
   path = gtk_theming_engine_get_path (engine);
-  len = gtk_widget_path_length (path);
 
-  trim_allocation_for_scale (engine, &x, &y, &width, &height);
+  if (gtk_widget_path_is_type (path, GTK_TYPE_SCALE) &&
+      gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_TROUGH))
+    unico_trim_scale_allocation (engine, &x, &y, &width, &height);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-      gtk_widget_path_iter_has_region (path, len - 2, GTK_STYLE_REGION_COLUMN_HEADER, &flags))
-    style_functions->draw_column_header_frame (engine, cr, x, y, width, height, flags);    
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SEPARATOR))
     style_functions->draw_separator (engine, cr, x, y, width, height);
   else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_widget_path_has_parent (path, GTK_TYPE_COMBO_BOX_TEXT))
-    style_functions->draw_combo_button_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_BUTTON) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
-    style_functions->draw_scrollbar_stepper_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM) &&
-           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUBAR))
-    style_functions->draw_menubaritem_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_FRAME) &&
-           gtk_widget_path_is_type (path, GTK_TYPE_SCROLLED_WINDOW))
-    style_functions->draw_scrolled_window_frame (engine, cr, x, y, width, height);
-  else if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_DOCK))
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_frame (engine, cr, x, y, width, height);
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SPINBUTTON))
+    style_functions->draw_spinbutton_frame (engine, cr, x, y, width, height);
+  else if (!gtk_widget_path_is_type (path, GTK_TYPE_ICON_VIEW) &&
+           gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_VIEW) &&
+           gtk_theming_engine_has_region (engine, GTK_STYLE_REGION_COLUMN, &flags))
+    style_functions->draw_cell_frame (engine, cr, x, y, width, height, flags);
   else
     style_functions->draw_common_frame (engine, cr, x, y, width, height);
 }
@@ -339,14 +240,10 @@ unico_engine_render_frame_gap (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-  if (gtk_theming_engine_has_class (engine, "notebook"))
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_NOTEBOOK))
     style_functions->draw_notebook (engine, cr, x, y, width, height, gap_side, xy0_gap, xy1_gap);
-  else if (gtk_theming_engine_has_class (engine, "frame"))
-    style_functions->draw_frame_gap (engine, cr, x, y, width, height, gap_side, xy0_gap, xy1_gap);
   else
-    GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_frame_gap (engine, cr,
-                                                                            x, y, width, height,
-                                                                            gap_side, xy0_gap, xy1_gap);
+    style_functions->draw_frame_gap (engine, cr, x, y, width, height, gap_side, xy0_gap, xy1_gap);
 }
 
 static void
@@ -357,130 +254,16 @@ unico_engine_render_handle (GtkThemingEngine *engine,
                             gdouble           width,
                             gdouble           height)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_handle (engine, cr, x, y, width, height);
-}
+  UnicoStyleFunctions *style_functions;
 
-static GdkPixbuf*
-pixbuf_set_transparency (GdkPixbuf *pixbuf,
-                         gdouble    alpha_percent)
-{
-  GdkPixbuf *target;
-  guchar *data, *current;
-  guint x, y, rowstride, height, width;
+  UNICO_CAIRO_INIT
 
-  g_return_val_if_fail (pixbuf != NULL, NULL);
-  g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-  /* Returns a copy of pixbuf with it's non-completely-transparent pixels to
-     have an alpha level "alpha_percent" of their original value. */
-
-  target = gdk_pixbuf_add_alpha (pixbuf, FALSE, 0, 0, 0);
-
-  if (alpha_percent == 1.0)
-    return target;
-
-  width = gdk_pixbuf_get_width (target);
-  height = gdk_pixbuf_get_height (target);
-  rowstride = gdk_pixbuf_get_rowstride (target);
-  data = gdk_pixbuf_get_pixels (target);
-
-  for (y = 0; y < height; y++)
-    {
-      for (x = 0; x < width; x++)
-        {
-          /* The "4" is the number of chars per pixel, in this case, RGBA,
-             the 3 means "skip to the alpha" */
-          current = data + (y * rowstride) + (x * 4) + 3;
-          *(current) = (guchar) (*(current) * alpha_percent);
-        }
-    }
-
-  return target;
-}
-
-static GdkPixbuf*
-pixbuf_scale_or_ref (GdkPixbuf *src,
-                     gint       width,
-                     gint       height)
-{
-  if (width == gdk_pixbuf_get_width (src) &&
-      height == gdk_pixbuf_get_height (src))
-    return g_object_ref (src);
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_GRIP))
+    style_functions->draw_grip (engine, cr, x, y, width, height);
   else
-    return gdk_pixbuf_scale_simple (src,
-                                    width, height,
-                                    GDK_INTERP_BILINEAR);
-}
-
-static GdkPixbuf*
-unico_engine_render_icon_pixbuf (GtkThemingEngine    *engine,
-                                 const GtkIconSource *source,
-                                 GtkIconSize          size)
-{
-  GdkPixbuf *scaled;
-  GdkPixbuf *stated;
-  GdkPixbuf *base_pixbuf;
-  GdkScreen *screen;
-  GtkSettings *settings;
-  GtkStateFlags flags;
-  gint width = 1;
-  gint height = 1;
-
-  base_pixbuf = gtk_icon_source_get_pixbuf (source);
-  screen = gtk_theming_engine_get_screen (engine);
-  settings = gtk_settings_get_for_screen (screen);
-  flags = gtk_theming_engine_get_state (engine);
-
-  g_return_val_if_fail (base_pixbuf != NULL, NULL);
-
-  if (size != (GtkIconSize) -1 && !gtk_icon_size_lookup_for_settings (settings, size, &width, &height))
-    {
-      g_warning (G_STRLOC ": invalid icon size '%d'", size);
-      return NULL;
-    }
-
-  /* If the size was wildcarded, and we're allowed to scale, then scale; otherwise,
-   * leave it alone.
-   */
-  if (size != (GtkIconSize)-1 && gtk_icon_source_get_size_wildcarded (source))
-    scaled = pixbuf_scale_or_ref (base_pixbuf, width, height);
-  else
-    scaled = g_object_ref (base_pixbuf);
-
-  /* If the state was wildcarded, then generate a state. */
-  if (gtk_icon_source_get_state_wildcarded (source))
-    {
-      if (flags & GTK_STATE_FLAG_INSENSITIVE)
-        {
-          stated = pixbuf_set_transparency (scaled, 0.3);
-          gdk_pixbuf_saturate_and_pixelate (stated, stated, 0.1, FALSE);
-
-          g_object_unref (scaled);
-        }
-      else if (flags & GTK_STATE_FLAG_PRELIGHT)
-        {
-          stated = gdk_pixbuf_copy (scaled);
-          gdk_pixbuf_saturate_and_pixelate (scaled, stated, 1.2, FALSE);
-
-          g_object_unref (scaled);
-        }
-      else
-        stated = scaled;
-    }
-  else
-    stated = scaled;
-
-  return stated;
-}
-
-static void
-unico_engine_render_layout (GtkThemingEngine *engine,
-                            cairo_t          *cr,
-                            gdouble           x,
-                            gdouble           y,
-                            PangoLayout      *layout)
-{
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_layout (engine, cr, x, y, layout);
+    style_functions->draw_handle (engine, cr, x, y, width, height);
 }
 
 static void
@@ -491,7 +274,13 @@ unico_engine_render_line (GtkThemingEngine *engine,
                           gdouble           x1,
                           gdouble           y1)
 {
-  GTK_THEMING_ENGINE_CLASS (unico_engine_parent_class)->render_line (engine, cr, x0, y0, x1, y1);
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  style_functions->draw_line (engine, cr, x0, y0, x1, y1);
 }
 
 static void
@@ -508,11 +297,11 @@ unico_engine_render_option (GtkThemingEngine *engine,
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
 
-	if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
-	  {
-	    if (render_from_assets_common (engine, cr, x, y, width, height))
-		    return;
-	  }
+  if (!gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_MENUITEM))
+    {
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
+        return;
+    }
 
   style_functions->draw_radio (engine, cr, x, y, width, height);
 }
@@ -527,31 +316,18 @@ unico_engine_render_slider (GtkThemingEngine *engine,
                             GtkOrientation    orientation)
 {
   UnicoStyleFunctions *style_functions;
-  const GtkWidgetPath *path;
 
   UNICO_CAIRO_INIT
 
   unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
-  path = gtk_theming_engine_get_path (engine);
 
-  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCROLLBAR))
+  if (gtk_theming_engine_has_class (engine, GTK_STYLE_CLASS_SCALE))
     {
-      style_functions->draw_scrollbar_slider (engine, cr, x, y, width, height);
+      if (unico_cairo_draw_from_texture (engine, cr, x, y, width, height))
+        return;
     }
-  else if (gtk_widget_path_is_type (path, GTK_TYPE_SWITCH))
-    {
-      style_functions->draw_switch (engine, cr, x, y, width, height, orientation);
-    }
-  else
-    {
-      UnicoSliderParameters slider;
 
-      slider.horizontal = (orientation == GTK_ORIENTATION_HORIZONTAL);
-      slider.lower = FALSE;
-      slider.fill_level = FALSE;
-
-      style_functions->draw_slider_button (engine, cr, x, y, width, height, &slider);
-    }
+  style_functions->draw_slider (engine, cr, x, y, width, height, orientation);
 }
 
 void
@@ -581,11 +357,15 @@ unico_engine_class_init (UnicoEngineClass *klass)
   engine_class->render_frame       = unico_engine_render_frame;
   engine_class->render_frame_gap   = unico_engine_render_frame_gap;
   engine_class->render_handle      = unico_engine_render_handle;
-  engine_class->render_icon_pixbuf = unico_engine_render_icon_pixbuf;
-  engine_class->render_layout      = unico_engine_render_layout;
   engine_class->render_line        = unico_engine_render_line;
   engine_class->render_option      = unico_engine_render_option;
   engine_class->render_slider      = unico_engine_render_slider;
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("background-texture",
+                                                            "Background texture",
+                                                            "Background texture",
+                                                            CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("border-gradient",
@@ -604,6 +384,13 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             "Bullet outline color",
                                                             "Bullet outline color",
                                                             GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("centroid-texture",
+                                                            "Centroid texture",
+                                                            "Centroid texture",
+                                                            CAIRO_GOBJECT_TYPE_PATTERN, 0));
+
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("focus-border-color",
@@ -630,9 +417,45 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_int ("glow-radius",
+                                                          "Glow radius",
+                                                          "Glow radius",
+                                                          0, G_MAXINT, 0, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("glow-color",
+                                                            "Glow color",
+                                                            "Glow color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("inner-stroke-color",
                                                             "Inner stroke color",
                                                             "Inner stroke color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-top-color",
+                                                            "Inner stroke top color",
+                                                            "Inner stroke top color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-right-color",
+                                                            "Inner stroke right color",
+                                                            "Inner stroke right color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-bottom-color",
+                                                            "Inner stroke bottom color",
+                                                            "Inner stroke bottom color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-left-color",
+                                                            "Inner stroke left color",
+                                                            "Inner stroke left color",
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
@@ -642,9 +465,39 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("inner-stroke-width",
+                                                            "Inner stroke width",
+                                                            "Inner stroke width",
+                                                            GTK_TYPE_BORDER, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("outer-stroke-color",
                                                             "Outer stroke color",
                                                             "Outer stroke color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-top-color",
+                                                            "Outer stroke top color",
+                                                            "Outer stroke top color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-right-color",
+                                                            "Outer stroke right color",
+                                                            "Outer stroke right color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-bottom-color",
+                                                            "Outer stroke bottom color",
+                                                            "Outer stroke bottom color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("outer-stroke-left-color",
+                                                            "Outer stroke left color",
+                                                            "Outer stroke left color",
                                                             GDK_TYPE_RGBA, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
@@ -654,11 +507,10 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_enum ("outer-stroke-style",
-                                                           "Outer stroke style",
-                                                           "Outer stroke style",
-                                                           UNICO_TYPE_STROKE_STYLE,
-                                                           UNICO_STROKE_STYLE_NONE, 0));
+                                        g_param_spec_boxed ("outer-stroke-width",
+                                                            "Outer stroke width",
+                                                            "Outer stroke width",
+                                                            GTK_TYPE_BORDER, 0));
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("text-shadow-color",

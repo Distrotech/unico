@@ -25,11 +25,9 @@
 
 G_BEGIN_DECLS
 
-#include <cairo.h>
 #include <gtk/gtk.h>
 
 #include "unico-types.h"
-#include "unico-engine.h"
 
 G_GNUC_INTERNAL void unico_register_style_default (UnicoStyleFunctions *functions);
 
