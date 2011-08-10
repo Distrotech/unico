@@ -860,7 +860,7 @@ unico_draw_radio (DRAW_ARGS)
         {
           if (in_menu)
             cairo_arc (cr, x + width / 2.0, y + height / 2.0,
-                           width + height / 4.0 - 4, 0, G_PI * 2);
+                           (width + height) / 4.0 - 4, 0, G_PI * 2);
           else
             {
               GdkRGBA *bullet_outline_color;
