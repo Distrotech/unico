@@ -791,7 +791,7 @@ unico_draw_line (GtkThemingEngine *engine,
 
   cairo_move_to (cr, x0, y0);
   cairo_line_to (cr, x1, y1);
-  unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
+  unico_cairo_set_source_border (engine, cr, MAX (x1 - x0, 1), MAX (y1 - y0, 1));
   cairo_stroke (cr);
 }
 
