@@ -1,3 +1,12 @@
+unico 1.0.1 (September 1, 2011)
+---------------------------
+
+* Some tweaks for the GtkSpinButton.
+
+* Bugs fixed:
+ 833958 gtk_render_line doesn't work if y0 == y1 or x1 == x0
+
+
 unico 1.0 (August 10, 2011)
 ---------------------------
 
