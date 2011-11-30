@@ -686,6 +686,7 @@ unico_draw_grip (DRAW_ARGS)
 
   if (draw_centroid_texture (engine, cr, x, y, width, height))
    return;
+
   state = gtk_theming_engine_get_state (engine);
 
   gtk_theming_engine_get (engine, state,
