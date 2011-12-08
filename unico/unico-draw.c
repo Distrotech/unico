@@ -98,7 +98,7 @@ unico_draw_arrow (GtkThemingEngine *engine,
 {
   GtkStateFlags state;
   GdkRGBA color;
-  gdouble size_reduction = 2;
+  gdouble size_reduction = 4;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -114,15 +114,13 @@ unico_draw_arrow (GtkThemingEngine *engine,
   size -= size_reduction;
 
   cairo_translate (cr, size_reduction / 2, size_reduction / 2);
-  cairo_translate (cr, x + (gint) (size / 2.0) + 0.5, y + (gint) (size / 2.0) + 0.5);
-  cairo_rotate (cr, angle - G_PI_2);
-  cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug */
-  cairo_move_to (cr, - (gint) (size / 2.0), - (gint) (size / 2.0));
-  cairo_rel_line_to (cr, (gint) (size / 2.0) + 1, (gint) (size / 2.0));
-  cairo_rel_line_to (cr, - (gint) (size / 2.0) - 1, (gint) (size / 2.0));
+  cairo_translate (cr, x + (gint)(size / 2) - 0.5, y + (gint)(size / 2) + 0.5);
+  cairo_rotate (cr, angle);
+
+  cairo_move_to (cr, 0, - (gint)(size / 2));
+  cairo_line_to (cr, - (gint)(size / 2), (gint)(size / 4));
+  cairo_line_to (cr, (gint)(size / 2), (gint)(size / 4));
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -321,7 +319,7 @@ unico_draw_expander (DRAW_ARGS)
   GtkStateFlags state;
   GdkRGBA color;
   gint size;
-  gdouble angle = G_PI_2;
+  gdouble angle = G_PI;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -336,17 +334,14 @@ unico_draw_expander (DRAW_ARGS)
   y += (gint) (height / 2) - size / 2;
 
   if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
-    angle = 0;
+    angle = G_PI_2;
 
-  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_translate (cr, x + (gint)(size / 2) - 0.5, y + (gint)(size / 2) + 0.5);
   cairo_rotate (cr, angle);
-  cairo_translate (cr, size / 4.0, 0);
 
-  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug */
-  cairo_move_to (cr, - size / 2.0, - size / 2.0);
-  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
-  cairo_rel_line_to (cr, - size / 2.0 - 1, size / 2.0);
+  cairo_move_to (cr, 0, - (gint)(size / 2));
+  cairo_line_to (cr, - (gint)(size / 2), (gint)(size / 4));
+  cairo_line_to (cr, (gint)(size / 2), (gint)(size / 4));
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
