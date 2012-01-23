@@ -791,7 +791,7 @@ unico_draw_line (GtkThemingEngine *engine,
 
   cairo_move_to (cr, x0, y0);
   cairo_line_to (cr, x1, y1);
-  unico_cairo_set_source_border (engine, cr, x1 - x0, y1 - y0);
+  unico_cairo_set_source_border (engine, cr, MAX (x1 - x0, 1), MAX (y1 - y0, 1));
   cairo_stroke (cr);
 }
 
@@ -948,7 +948,7 @@ unico_draw_slider (DRAW_ARGS,
 static void
 unico_draw_spinbutton_background (DRAW_ARGS)
 {
-  GtkBorder border;
+  GtkBorder border, *outer_border;
   GtkJunctionSides junction;
   GtkStateFlags state;
 
@@ -956,28 +956,43 @@ unico_draw_spinbutton_background (DRAW_ARGS)
 
   state = gtk_theming_engine_get_state (engine);
 
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
   gtk_theming_engine_get_border (engine, state, &border);
 
-  /* use floor function to adjust doubles */
-  x = floor (x);
-  y = floor (y);
-  width = floor (width);
-  height = floor (height);
+  cairo_save (cr);
 
-  /* FIXME this code always adds padding,
-   * even when outer stroke for the spinbutton frame is none */
+  cairo_rectangle (cr, x, y, width, height);
+  cairo_clip (cr);
+
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
-    y += border.top;
+    {
+      y = ceil (y);
+      height = floor (height);
+      height += border.bottom + outer_border->bottom;
+    }
+  else
+    {
+      y = floor (y);
+      height = ceil (height);
+      y -= outer_border->top;
+      height += outer_border->bottom;
+    }
 
   unico_cairo_draw_background (engine, cr,
                                x, y, width, height,
                                0, junction);
+
+  cairo_restore (cr);
+
+  gtk_border_free (outer_border);
 }
 
 static void
 unico_draw_spinbutton_frame (DRAW_ARGS)
 {
-  GtkBorder border;
+  GtkBorder border, *outer_border;
   GtkJunctionSides junction;
   GtkStateFlags state;
 
@@ -985,22 +1000,37 @@ unico_draw_spinbutton_frame (DRAW_ARGS)
 
   state = gtk_theming_engine_get_state (engine);
 
+  gtk_theming_engine_get (engine, state,
+                          "-unico-outer-stroke-width", &outer_border,
+                          NULL);
   gtk_theming_engine_get_border (engine, state, &border);
 
-  /* use floor function to adjust doubles */
-  x = floor (x);
-  y = floor (y);
-  width = floor (width);
-  height = floor (height);
+  cairo_save (cr);
 
-  /* FIXME this code always adds padding,
-   * even when outer stroke for the spinbutton frame is none */
+  cairo_rectangle (cr, x, y, width, height);
+  cairo_clip (cr);
+
   if (!(junction & GTK_JUNCTION_CORNER_TOPRIGHT))
-    y += border.top;
+    {
+      y = ceil (y);
+      height = floor (height);
+      height += border.bottom + outer_border->bottom;
+    }
+  else
+    {
+      y = floor (y);
+      height = ceil (height);
+      y -= outer_border->top;
+      height += outer_border->bottom;
+    }
 
   unico_cairo_draw_frame (engine, cr,
                           x, y, width, height,
                           0, junction);
+
+  cairo_restore (cr);
+
+  gtk_border_free (outer_border);
 }
 
 void

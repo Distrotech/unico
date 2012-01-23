@@ -1,3 +1,10 @@
+gtk3-engines-unico (1.0.1-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+    - gtk_render_line doesn't work if y0 == y1 or x1 == x0 (LP: #833958)
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 01 Sep 2011 15:30:30 -0400
+
 gtk3-engines-unico (1.0-0ubuntu1) oneiric; urgency=low
 
   * New upstream release.
