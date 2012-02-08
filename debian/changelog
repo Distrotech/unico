@@ -1,3 +1,13 @@
+gtk3-engines-unico (1.0.1-0ubuntu2) UNRELEASED; urgency=low
+
+  * Backported r125, support correctly the new gtk (lp: #928712)
+  * debian/control: updated gtk requirement
+  * debian/source/format:
+    - switch to format v1, bzr-builddeb doesn't like full source backports
+      using the vcs with v3
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 08 Feb 2012 15:02:30 +0100
+
 gtk3-engines-unico (1.0.1-0ubuntu1) oneiric; urgency=low
 
   * New upstream release.
