@@ -584,10 +584,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc += outer_border->top;
         }
 
-      if (xy0_gap < border_radius.top_left.horizontal)
+      if (xy0_gap < _gtk_css_number_get (&top_left_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > width - border_radius.top_right.horizontal)
+      if (xy1_gap > width - _gtk_css_number_get (&top_right_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
       break;
     default:
@@ -605,10 +605,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc += outer_border->bottom;
         }
 
-      if (xy0_gap < border_radius.bottom_left.horizontal)
+      if (xy0_gap < _gtk_css_number_get (&bottom_left_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
-      if (xy1_gap > width - border_radius.bottom_right.horizontal)
+      if (xy1_gap > width - _gtk_css_number_get (&bottom_right_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
@@ -625,10 +625,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
-      if (xy0_gap < border_radius.top_left.vertical)
+      if (xy0_gap < _gtk_css_number_get (&top_left_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > height - border_radius.bottom_left.vertical)
+      if (xy1_gap > height - _gtk_css_number_get (&bottom_left_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
       break;
@@ -646,10 +646,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
-      if (xy0_gap < border_radius.top_right.vertical)
+      if (xy0_gap < _gtk_css_number_get (&top_right_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
 
-      if (xy1_gap > height - border_radius.bottom_right.vertical)
+      if (xy1_gap > height - _gtk_css_number_get (&bottom_right_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
