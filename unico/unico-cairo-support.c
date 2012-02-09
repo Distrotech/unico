@@ -1171,10 +1171,12 @@ unico_cairo_draw_frame (GtkThemingEngine *engine,
     }
 
   /* second layer, inner stroke */
-  draw_inner_stroke (engine, cr,
-                     x + border.left, y + border.top,
-                     width - (border.left + border.right), height - (border.top + border.bottom),
-                     hidden_side, junction);
+  if (width - (border.left + border.right) > 0 &&
+      height - (border.top + border.bottom) > 0)
+    draw_inner_stroke (engine, cr,
+                       x + border.left, y + border.top,
+                       width - (border.left + border.right), height - (border.top + border.bottom),
+                       hidden_side, junction);
 
   /* third layer, border */
   draw_border (engine, cr,
