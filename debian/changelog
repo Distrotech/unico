@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0.1-0ubuntu3) UNRELEASED; urgency=low
+
+  * Backported r126, fixes gedit context menu issues (lp: #929138)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 09 Feb 2012 17:17:09 +0100
+
 gtk3-engines-unico (1.0.1-0ubuntu2) precise; urgency=low
 
   * Backported r125, support correctly the new gtk (lp: #928712)
