@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0.1-0ubuntu4) precise; urgency=low
+
+  * Backport upstream commit "Fixes for inconsistent state"
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 22 Feb 2012 21:31:52 +0100
+
 gtk3-engines-unico (1.0.1-0ubuntu3) precise; urgency=low
 
   * Backported r126, fixes gedit context menu issues (lp: #929138)
