@@ -737,6 +737,9 @@ unico_draw_handle (DRAW_ARGS)
 
   unico_get_line_width (engine, &line_width);
 
+  if (line_width < 1)
+    return;
+
   bar_y = 1;
   num_bars = 3;
   bar_spacing = 3;
