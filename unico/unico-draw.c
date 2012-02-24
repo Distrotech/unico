@@ -754,7 +754,7 @@ unico_draw_handle (DRAW_ARGS)
       /* draw bars */
       cairo_move_to (cr, 0, bar_y);
       cairo_line_to (cr, bar_width, bar_y);
-      unico_cairo_set_source_border (engine, cr, bar_width, 3);
+      unico_cairo_set_source_border (engine, cr, bar_width, line_width);
       cairo_stroke (cr);
 
       cairo_move_to (cr, 0, bar_y + line_width);
