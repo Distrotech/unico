@@ -719,12 +719,18 @@ unico_draw_grip (DRAW_ARGS)
 static void
 unico_draw_handle (DRAW_ARGS)
 {
+  GtkBorder border;
+  GtkStateFlags state;
   gdouble line_width;
   gint i, bar_y, num_bars, bar_spacing, bar_width, bar_height;
 
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border (engine, state, &border);
+
   unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
+                               x - border.left, y - border.top,
+                               width + border.left + border.right, height + border.top + border.bottom,
+                               0, GTK_JUNCTION_NONE);
 
   if (draw_centroid_texture (engine, cr, x, y, width, height))
     return;
