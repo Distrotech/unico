@@ -28,6 +28,7 @@
 #include "unico-draw.h"
 #include "unico-support.h"
 #include "unico-types.h"
+#include "gtkroundedboxprivate.h"
 
 /* draw a texture placed on the centroid */
 static gboolean
