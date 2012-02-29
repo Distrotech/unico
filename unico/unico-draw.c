@@ -28,6 +28,7 @@
 #include "unico-draw.h"
 #include "unico-support.h"
 #include "unico-types.h"
+#include "gtkroundedboxprivate.h"
 
 /* draw a texture placed on the centroid */
 static gboolean
@@ -537,7 +538,6 @@ unico_draw_frame_gap (DRAW_ARGS,
   GtkBorder *outer_border;
   GtkCssBorderCornerRadius *top_left_radius, *top_right_radius;
   GtkCssBorderCornerRadius *bottom_left_radius, *bottom_right_radius;
-  GtkCssBorderRadius border_radius = { { 0, },  };
   GtkJunctionSides junction;
   GtkStateFlags state;
   gboolean has_outer_stroke = FALSE;
@@ -562,19 +562,6 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   if (!unico_gtk_border_is_zero (outer_border))
     has_outer_stroke = TRUE;
-
-  if (top_left_radius)
-    border_radius.top_left = *top_left_radius;
-  g_free (top_left_radius);
-  if (top_right_radius)
-    border_radius.top_right = *top_right_radius;
-  g_free (top_right_radius);
-  if (bottom_right_radius)
-    border_radius.bottom_right = *bottom_right_radius;
-  g_free (bottom_right_radius);
-  if (bottom_left_radius)
-    border_radius.bottom_left = *bottom_left_radius;
-  g_free (bottom_left_radius);
 
   cairo_save (cr);
 
@@ -678,6 +665,10 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   cairo_restore (cr);
 
+  g_free (top_left_radius);
+  g_free (top_right_radius);
+  g_free (bottom_right_radius);
+  g_free (bottom_left_radius);
   gtk_border_free (outer_border);
 }
 
@@ -724,17 +715,26 @@ unico_draw_grip (DRAW_ARGS)
 static void
 unico_draw_handle (DRAW_ARGS)
 {
+  GtkBorder border;
+  GtkStateFlags state;
   gdouble line_width;
   gint i, bar_y, num_bars, bar_spacing, bar_width, bar_height;
 
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border (engine, state, &border);
+
   unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
+                               x - border.left, y - border.top,
+                               width + border.left + border.right, height + border.top + border.bottom,
+                               0, GTK_JUNCTION_NONE);
 
   if (draw_centroid_texture (engine, cr, x, y, width, height))
     return;
 
   unico_get_line_width (engine, &line_width);
+
+  if (line_width < 1)
+    return;
 
   bar_y = 1;
   num_bars = 3;
@@ -759,7 +759,7 @@ unico_draw_handle (DRAW_ARGS)
       /* draw bars */
       cairo_move_to (cr, 0, bar_y);
       cairo_line_to (cr, bar_width, bar_y);
-      unico_cairo_set_source_border (engine, cr, bar_width, 3);
+      unico_cairo_set_source_border (engine, cr, bar_width, line_width);
       cairo_stroke (cr);
 
       cairo_move_to (cr, 0, bar_y + line_width);

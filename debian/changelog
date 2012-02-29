@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0.1-0ubuntu5) UNRELEASED; urgency=low
+
+  * Backport upstream fixes for i386 look issues and valgrind errors
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 21:26:50 +0100
+
 gtk3-engines-unico (1.0.1-0ubuntu4) precise; urgency=low
 
   * Backport upstream commit "Fixes for inconsistent state"
