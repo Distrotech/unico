@@ -533,7 +533,6 @@ unico_draw_frame_gap (DRAW_ARGS,
   GtkBorder *outer_border;
   GtkCssBorderCornerRadius *top_left_radius, *top_right_radius;
   GtkCssBorderCornerRadius *bottom_left_radius, *bottom_right_radius;
-  GtkCssBorderRadius border_radius = { { 0, },  };
   GtkJunctionSides junction;
   GtkStateFlags state;
   gboolean has_outer_stroke = FALSE;
@@ -558,19 +557,6 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   if (!unico_gtk_border_is_zero (outer_border))
     has_outer_stroke = TRUE;
-
-  if (top_left_radius)
-    border_radius.top_left = *top_left_radius;
-  g_free (top_left_radius);
-  if (top_right_radius)
-    border_radius.top_right = *top_right_radius;
-  g_free (top_right_radius);
-  if (bottom_right_radius)
-    border_radius.bottom_right = *bottom_right_radius;
-  g_free (bottom_right_radius);
-  if (bottom_left_radius)
-    border_radius.bottom_left = *bottom_left_radius;
-  g_free (bottom_left_radius);
 
   cairo_save (cr);
 
@@ -674,6 +660,10 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   cairo_restore (cr);
 
+  g_free (top_left_radius);
+  g_free (top_right_radius);
+  g_free (bottom_right_radius);
+  g_free (bottom_left_radius);
   gtk_border_free (outer_border);
 }
 
