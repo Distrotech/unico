@@ -397,6 +397,8 @@ draw_glow (GtkThemingEngine *engine,
 
   cairo_restore (cr);
 
+  raico_blur_destroy(blur);
+
   cairo_surface_destroy (surface); 
   cairo_destroy (cr_surface);
 
