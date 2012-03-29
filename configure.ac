@@ -2,7 +2,7 @@ AC_PREREQ(2.63)
 
 # Package
 
-AC_INIT([unico],[1.0.1],[https://bugs.launchpad.net/unico],[unico])
+AC_INIT([unico],[1.0.2],[https://bugs.launchpad.net/unico],[unico])
 AC_CONFIG_SRCDIR([unico/unico.h])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_AUX_DIR([build])

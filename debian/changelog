@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0.2-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 29 Mar 2012 14:24:43 -0400
+
 gtk3-engines-unico (1.0.1-0ubuntu5) precise; urgency=low
 
   * Backport upstream fixes for i386 look issues and valgrind errors
