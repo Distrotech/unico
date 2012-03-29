@@ -28,6 +28,7 @@
 #include "unico-draw.h"
 #include "unico-support.h"
 #include "unico-types.h"
+#include "gtkroundedboxprivate.h"
 
 /* draw a texture placed on the centroid */
 static gboolean
@@ -98,7 +99,7 @@ unico_draw_arrow (GtkThemingEngine *engine,
 {
   GtkStateFlags state;
   GdkRGBA color;
-  gdouble size_reduction = 2;
+  gdouble size_reduction = 4;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -114,15 +115,13 @@ unico_draw_arrow (GtkThemingEngine *engine,
   size -= size_reduction;
 
   cairo_translate (cr, size_reduction / 2, size_reduction / 2);
-  cairo_translate (cr, x + (gint) (size / 2.0) + 0.5, y + (gint) (size / 2.0) + 0.5);
-  cairo_rotate (cr, angle - G_PI_2);
-  cairo_translate (cr, (gint) (size / 4.0), 0);
 
-  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug */
-  cairo_move_to (cr, - (gint) (size / 2.0), - (gint) (size / 2.0));
-  cairo_rel_line_to (cr, (gint) (size / 2.0) + 1, (gint) (size / 2.0));
-  cairo_rel_line_to (cr, - (gint) (size / 2.0) - 1, (gint) (size / 2.0));
+  cairo_translate (cr, x + (gint)(size / 2) - 0.5, y + (gint)(size / 2) + 0.5);
+  cairo_rotate (cr, angle);
+
+  cairo_move_to (cr, 0, - (gint)(size / 2));
+  cairo_line_to (cr, - (gint)(size / 2), (gint)(size / 4));
+  cairo_line_to (cr, (gint)(size / 2), (gint)(size / 4));
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -220,25 +219,31 @@ unico_draw_check (DRAW_ARGS)
                               "-unico-bullet-color", &bullet_color,
                               NULL);
 
+      cairo_translate (cr, x, y);
+      cairo_scale (cr, width / 18.0, height / 18.0);
+
       if (inconsistent)
         {
-          cairo_save (cr);
+          GdkRGBA *bullet_outline_color;
 
-          cairo_set_line_width (cr, 2.0);
-          cairo_move_to (cr, 3, height / 2.0);
-          cairo_line_to (cr, width - 3, height / 2.0);
+          gtk_theming_engine_get (engine, state,
+                                  "-unico-bullet-outline-color", &bullet_outline_color,
+                                  NULL);
 
-          cairo_restore (cr);
+          /* thick's outline */
+          cairo_rectangle (cr, 3.5, 7, 11, 4);
+
+          gdk_cairo_set_source_rgba (cr, bullet_outline_color);
+          cairo_fill (cr);
+
+          cairo_rectangle (cr, 4.5, 8, 9, 2);
+
+          gdk_rgba_free (bullet_outline_color);
         }
       else
         {
-          cairo_translate (cr, x, y);
-
           if (in_menu)
-            {
-              cairo_scale (cr, width / 18.0, height / 18.0);
-              cairo_translate (cr, 2.0, 3.0);
-            }
+            cairo_translate (cr, 2.0, 3.0);
           else
             {
               GdkRGBA *bullet_outline_color;
@@ -246,8 +251,6 @@ unico_draw_check (DRAW_ARGS)
               gtk_theming_engine_get (engine, state,
                                       "-unico-bullet-outline-color", &bullet_outline_color,
                                       NULL);
-
-              cairo_scale (cr, width / 18.0, height / 18.0);
 
               /* thick's outline */
               cairo_move_to (cr, 5.0, 5.65);
@@ -321,7 +324,7 @@ unico_draw_expander (DRAW_ARGS)
   GtkStateFlags state;
   GdkRGBA color;
   gint size;
-  gdouble angle = G_PI_2;
+  gdouble angle = G_PI;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -336,17 +339,14 @@ unico_draw_expander (DRAW_ARGS)
   y += (gint) (height / 2) - size / 2;
 
   if ((state & GTK_STATE_FLAG_ACTIVE) == 0)
-    angle = 0;
+    angle = G_PI_2;
 
-  cairo_translate (cr, x + size / 2.0 + 0.5, y + size / 2.0 + 0.5);
+  cairo_translate (cr, x + (gint)(size / 2) - 0.5, y + (gint)(size / 2) + 0.5);
   cairo_rotate (cr, angle);
-  cairo_translate (cr, size / 4.0, 0);
 
-  /* FIXME this + 1/- 1 is done to fix blurred diagonal lines.
-   * I know it's not nice at all, but it fix a visual bug */
-  cairo_move_to (cr, - size / 2.0, - size / 2.0);
-  cairo_rel_line_to (cr, size / 2.0 + 1, size / 2.0);
-  cairo_rel_line_to (cr, - size / 2.0 - 1, size / 2.0);
+  cairo_move_to (cr, 0, - (gint)(size / 2));
+  cairo_line_to (cr, - (gint)(size / 2), (gint)(size / 4));
+  cairo_line_to (cr, (gint)(size / 2), (gint)(size / 4));
   cairo_close_path (cr);
 
   cairo_set_source_rgba (cr, color.red, color.green, color.blue, color.alpha * 0.75);
@@ -533,7 +533,6 @@ unico_draw_frame_gap (DRAW_ARGS,
   GtkBorder *outer_border;
   GtkCssBorderCornerRadius *top_left_radius, *top_right_radius;
   GtkCssBorderCornerRadius *bottom_left_radius, *bottom_right_radius;
-  GtkCssBorderRadius border_radius = { { 0, },  };
   GtkJunctionSides junction;
   GtkStateFlags state;
   gboolean has_outer_stroke = FALSE;
@@ -559,19 +558,6 @@ unico_draw_frame_gap (DRAW_ARGS,
   if (!unico_gtk_border_is_zero (outer_border))
     has_outer_stroke = TRUE;
 
-  if (top_left_radius)
-    border_radius.top_left = *top_left_radius;
-  g_free (top_left_radius);
-  if (top_right_radius)
-    border_radius.top_right = *top_right_radius;
-  g_free (top_right_radius);
-  if (bottom_right_radius)
-    border_radius.bottom_right = *bottom_right_radius;
-  g_free (bottom_right_radius);
-  if (bottom_left_radius)
-    border_radius.bottom_left = *bottom_left_radius;
-  g_free (bottom_left_radius);
-
   cairo_save (cr);
 
   switch (gap_side)
@@ -589,11 +575,12 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc += outer_border->top;
         }
 
-      if (xy0_gap < border_radius.top_left.horizontal)
+      if (xy0_gap < _gtk_css_number_get (&top_left_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > width - border_radius.top_right.horizontal)
+      if (xy1_gap > width - _gtk_css_number_get (&top_right_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
+
       break;
     default:
     case GTK_POS_BOTTOM:
@@ -610,10 +597,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc += outer_border->bottom;
         }
 
-      if (xy0_gap < border_radius.bottom_left.horizontal)
+      if (xy0_gap < _gtk_css_number_get (&bottom_left_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
-      if (xy1_gap > width - border_radius.bottom_right.horizontal)
+      if (xy1_gap > width - _gtk_css_number_get (&bottom_right_radius->horizontal, width))
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
@@ -630,10 +617,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
-      if (xy0_gap < border_radius.top_left.vertical)
+      if (xy0_gap < _gtk_css_number_get (&top_left_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_TOPLEFT;
 
-      if (xy1_gap > height - border_radius.bottom_left.vertical)
+      if (xy1_gap > height - _gtk_css_number_get (&bottom_left_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_BOTTOMLEFT;
 
       break;
@@ -651,10 +638,10 @@ unico_draw_frame_gap (DRAW_ARGS,
           hc = MAX (xy1_gap - xy0_gap - (outer_border->top + outer_border->bottom) - (border.top + border.bottom), 0);
         }
 
-      if (xy0_gap < border_radius.top_right.vertical)
+      if (xy0_gap < _gtk_css_number_get (&top_right_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_TOPRIGHT;
 
-      if (xy1_gap > height - border_radius.bottom_right.vertical)
+      if (xy1_gap > height - _gtk_css_number_get (&bottom_right_radius->vertical, height))
         junction |= GTK_JUNCTION_CORNER_BOTTOMRIGHT;
 
       break;
@@ -673,6 +660,10 @@ unico_draw_frame_gap (DRAW_ARGS,
 
   cairo_restore (cr);
 
+  g_free (top_left_radius);
+  g_free (top_right_radius);
+  g_free (bottom_right_radius);
+  g_free (bottom_left_radius);
   gtk_border_free (outer_border);
 }
 
@@ -683,6 +674,9 @@ unico_draw_grip (DRAW_ARGS)
   GdkRGBA *inner_stroke_color;
   GtkStateFlags state;
   gint lx, ly;
+
+  if (draw_centroid_texture (engine, cr, x, y, width, height))
+    return;
 
   state = gtk_theming_engine_get_state (engine);
 
@@ -716,17 +710,26 @@ unico_draw_grip (DRAW_ARGS)
 static void
 unico_draw_handle (DRAW_ARGS)
 {
+  GtkBorder border;
+  GtkStateFlags state;
   gdouble line_width;
   gint i, bar_y, num_bars, bar_spacing, bar_width, bar_height;
 
+  state = gtk_theming_engine_get_state (engine);
+  gtk_theming_engine_get_border (engine, state, &border);
+
   unico_cairo_draw_background (engine, cr,
-                               x, y, width, height,
-                               0, gtk_theming_engine_get_junction_sides (engine));
+                               x - border.left, y - border.top,
+                               width + border.left + border.right, height + border.top + border.bottom,
+                               0, GTK_JUNCTION_NONE);
 
   if (draw_centroid_texture (engine, cr, x, y, width, height))
     return;
 
   unico_get_line_width (engine, &line_width);
+
+  if (line_width < 1)
+    return;
 
   bar_y = 1;
   num_bars = 3;
@@ -751,7 +754,7 @@ unico_draw_handle (DRAW_ARGS)
       /* draw bars */
       cairo_move_to (cr, 0, bar_y);
       cairo_line_to (cr, bar_width, bar_y);
-      unico_cairo_set_source_border (engine, cr, bar_width, 3);
+      unico_cairo_set_source_border (engine, cr, bar_width, line_width);
       cairo_stroke (cr);
 
       cairo_move_to (cr, 0, bar_y + line_width);
@@ -843,18 +846,23 @@ unico_draw_radio (DRAW_ARGS)
 
       if (inconsistent)
         {
-          cairo_save (cr);
+          GdkRGBA *bullet_outline_color;
 
-          cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
-          cairo_set_line_width (cr, 2.0);
+          gtk_theming_engine_get (engine, state,
+                                  "-unico-bullet-outline-color", &bullet_outline_color,
+                                  NULL);
 
-          cairo_move_to(cr, 5, height / 2.0);
-          cairo_line_to(cr, width - 5, height / 2.0);
+          /* bullet's outline */
+          cairo_rectangle (cr, x + width / 2.0 - (width + height) / 4.0 + 3, y + height / 2.0 - 2,
+                               (width + height) / 4.0 + 2, 4);
 
-          gdk_cairo_set_source_rgba (cr, bullet_color);
-          cairo_stroke (cr);
+          gdk_cairo_set_source_rgba (cr, bullet_outline_color);
+          cairo_fill (cr);
 
-          cairo_restore (cr);
+          cairo_rectangle (cr, x + width / 2.0 - (width + height) / 4.0 + 4, y + height / 2.0 - 1,
+                               (width + height) / 4.0, 2);
+
+          gdk_rgba_free (bullet_outline_color);
         }
       else
         {
@@ -880,11 +888,11 @@ unico_draw_radio (DRAW_ARGS)
 
               gdk_rgba_free (bullet_outline_color);
             }
-
-          /* bullet */
-          gdk_cairo_set_source_rgba (cr, bullet_color);
-          cairo_fill (cr);
         }
+
+      /* bullet */
+      gdk_cairo_set_source_rgba (cr, bullet_color);
+      cairo_fill (cr);
 
       gdk_rgba_free (bullet_color);
     }

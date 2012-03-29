@@ -32,12 +32,54 @@
 
 G_BEGIN_DECLS
 
+/* for the order in arrays */
+typedef enum /*< skip >*/ {
+  GTK_CSS_TOP,
+  GTK_CSS_RIGHT,
+  GTK_CSS_BOTTOM,
+  GTK_CSS_LEFT
+} GtkCssSide;
+
+typedef enum /*< skip >*/ {
+  GTK_CSS_TOP_LEFT,
+  GTK_CSS_TOP_RIGHT,
+  GTK_CSS_BOTTOM_RIGHT,
+  GTK_CSS_BOTTOM_LEFT
+} GtkCssCorner;
+
+typedef enum /*< skip >*/ {
+  /* CSS term: <number> */
+  GTK_CSS_NUMBER,
+  /* CSS term: <percentage> */
+  GTK_CSS_PERCENT,
+  /* CSS term: <length> */
+  GTK_CSS_PX,
+  GTK_CSS_PT,
+  GTK_CSS_EM,
+  GTK_CSS_EX,
+  GTK_CSS_PC,
+  GTK_CSS_IN,
+  GTK_CSS_CM,
+  GTK_CSS_MM,
+  /* CSS term: <angle> */
+  GTK_CSS_RAD,
+  GTK_CSS_DEG,
+  GTK_CSS_GRAD,
+  GTK_CSS_TURN
+} GtkCssUnit;
+
+typedef struct _GtkCssNumber GtkCssNumber;
 typedef struct _GtkCssBorderCornerRadius GtkCssBorderCornerRadius;
 typedef struct _GtkCssBorderRadius GtkCssBorderRadius;
 
+struct _GtkCssNumber {
+  gdouble        value;
+  GtkCssUnit     unit;
+};
+
 struct _GtkCssBorderCornerRadius {
-  gdouble horizontal;
-  gdouble vertical;
+  GtkCssNumber horizontal;
+  GtkCssNumber vertical;
 };
 
 struct _GtkCssBorderRadius {

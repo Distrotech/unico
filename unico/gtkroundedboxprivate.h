@@ -1,4 +1,4 @@
-/* GTK - The GIMP Toolkit
+                                /* GTK - The GIMP Toolkit
  * Copyright (C) 2011 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -28,11 +28,20 @@
 G_BEGIN_DECLS
 
 typedef struct _GtkRoundedBox GtkRoundedBox;
+typedef struct _GtkRoundedBoxCorner GtkRoundedBoxCorner;
+
+struct _GtkRoundedBoxCorner {
+  double horizontal;
+  double vertical;
+};
 
 struct _GtkRoundedBox {
-  cairo_rectangle_t  box;
-  GtkCssBorderRadius border_radius;
+  cairo_rectangle_t   box;
+  GtkRoundedBoxCorner corner[4];
 };
+
+double          _gtk_css_number_get                             (const GtkCssNumber  *number,
+                                                                 double               one_hundred_percent);
 
 void            _gtk_rounded_box_init_rect                      (GtkRoundedBox       *box,
                                                                  gdouble              x,
