@@ -90,16 +90,17 @@ _gtk_rounded_box_apply_border_radius (GtkRoundedBox    *box,
                                       GtkStateFlags     state,
                                       GtkJunctionSides  junction)
 {
-  GtkCssBorderCornerRadius *corner[4];
+  GtkCssBorderCornerRadius *corner[4] = { NULL, NULL, NULL, NULL };
   guint i;
 
+  /* NOTE: Border radius is disabled due to it not working in GTK+ 3.5 */
   gtk_theming_engine_get (engine, state,
                           /* Can't use border-radius as it's an int for
                            * backwards compat */
-                          "border-top-left-radius", &corner[GTK_CSS_TOP_LEFT],
+                          /*"border-top-left-radius", &corner[GTK_CSS_TOP_LEFT],
                           "border-top-right-radius", &corner[GTK_CSS_TOP_RIGHT],
                           "border-bottom-right-radius", &corner[GTK_CSS_BOTTOM_RIGHT],
-                          "border-bottom-left-radius", &corner[GTK_CSS_BOTTOM_LEFT],
+                          "border-bottom-left-radius", &corner[GTK_CSS_BOTTOM_LEFT],*/
                           NULL);
 
   if (corner[GTK_CSS_TOP_LEFT] && (junction & GTK_JUNCTION_CORNER_TOPLEFT) == 0)
