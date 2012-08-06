@@ -58,6 +58,8 @@ struct _UnicoStyleFunctions
                       gdouble           size);
 
   void (*draw_expander) (DRAW_ARGS);
+
+  void (*draw_focus) (DRAW_ARGS);
 };
 
 G_END_DECLS

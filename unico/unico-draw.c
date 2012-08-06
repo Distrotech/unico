@@ -175,16 +175,21 @@ unico_draw_focus (DRAW_ARGS)
 
   state = gtk_theming_engine_get_state (engine);
 
+  gtk_theming_engine_get_style (engine,
+                                "focus-padding", &focus_pad,
+                                "focus-line-width", &line_width,
+                                NULL);
+
+  /* Skip rendering if focus-line-width is 0 or less. */
+  if (line_width < 1)
+    return;
+
   gtk_theming_engine_get (engine, state,
                           "-unico-focus-border-color", &border_color,
                           "-unico-focus-border-radius", &radius,
                           "-unico-focus-fill-color", &fill_color,
                           "-unico-focus-outer-stroke-color", &outer_stroke_color,
                           NULL);
-  gtk_theming_engine_get_style (engine,
-                                "focus-padding", &focus_pad,
-                                "focus-line-width", &line_width,
-                                NULL);  
 
   x += focus_pad;
   y += focus_pad;
@@ -228,6 +233,7 @@ unico_register_style_default (UnicoStyleFunctions *functions)
 {
   g_assert (functions);
 
-  functions->draw_arrow                         = unico_draw_arrow;
-  functions->draw_expander                      = unico_draw_expander;
+  functions->draw_arrow    = unico_draw_arrow;
+  functions->draw_expander = unico_draw_expander;
+  functions->draw_focus    = unico_draw_focus;
 }

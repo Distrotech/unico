@@ -74,6 +74,23 @@ unico_engine_render_expander (GtkThemingEngine *engine,
   style_functions->draw_expander (engine, cr, x, y, width, height);
 }
 
+static void
+unico_engine_render_focus (GtkThemingEngine *engine,
+                           cairo_t          *cr,
+                           gdouble           x,
+                           gdouble           y,
+                           gdouble           width,
+                           gdouble           height)
+{
+  UnicoStyleFunctions *style_functions;
+
+  UNICO_CAIRO_INIT
+
+  unico_lookup_functions (UNICO_ENGINE (engine), &style_functions);
+
+  style_functions->draw_focus (engine, cr, x, y, width, height);
+}
+
 void
 unico_engine_register_types (GTypeModule *module)
 {
@@ -93,12 +110,37 @@ unico_engine_class_init (UnicoEngineClass *klass)
 
   engine_class->render_arrow       = unico_engine_render_arrow;
   engine_class->render_expander    = unico_engine_render_expander;
+  engine_class->render_focus       = unico_engine_render_focus;
 
   gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
                                         g_param_spec_boxed ("arrow-texture",
                                                             "Arrow texture",
                                                             "Arrow texture",
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("focus-border-color",
+                                                            "Focus border color",
+                                                            "Focus border color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_int ("focus-border-radius",
+                                                          "Focus border radius",
+                                                          "Focus border radius",
+                                                          0, G_MAXINT, 0, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("focus-fill-color",
+                                                            "Focus fill color",
+                                                            "Focus fill color",
+                                                            GDK_TYPE_RGBA, 0));
+
+  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
+                                        g_param_spec_boxed ("focus-outer-stroke-color",
+                                                            "Focus outer stroke color",
+                                                            "Focus outer stroke color",
+                                                            GDK_TYPE_RGBA, 0));
 }
 
 static void
