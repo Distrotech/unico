@@ -168,7 +168,7 @@ unico_draw_expander (DRAW_ARGS)
 static void
 unico_draw_focus (DRAW_ARGS)
 {
-  GdkRGBA *fill_color, *border_color, *outer_stroke_color;
+  GdkRGBA *fill_color, *border_color;
   GtkStateFlags state;
   gint focus_pad, line_width;
   gint radius;
@@ -188,7 +188,6 @@ unico_draw_focus (DRAW_ARGS)
                           "-unico-focus-border-color", &border_color,
                           "-unico-focus-border-radius", &radius,
                           "-unico-focus-fill-color", &fill_color,
-                          "-unico-focus-outer-stroke-color", &outer_stroke_color,
                           NULL);
 
   x += focus_pad;
@@ -207,14 +206,7 @@ unico_draw_focus (DRAW_ARGS)
   gdk_cairo_set_source_rgba (cr, fill_color);
   cairo_fill (cr);
 
-  /* second layer, outer stroke */
-  unico_cairo_round_rect_inner (cr, x - line_width, y - line_width,
-                                    width + line_width * 2, height + line_width * 2,
-                                    radius + 1, SIDE_ALL, GTK_JUNCTION_NONE);
-  gdk_cairo_set_source_rgba (cr, outer_stroke_color);
-  cairo_stroke (cr);
-
-  /* third layer, border */
+  /* second layer, border */
   unico_cairo_round_rect_inner (cr, x, y,
                                     width, height,
                                     radius, SIDE_ALL, GTK_JUNCTION_NONE);
@@ -225,7 +217,6 @@ unico_draw_focus (DRAW_ARGS)
 
   gdk_rgba_free (border_color);
   gdk_rgba_free (fill_color);
-  gdk_rgba_free (outer_stroke_color);
 }
 
 void

@@ -135,12 +135,6 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             "Focus fill color",
                                                             "Focus fill color",
                                                             GDK_TYPE_RGBA, 0));
-
-  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_boxed ("focus-outer-stroke-color",
-                                                            "Focus outer stroke color",
-                                                            "Focus outer stroke color",
-                                                            GDK_TYPE_RGBA, 0));
 }
 
 static void
