@@ -1,3 +1,9 @@
+gtk3-engines-unico (1.0.2+r139-0ubuntu1) UNRELEASED; urgency=low
+
+  * New snapshot from trunk
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 08 Aug 2012 12:27:53 -0400
+
 gtk3-engines-unico (1.0.2-0ubuntu2) quantal; urgency=low
 
   * Disable rounded corner code that crashes on quantal

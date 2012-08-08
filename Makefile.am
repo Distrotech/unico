@@ -1,7 +1,6 @@
 SUBDIRS = \
 	build \
-	unico \
-	tests
+	unico
 
 ACLOCAL_AMFLAGS = -I build
 

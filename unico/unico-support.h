@@ -30,21 +30,8 @@
 
 G_BEGIN_DECLS
 
-G_GNUC_INTERNAL gboolean unico_gdk_rgba_is_default (GdkRGBA *color);
-
-G_GNUC_INTERNAL void unico_get_line_width (GtkThemingEngine *engine,
-                                           gdouble          *line_width);
-
-G_GNUC_INTERNAL gboolean unico_gtk_border_is_zero (GtkBorder *border);
-
 G_GNUC_INTERNAL void unico_lookup_functions (UnicoEngine          *engine,
                                              UnicoStyleFunctions **functions);
-
-G_GNUC_INTERNAL void unico_trim_scale_allocation (GtkThemingEngine *engine,
-                                                  gdouble          *x,
-                                                  gdouble          *y,
-                                                  gdouble          *width,
-                                                  gdouble          *height);
 
 G_END_DECLS
 
