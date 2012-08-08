@@ -1,3 +1,10 @@
+gtk3-engines-unico (1.0.2+r139-0ubuntu2) quantal; urgency=low
+
+  * debian/control
+    - build depend on dh-autoreconf
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 08 Aug 2012 14:57:10 -0400
+
 gtk3-engines-unico (1.0.2+r139-0ubuntu1) quantal; urgency=low
 
   * New snapshot from trunk
