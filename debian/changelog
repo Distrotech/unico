@@ -1,3 +1,13 @@
+gtk3-engines-unico (1.0.2+r139-0ubuntu3) UNRELEASED; urgency=low
+
+  * Build for multiarch 
+    - debian/compat: Use compat level 9 to pass the MA dirs to the build
+      system
+    - debian/control: BD on debhelper (>= 9) for compat 9
+    - debian/control: Mark package M-A: same
+
+ -- Iain Lane <iain.lane@canonical.com>  Mon, 12 Nov 2012 10:22:00 +0000
+
 gtk3-engines-unico (1.0.2+r139-0ubuntu2) quantal; urgency=low
 
   * debian/control
