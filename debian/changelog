@@ -1,6 +1,10 @@
 gtk3-engines-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
 
-  * 
+  * debian/control:
+    - Update to use trailing commas at the end of lists to make it easier to
+      add items to Build-Depends and Depends.
+    - Reorganize Build-Depends for clarity, wrap gtk3-engines-unico Depends for
+      the binary.
 
  -- Mathieu Trudel-Lapierre <mathieu-tl@ubuntu.com>  Thu, 06 Dec 2012 17:33:25 -0500
 

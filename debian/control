@@ -1,20 +1,21 @@
 Source: gtk3-engines-unico
+Section: x11
 Priority: optional
 Maintainer: Ken VanDine <ken.vandine@ubuntu.com>
 Build-Depends: debhelper (>= 9),
                autotools-dev,
+               dh-autoreconf,
                libgtk-3-dev (>= 3.1.14),
                libglib2.0-dev (>= 2.26.0),
                libcairo2-dev (>= 1.10),
-               dh-autoreconf
 Standards-Version: 3.9.3
-Section: x11
 Homepage: https://launchpad.net/unico
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/unico/ubuntu
 
 Package: gtk3-engines-unico
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
 Multi-Arch: same
 Description: Unico Gtk+ 3 theme engine
  Unico is a Gtk+ engine that aims to be the more complete yet powerful theming 
