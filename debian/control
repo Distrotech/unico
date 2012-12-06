@@ -10,7 +10,11 @@ Build-Depends: debhelper (>= 9),
                libcairo2-dev (>= 1.10),
 Standards-Version: 3.9.3
 Homepage: https://launchpad.net/unico
-Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/unico/ubuntu
+# If you aren't a member of ~unico-team but need to upload
+# packaging changes, just go ahead. ~unico-team will notice
+# and sync up the code again.
+Vcs-Bzr: https://code.launchpad.net/~unico-team/unico/trunk
+Vcs-Browser: https://bazaar.launchpad.net/~unico-team/unico/trunk/files
 
 Package: gtk3-engines-unico
 Architecture: any
