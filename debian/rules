@@ -6,6 +6,9 @@
 %:
 	dh $@ --with autoreconf
 
+override_dh_autoreconf:
+	NOCONFIGURE=1 dh_autoreconf ./autogen.sh
+
 override_dh_install:
 	find debian/gtk3-engines-unico/usr/lib -name \*.la -exec rm {} \;
 	find debian/gtk3-engines-unico/usr/lib -name \*.a -exec rm {} \;

@@ -6,6 +6,8 @@ gtk3-engines-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
     - Reorganize Build-Depends for clarity, wrap gtk3-engines-unico Depends for
       the binary.
     - Update Vcs-Bzr, Vcs-Browser and add a notice to uploaders.
+  * debian/rules:
+    - Override dh_autoreconf to call autogen.sh and not run configure.
 
  -- Mathieu Trudel-Lapierre <mathieu-tl@ubuntu.com>  Thu, 06 Dec 2012 17:33:25 -0500
 
