@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Ken VanDine <ken.vandine@ubuntu.com>
 Build-Depends: debhelper (>= 9),
                autotools-dev,
+               gnome-common,
                dh-autoreconf,
                libgtk-3-dev (>= 3.1.14),
                libglib2.0-dev (>= 2.26.0),
