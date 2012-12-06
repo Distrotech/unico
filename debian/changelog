@@ -1,0 +1,109 @@
+gtk3-engines-unico (1.0.2+r139-0ubuntu3) raring; urgency=low
+
+  * Build for multiarch 
+    - debian/compat: Use compat level 9 to pass the MA dirs to the build
+      system
+    - debian/control: BD on debhelper (>= 9) for compat 9
+    - debian/control: Mark package M-A: same
+
+ -- Iain Lane <iain.lane@canonical.com>  Mon, 12 Nov 2012 10:23:20 +0000
+
+gtk3-engines-unico (1.0.2+r139-0ubuntu2) quantal; urgency=low
+
+  * debian/control
+    - build depend on dh-autoreconf
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 08 Aug 2012 14:57:10 -0400
+
+gtk3-engines-unico (1.0.2+r139-0ubuntu1) quantal; urgency=low
+
+  * New snapshot from trunk
+  * debian/control
+    - bump standards to 3.9.3
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 08 Aug 2012 14:47:34 -0400
+
+gtk3-engines-unico (1.0.2-0ubuntu2) quantal; urgency=low
+
+  * Disable rounded corner code that crashes on quantal
+
+ -- Robert Ancell <robert.ancell@canonical.com>  Thu, 14 Jun 2012 17:40:10 +1200
+
+gtk3-engines-unico (1.0.2-0ubuntu1) precise; urgency=low
+
+  * New upstream release.
+    - Fixed a memory leak
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 29 Mar 2012 15:01:51 -0400
+
+gtk3-engines-unico (1.0.1-0ubuntu5) precise; urgency=low
+
+  * Backport upstream fixes for i386 look issues and valgrind errors
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 21:28:29 +0100
+
+gtk3-engines-unico (1.0.1-0ubuntu4) precise; urgency=low
+
+  * Backport upstream commit "Fixes for inconsistent state"
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 22 Feb 2012 21:31:52 +0100
+
+gtk3-engines-unico (1.0.1-0ubuntu3) precise; urgency=low
+
+  * Backported r126, fixes gedit context menu issues (lp: #929138)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 09 Feb 2012 17:18:24 +0100
+
+gtk3-engines-unico (1.0.1-0ubuntu2) precise; urgency=low
+
+  * Backported r125, support correctly the new gtk (lp: #928712)
+  * debian/control: updated gtk requirement
+  * debian/source/format:
+    - switch to format v1, bzr-builddeb doesn't like full source backports
+      using the vcs with v3
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 08 Feb 2012 15:16:02 +0100
+
+gtk3-engines-unico (1.0.1-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+    - gtk_render_line doesn't work if y0 == y1 or x1 == x0 (LP: #833958)
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 01 Sep 2011 15:30:30 -0400
+
+gtk3-engines-unico (1.0-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 10 Aug 2011 11:38:14 -0400
+
+gtk3-engines-unico (0.1.0+r74-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+  * debian/control
+    - bump build depends for libgtk-3-dev >= 3.1.6
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 30 Jun 2011 10:51:38 +0100
+
+gtk3-engines-unico (0.1.0+r69-0ubuntu1) oneiric; urgency=low
+
+  * New upstream snapshot.
+  * debian/control
+    - Updated Vcs-Bzr to point to the proper project
+    - Updated maintainer email to use @ubuntu.com
+    - Updated standards version to 3.9.2
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Fri, 17 Jun 2011 16:18:41 -0400
+
+gtk3-engines-unico (0.1.0+r66-0ubuntu1) oneiric; urgency=low
+
+  * New upstream snapshot.
+    - Fix for a gnome-control-center crasher (LP: #789010)
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Wed, 01 Jun 2011 13:21:40 -0400
+
+gtk3-engines-unico (0.1.0+r64-0ubuntu1) oneiric; urgency=low
+
+  * Initial packaging
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 19 May 2011 09:46:01 -0400
