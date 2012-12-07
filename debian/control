@@ -1,4 +1,4 @@
-Source: gtk3-engines-unico
+Source: unico
 Section: x11
 Priority: optional
 Maintainer: Ken VanDine <ken.vandine@ubuntu.com>

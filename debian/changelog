@@ -1,4 +1,4 @@
-gtk3-engines-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
+unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
 
   * debian/control:
     - Update to use trailing commas at the end of lists to make it easier to
@@ -7,6 +7,7 @@ gtk3-engines-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
       the binary.
     - Update Vcs-Bzr, Vcs-Browser and add a notice to uploaders.
     - Add gnome-common to Build-Depends.
+    - Renamed source package to unico to match the project name.
   * debian/rules:
     - Override dh_autoreconf to call autogen.sh and not run configure.
 
