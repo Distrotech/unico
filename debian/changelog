@@ -1,5 +1,6 @@
-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
+unico (1.0.3-0ubuntu2) UNRELEASED; urgency=low
 
+  [ Mathieu Trudel-Lapierre ]
   * debian/control:
     - Update to use trailing commas at the end of lists to make it easier to
       add items to Build-Depends and Depends.
@@ -11,7 +12,10 @@ unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
   * debian/rules:
     - Override dh_autoreconf to call autogen.sh and not run configure.
 
- -- Mathieu Trudel-Lapierre <mathieu-tl@ubuntu.com>  Thu, 06 Dec 2012 17:33:25 -0500
+  [ Didier Roche ]
+  * Automatic snapshot from revision 140 (bootstrap)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 11 Dec 2012 14:35:47 +0100
 
 gtk3-engines-unico (1.0.2+r139-0ubuntu3) raring; urgency=low
 
