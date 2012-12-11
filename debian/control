@@ -1,12 +1,12 @@
 Source: unico
 Section: x11
 Priority: optional
-Maintainer: Ken VanDine <ken.vandine@ubuntu.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
                autotools-dev,
                gnome-common,
                dh-autoreconf,
-               libgtk-3-dev (>= 3.1.14),
+               libgtk-3-dev (>= 3.5.2),
                libglib2.0-dev (>= 2.26.0),
                libcairo2-dev (>= 1.10),
 Standards-Version: 3.9.3
