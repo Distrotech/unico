@@ -4,8 +4,8 @@ Upstream-Contact: Andrea Cimitan <andrea.cimitan@canonical.com>
 Source: https://launchpad.net/unico
 
 Files: *
-Copyright: 2011 Canonical Ltd
-License: LGPL-2.1+
+Copyright: 2011-2012 Canonical Ltd
+License: LGPL-2.1
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either

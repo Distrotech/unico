@@ -14,6 +14,7 @@ unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
 
   [ Didier Roche ]
   * Automatic snapshot from revision 140 (bootstrap)
+  * Fix licensing
 
  -- Didier Roche <didrocks@ubuntu.com>  Tue, 11 Dec 2012 14:35:47 +0100
 
