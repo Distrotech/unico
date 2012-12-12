@@ -1,4 +1,4 @@
-unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
+unico (1.0.3daily12.12.12-0ubuntu1) raring; urgency=low
 
   [ Mathieu Trudel-Lapierre ]
   * debian/control:
@@ -17,7 +17,10 @@ unico (1.0.3-0ubuntu1) UNRELEASED; urgency=low
   * Fix licensing
   * Bump build-deps to match configure.ac
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 11 Dec 2012 14:35:47 +0100
+  [ Automatic PS uploader ]
+  * Automatic snapshot from revision 145
+
+ -- Automatic PS uploader <ps-jenkins@lists.canonical.com>  Wed, 12 Dec 2012 00:01:01 +0000
 
 gtk3-engines-unico (1.0.2+r139-0ubuntu3) raring; urgency=low
 
