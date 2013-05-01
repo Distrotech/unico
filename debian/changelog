@@ -1,3 +1,11 @@
+unico (1.0.3daily12.12.12-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/control, debian/rules:
+    - Modifications related to compliance with our packaging standards
+  * Remove debian/watch
+
+ -- Łukasz 'sil2100' Zemczak <lukasz.zemczak@canonical.com>  Wed, 01 May 2013 18:47:43 +0200
+
 unico (1.0.3daily12.12.12-0ubuntu1) raring; urgency=low
 
   [ Mathieu Trudel-Lapierre ]
