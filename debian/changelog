@@ -1,3 +1,9 @@
+unico (1.0.3daily13.05.30-0ubuntu1) saucy; urgency=low
+
+  * Automatic snapshot from revision 149
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 30 May 2013 00:24:13 +0000
+
 unico (1.0.3daily13.05.29ubuntu.unity.next-0ubuntu1) saucy; urgency=low
 
   * Automatic snapshot from revision 148 (ubuntu-unity/next)
