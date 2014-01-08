@@ -183,11 +183,17 @@ unico_draw_focus (DRAW_ARGS)
   if (line_width < 1)
     return;
 
+  /* Use the outline attributes for the focus properties to avoid using
+   * custom attributes. Outlines don't have a fill, so hardcode the fill
+   * color to be the same color as the border, but with 20% of its alpha.
+   */
   gtk_theming_engine_get (engine, state,
-                          "-unico-focus-border-color", &border_color,
-                          "-unico-focus-border-radius", &radius,
-                          "-unico-focus-fill-color", &fill_color,
+                          "outline-color", &border_color,
+                          "outline-offset", &radius,
                           NULL);
+
+  fill_color = gdk_rgba_copy (border_color);
+  fill_color->alpha = border_color->alpha * 0.2;
 
   x += focus_pad;
   y += focus_pad;
