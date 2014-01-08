@@ -116,24 +116,6 @@ unico_engine_class_init (UnicoEngineClass *klass)
                                                             "Arrow texture",
                                                             "Arrow texture",
                                                             CAIRO_GOBJECT_TYPE_PATTERN, 0));
-
-  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_boxed ("focus-border-color",
-                                                            "Focus border color",
-                                                            "Focus border color",
-                                                            GDK_TYPE_RGBA, 0));
-
-  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_int ("focus-border-radius",
-                                                          "Focus border radius",
-                                                          "Focus border radius",
-                                                          0, G_MAXINT, 0, 0));
-
-  gtk_theming_engine_register_property (UNICO_NAMESPACE, NULL,
-                                        g_param_spec_boxed ("focus-fill-color",
-                                                            "Focus fill color",
-                                                            "Focus fill color",
-                                                            GDK_TYPE_RGBA, 0));
 }
 
 static void
