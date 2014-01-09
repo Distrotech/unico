@@ -1,3 +1,19 @@
+unico (1.0.3+14.04.20140109-0ubuntu1) trusty; urgency=low
+
+  [ Lars Uebernickel ]
+  * Use outline attributes for focus to avoid custom attributes Custom
+    attributes are deprecated, slow, and are causing problems with gtk
+    3.10. Adwaita is using the same hack for some time now [1]. This
+    patch is a bit more hacky in that it hard codes the a fill color.
+    [1] https://git.gnome.org/browse/gnome-themes-
+    standard/commit/?id=6e641cf46cc70ce770482b3fc331b1fa3cd7af2b. (LP:
+    #1018718)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 151
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 09 Jan 2014 07:10:33 +0000
+
 unico (1.0.3daily13.05.30-0ubuntu1) saucy; urgency=low
 
   * Automatic snapshot from revision 149
